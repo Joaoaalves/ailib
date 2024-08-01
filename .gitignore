@@ -1,0 +1,39 @@
+# Ignore arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignore pastas de compilação do Tauri
+# /app/src-tauri/target/
+# /app/src-tauri/tauri-build
+
+# Ignore pastas e arquivos gerados pela build
+# /app/dist/
+# /app/node_modules/
+# /app/src-tauri/Cargo.lock
+# /app/src-tauri/Cargo.toml
+
+*venv/
+*__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+/api/files/*
+
+qdrant_storage
+
+# Ignore arquivos de logs e temporários
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.backup
+*.tmp
+*.temp
+*.old
+
+# Ignore arquivos de ambiente do editor de texto
+.vscode/
+.idea/
+*.iml
