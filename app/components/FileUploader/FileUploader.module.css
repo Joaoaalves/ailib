@@ -1,0 +1,37 @@
+/* FileUploader.module.css */
+
+/* Define a animação de piscar */
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+.processing {
+background-color: gray;
+cursor: not-allowed;
+opacity: 0.7;
+animation: blink 1s infinite; /* Aplica a animação de piscar */
+transition: opacity 0.3s ease; /* Transição suave ao mudar a opacidade */
+}
+
+.button {
+padding: 10px 20px;
+font-size: 16px;
+border: none;
+border-radius: 5px;
+color: white;
+background-color: #007bff;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+
+.button:hover {
+background-color: #0056b3;
+}
+
+.button:disabled {
+background-color: gray;
+cursor: not-allowed;
+}
+  

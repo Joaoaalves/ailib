@@ -6,19 +6,6 @@ services:
       - "6334:6334"
     volumes:
       - ./qdrant_storage:/qdrant/storage:z
-    container_name: vector_db
-
-  api:
-    build: ./api
-    container_name: api
     environment:
-      - QDRANT_URL=http://qdrant:6333
-
-  app:
-    build: ./app
-    depends_on:
-      api:
-        condition: service_completed_successfully
-    ports:
-      - "3000:3000"
-    container_name: app
+      - QDRANT__SERVICE__GRPC_PORT=6334
+    container_name: vector_db

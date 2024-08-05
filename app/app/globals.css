@@ -1,0 +1,11 @@
+:root{
+  --primary-background: #232323;
+  --secondary-background: #000;
+  --primary-border: #80808040;
+  --text-primary: #f0f0f0;
+}
+
+body{
+  padding: 0;
+  margin: 0;
+}
