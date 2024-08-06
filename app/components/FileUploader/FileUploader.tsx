@@ -1,12 +1,10 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { invoke } from '@tauri-apps/api/tauri';
-import { open } from '@tauri-apps/api/dialog';
+import { WebviewWindow } from '@tauri-apps/api/window';
 import styles from './FileUploader.module.css';
 import { listen } from '@tauri-apps/api/event';
 
 const FileUploader: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   useEffect(() => {
@@ -16,7 +14,7 @@ const FileUploader: React.FC = () => {
       });
 
       const unlistenComplete = await listen('embedding_complete', () => {
-        setIsProcessing(false); 
+        setIsProcessing(false);
         unlistenProgress();
         unlistenComplete();
       });
@@ -28,35 +26,34 @@ const FileUploader: React.FC = () => {
     };
 
     setupListeners();
-
   }, []);
 
-  const handleFileSelectAndSubmit = async () => {
-    const selected = await open({
-      multiple: false,
-      filters: [{ name: 'PDF', extensions: ['pdf'] }]
+  const openUploadWindow = () => {
+    const uploadWindow = new WebviewWindow('upload', {
+      url: '/upload',
+      title: 'Upload PDF',
+      width: 400,
+      height: 300,
+      resizable: false,
     });
 
-    if (selected && typeof selected === 'string') {
-      setFile(new File([], selected));
-      setIsProcessing(true);
+    uploadWindow.once('tauri://created', () => {
+      console.log('Upload window created');
+    });
 
-      try {
-        await invoke('process_pdf', { pdfPath: selected });
-      } catch (error) {
-        console.error(`Erro: ${error}`);
-      }
-    }
+    uploadWindow.once('tauri://error', (e) => {
+      console.error('Error creating upload window:', e);
+    });
   };
 
   return (
     <div>
       <button
-        onClick={handleFileSelectAndSubmit}
+        onClick={openUploadWindow}
         className={`${styles.button} ${isProcessing ? styles.processing : ''}`}
         disabled={isProcessing}
       >
-        {isProcessing ? 'Processando...' : 'Selecionar e Processar PDF'}
+        {isProcessing ? 'Processing...' : 'Upload PDF'}
       </button>
     </div>
   );

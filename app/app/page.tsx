@@ -1,3 +1,4 @@
+import ApiKeyHandler from "@/components/ApiKeyHandler/ApiKeyHandler";
 import styles from "./page.module.css";
 
 import Sidepanel from "@/components/Sidepanel/Sidepanel";
@@ -8,7 +9,8 @@ export default function Home() {
     <main className={styles.main}>
       <TopBar />
       <Sidepanel />
-      <div className={styles.content}></div>
+      <div className={styles.content}>
+      </div>
     </main>
   );
 }

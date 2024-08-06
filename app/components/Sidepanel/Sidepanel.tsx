@@ -1,7 +1,7 @@
 "use client"
-import FileUploader from "@/components/FileUploader/FileUploader"
 
 import styles from "./Sidepanel.module.css"
+import FileUploader from "@/components/FileUploader/FileUploader"
 
 export default function Sidepanel(){
 

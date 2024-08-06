@@ -4,40 +4,57 @@ use tauri::{command, Builder};
 use reqwest;
 use serde_json::json;
 use pdf_extract::extract_text;
-use std::env;
 use qdrant_client::qdrant::{
     CreateCollectionBuilder, PointStruct, UpsertPointsBuilder, VectorParamsBuilder, Distance, Value as QdrantValue
 };
 use qdrant_client::{Qdrant, QdrantError, Payload};
 use std::collections::HashMap;
+use std::fs;
+use std::io::{self, Write};
 
-fn split_text(text: &str, max_length: usize) -> Vec<String> {
+const CONFIG_FILE_PATH: &str = "api_key.config";
+
+fn save_api_key(api_key: &str) -> io::Result<()> {
+    let mut file = fs::File::create(CONFIG_FILE_PATH)?;
+    file.write_all(api_key.as_bytes())?;
+    Ok(())
+}
+
+fn load_api_key() -> io::Result<String> {
+    fs::read_to_string(CONFIG_FILE_PATH)
+}
+
+fn split_text(text: &str, max_length: usize) -> Vec<(String, usize)> {
     text.chars()
         .collect::<Vec<char>>()
         .chunks(max_length)
-        .map(|chunk| chunk.iter().collect())
+        .enumerate()
+        .map(|(i, chunk)| (chunk.iter().collect(), i * max_length))
         .collect()
 }
 
 #[command]
-async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), String> {
+async fn set_api_key(api_key: String) -> Result<(), String> {
+    save_api_key(&api_key).map_err(|e| e.to_string())
+}
+
+#[command]
+async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String) -> Result<(), String> {
     let text = extract_text(&pdf_path).map_err(|e| e.to_string())?;
-    
+
     let chunks = split_text(&text, 2500);
     let total_chunks = chunks.len();
 
     let client = reqwest::Client::new();
-    let api_key = env::var("OPENAI_API_KEY").expect("OPENAI_API_KEY not set");
-    
+    let api_key = load_api_key().map_err(|e| e.to_string())?;
 
     let qdrant_client = Qdrant::from_url("http://localhost:6334").build().map_err(|e| e.to_string())?;
     let collection_name = "pdfs";
-    
+
     let collections_response = qdrant_client.list_collections().await.map_err(|e| e.to_string())?;
     let existing_collections: Vec<String> = collections_response.collections.into_iter()
         .map(|c| c.name)
         .collect();
-    
 
     if !existing_collections.contains(&collection_name.to_string()) {
         qdrant_client
@@ -49,9 +66,8 @@ async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), Stri
             .map_err(|e| e.to_string())?;
     }
 
-    for (index, chunk) in chunks.into_iter().enumerate() {
-
-        
+    for (index, (chunk, offset)) in chunks.into_iter().enumerate() {
+        println!("Embedding {}° chunk", index);
         let response = client.post("https://api.openai.com/v1/embeddings")
             .header("Authorization", format!("Bearer {}", api_key))
             .json(&json!({
@@ -61,9 +77,9 @@ async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), Stri
             .send()
             .await
             .map_err(|e| e.to_string())?;
-        
+
         let response_json: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
-        
+
         let embedding = response_json["data"][0]["embedding"]
             .as_array()
             .unwrap()
@@ -71,11 +87,12 @@ async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), Stri
             .map(|v| v.as_f64().unwrap() as f32)
             .collect::<Vec<f32>>();
 
-
         let mut payload = HashMap::new();
-        payload.insert("chunk_number".to_string(), QdrantValue::from((index + 1) as i64)); // Convertido para i64
+        payload.insert("chunk_number".to_string(), QdrantValue::from((index + 1) as i64));
         payload.insert("content".to_string(), QdrantValue::from(chunk.clone()));
-        
+        payload.insert("book_name".to_string(), QdrantValue::from(book_name.clone()));
+        payload.insert("offset".to_string(), QdrantValue::from(offset as i64));
+
         let point = PointStruct::new(
             index as u64,
             embedding.clone(),
@@ -86,7 +103,6 @@ async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), Stri
             .upsert_points(UpsertPointsBuilder::new(collection_name, vec![point]))
             .await
             .map_err(|e| e.to_string())?;
-        
 
         window.emit("embedding_progress", json!({
             "chunk": index + 1,
@@ -102,7 +118,7 @@ async fn process_pdf(window: tauri::Window, pdf_path: String) -> Result<(), Stri
 
 fn main() -> Result<(), QdrantError> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())
