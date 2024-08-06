@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   qdrant:
     image: qdrant/qdrant:latest
@@ -9,3 +11,16 @@ services:
     environment:
       - QDRANT__SERVICE__GRPC_PORT=6334
     container_name: vector_db
+
+  tauri_app:
+    build:
+      context: ./app
+    ports:
+      - "3000:3000"
+      - "1430:1430"
+    environment:
+      - DISPLAY=$DISPLAY
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    container_name: tauri_app
+
