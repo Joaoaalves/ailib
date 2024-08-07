@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { WebviewWindow } from '@tauri-apps/api/window';
-import styles from './FileUploader.module.css';
 import { listen } from '@tauri-apps/api/event';
+import Button from '../FormComponents/Button';
 
 const FileUploader: React.FC = () => {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -36,26 +36,15 @@ const FileUploader: React.FC = () => {
       height: 300,
       resizable: false,
     });
-
-    uploadWindow.once('tauri://created', () => {
-      console.log('Upload window created');
-    });
-
-    uploadWindow.once('tauri://error', (e) => {
-      console.error('Error creating upload window:', e);
-    });
   };
 
   return (
-    <div>
-      <button
+      <Button
         onClick={openUploadWindow}
-        className={`${styles.button} ${isProcessing ? styles.processing : ''}`}
         disabled={isProcessing}
       >
         {isProcessing ? 'Processing...' : 'Upload PDF'}
-      </button>
-    </div>
+      </Button>
   );
 };
 

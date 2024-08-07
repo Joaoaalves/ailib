@@ -24,6 +24,8 @@ qdrant-client = "1.10.1"
 anyhow = "1.0.86"
 tonic = "0.12.1"
 tokio = { version = "1.29.1", features = ["rt-multi-thread"] }
+mysql = "20.1"
+dotenv = "0.15"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

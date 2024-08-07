@@ -6,6 +6,9 @@ import {  WebviewWindow } from '@tauri-apps/api/window';
 import { readBinaryFile } from '@tauri-apps/api/fs';
 import { UnlistenFn } from '@tauri-apps/api/event';
 import styles from './UploadForm.module.css';
+import Input from '../FormComponents/Input';
+import Button from '../FormComponents/Button';
+import Form from '../FormComponents/Form';
 
 const UploadForm: React.FC = () => {
   const [appWindow, setAppWindow] = useState<WebviewWindow>()
@@ -90,7 +93,7 @@ const UploadForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={styles.form}>
+    <Form onSubmit={handleSubmit}>
       <div
         onDragOver={handleDragOver}
         onClick={handleFileSelect}
@@ -98,18 +101,17 @@ const UploadForm: React.FC = () => {
       >
         {filePath ? filePath.split('\\').pop()?.split('/').pop() : 'Drop PDF here or click to select'}
       </div>
-      <input
+       <Input         
         type="text"
         value={bookName}
         onChange={(e) => setBookName(e.target.value)}
         placeholder="Book Name"
-        required
-        className={styles.input}
-      />
-      <button type="submit" disabled={isSubmitting} className={styles.button}>
-        {isSubmitting ? 'Submitting...' : 'Submit'}
-      </button>
-    </form>
+        required />
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Submitting...' : 'Submit 2'}
+      </Button>
+
+    </Form>
   );
 };
 

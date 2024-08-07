@@ -13,6 +13,8 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::Path;
 
+mod db;
+
 const CONFIG_FILE_PATH: &str = "api_key.config";
 
 fn save_api_key(api_key: &str) -> io::Result<()> {
@@ -135,9 +137,15 @@ async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String)
     Ok(())
 }
 
+#[command]
+async fn create_collection(collection_name: String) -> Result<(), String> {
+    db::create_collection(&collection_name)
+        .map_err(|e| e.to_string())
+}
+
 fn main() -> Result<(), QdrantError> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, create_collection])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())

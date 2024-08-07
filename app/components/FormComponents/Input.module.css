@@ -1,0 +1,9 @@
+.input{
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 2px solid var(--primary-border);
+    background-color: transparent;
+    color: white;
+  }
