@@ -8,6 +8,7 @@ Thumbs.db
 *.pyo
 *.pyd
 app/src-tauri/target/
+app/src-tauri/storage/*
 *.next
 
 /api/files/*
