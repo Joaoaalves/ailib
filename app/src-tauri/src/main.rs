@@ -11,6 +11,7 @@ use qdrant_client::{Qdrant, QdrantError, Payload};
 use std::collections::HashMap;
 use std::fs;
 use std::io::{self, Write};
+use std::path::Path;
 
 const CONFIG_FILE_PATH: &str = "api_key.config";
 
@@ -33,6 +34,21 @@ fn split_text(text: &str, max_length: usize) -> Vec<(String, usize)> {
         .collect()
 }
 
+fn save_pdf_to_storage(pdf_path: &str, book_name: &str) -> io::Result<String> {
+    let storage_dir = Path::new("storage");
+    if !storage_dir.exists() {
+        fs::create_dir(storage_dir)?;
+    }
+
+    let filename = Path::new(pdf_path)
+        .file_name()
+        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Invalid PDF path"))?;
+    let new_path = storage_dir.join(format!("{}_{}", book_name, filename.to_string_lossy()));
+    fs::copy(pdf_path, &new_path)?;
+
+    Ok(new_path.to_string_lossy().to_string())
+}
+
 #[command]
 async fn set_api_key(api_key: String) -> Result<(), String> {
     save_api_key(&api_key).map_err(|e| e.to_string())
@@ -40,7 +56,10 @@ async fn set_api_key(api_key: String) -> Result<(), String> {
 
 #[command]
 async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String) -> Result<(), String> {
-    let text = extract_text(&pdf_path).map_err(|e| e.to_string())?;
+    let saved_pdf_path = save_pdf_to_storage(&pdf_path, &book_name)
+        .map_err(|e| e.to_string())?;
+    
+    let text = extract_text(&saved_pdf_path).map_err(|e| e.to_string())?;
 
     let chunks = split_text(&text, 2500);
     let total_chunks = chunks.len();
