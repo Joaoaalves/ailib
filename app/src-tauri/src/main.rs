@@ -13,8 +13,11 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::Path;
 
-
 mod db;
+use db::collection::CollectionRepository;
+use db::document::DocumentRepository;
+use db::services::document_collection::DocumentCollectionService;
+
 mod models;
 use models::collection::Collection;
 
@@ -90,6 +93,10 @@ async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String,
             .map_err(|e| e.to_string())?;
     }
 
+    let document_repo = DocumentRepository::new().map_err(|e| e.to_string())?;
+    let document_id = document_repo.insert_document(&book_name, &saved_pdf_path).map_err(|e| e.to_string())?;
+
+
     for (index, (chunk, offset)) in chunks.into_iter().enumerate() {
         println!("Embedding {}° chunk", index);
         let response = client.post("https://api.openai.com/v1/embeddings")
@@ -128,6 +135,11 @@ async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String,
             .await
             .map_err(|e| e.to_string())?;
 
+        // Add document to collection
+        let doc_col_service = DocumentCollectionService::new().map_err(|e| e.to_string())?;
+        doc_col_service.add_document_to_collection(document_id, collection)
+
+        .map_err(|e| e.to_string())?;
         window.emit("embedding_progress", json!({
             "chunk": index + 1,
             "total": total_chunks,
@@ -142,19 +154,29 @@ async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String,
 
 #[command]
 async fn create_collection(collection_name: String) -> Result<(), String> {
-    db::create_collection(&collection_name)
-        .map_err(|e| e.to_string())
+    let repo = match CollectionRepository::new() {
+        Ok(repo) => repo,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    repo.insert_collection(&collection_name).map_err(|e| e.to_string())?;
+    Ok(())
 }
 
 #[command]
 async fn get_collections() -> Result<Vec<Collection>, String> {
-    let db = db::DbConnection::new().map_err(|e| e.to_string())?;
-    db.get_collections().map_err(|e| e.to_string())
+    let repo = match CollectionRepository::new() {
+        Ok(repo) => repo,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    let collections = repo.get_collections().map_err(|e| e.to_string())?;
+    Ok(collections)
 }
 
 fn main() -> Result<(), QdrantError> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, create_collection, get_collections])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())

@@ -1,3 +1,4 @@
+pub mod connection;
 pub mod collection;
 pub mod document;
-pub mod document_collection;
+pub mod services;

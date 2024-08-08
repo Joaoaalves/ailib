@@ -1,21 +1,22 @@
 use mysql::prelude::FromRow;
-use mysql::{Row, from_row};
 use serde::{Serialize, Deserialize};
+use mysql::{Row, from_row};
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Collection {
+pub struct Document{
     pub id: u64,
     pub name: String,
+    pub path: String,
 }
 
-impl FromRow for Collection {
+impl FromRow for Document {
     fn from_row(row: Row) -> Self {
-        let (id, name) = from_row(row);
-        Collection { id, name }
+        let (id, name, path) = from_row(row);
+        Document { id, name, path }
     }
 
     fn from_row_opt(row: Row) -> std::result::Result<Self, mysql::FromRowError> {
-        let (id, name) = from_row(row);
-        Ok(Collection { id, name })
+        let (id, name, path) = from_row(row);
+        Ok(Document { id, name, path })
     }
 }
