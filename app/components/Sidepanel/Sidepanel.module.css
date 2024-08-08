@@ -1,7 +1,7 @@
 .sidepanel{
-    background-color: #232323;
+    background-color: rgb(var(--primary-background));
     grid-row: 2;
-    border: solid 2px var(--primary-border);
+    border: solid 2px rgb(var(--primary-border));
     border-top: none;
     display: grid;
     grid-template-columns: 1fr;

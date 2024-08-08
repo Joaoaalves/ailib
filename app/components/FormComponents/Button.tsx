@@ -7,12 +7,15 @@ interface ButtonProps{
     type?: "submit" | "button",
     onClick?: MouseEventHandler<HTMLButtonElement>,
     disabled?: boolean,
-    children?: ReactNode
+    children?: ReactNode,
+    variant?: "normal" | "outline"
 }
 
-export default function Button({type="submit", onClick, disabled=false, children}: ButtonProps){
+export default function Button({type="submit", onClick, disabled=false, variant="normal", children}: ButtonProps){
     return (
-        <button type={type} onClick={onClick} disabled={disabled} className={styles.button}>
+        <button type={type} onClick={onClick} disabled={disabled} className={variant === "normal" ? `${styles.button} ${styles.filled}`
+            : `${styles.button} ${styles.outline}`
+        }>
             {children}
         </button>
     )

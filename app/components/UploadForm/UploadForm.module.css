@@ -3,7 +3,7 @@
   width: 100%;
 
   border-radius: 16px;
-  border: 2px dashed var(--primary-border);
+  border: 2px dashed rgb(var(--primary-border));
   
   cursor: pointer;
 
@@ -13,14 +13,14 @@
 }
 
 .dropzone:hover{
-  background-color: var(--primary-background)
+  background-color: rgb(var(--primary-background));
 }
 
 .dropzone.dragover {
-  border-color: var(--primary);
-  background-color: var(--primary-background);
+  border-color: rgb(var(--primary));
+  background-color: rgb(var(--primary-background));
 }
 
 .dropzone:hover {
-  background-color: var(--primary-background);
+  background-color: rgb(var(--primary-background));
 }

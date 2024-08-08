@@ -1,9 +1,9 @@
 :root{
-  --primary-background: #232323;
-  --secondary-background: #000;
-  --primary-border: #80808040;
-  --text-primary: #f0f0f0;
-  --primary: #9a36a1;
+  --primary-background: 35, 35, 35;
+  --secondary-background: 0, 0, 0;
+  --primary-border: 60, 60, 60;
+  --text-primary: 240, 240, 240;
+  --primary: 154, 54, 161;
 }
 
 body{

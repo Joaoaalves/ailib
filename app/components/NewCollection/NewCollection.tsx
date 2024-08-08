@@ -18,6 +18,7 @@ const NewCollection: React.FC = () => {
   return (
       <Button
         onClick={openNewCollection}
+        variant='outline'
       >
         Create Collection
       </Button>

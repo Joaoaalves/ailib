@@ -1,5 +1,5 @@
 .topbar{
-    background-color: var(--primary-background);
+    background-color: rgb(var(--primary-background));
 
     grid-row: 1;
     grid-column: 1 / span 2;
@@ -9,10 +9,10 @@
     align-items: center;
     place-items: center;
 
-    border: 2px solid var(--primary-border);
+    border: 2px solid rgb(var(--primary-border));
 }
 .title{
-    color: var(--text-primary);
+    color: rgb(var(--text-primary));
     font-weight: bold;
     font-size: large;
 }
