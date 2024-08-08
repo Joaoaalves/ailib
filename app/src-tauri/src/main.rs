@@ -1,17 +1,6 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use tauri::{command, Builder};
-use reqwest;
-use serde_json::json;
-use pdf_extract::extract_text;
-use qdrant_client::qdrant::{
-    CreateCollectionBuilder, PointStruct, UpsertPointsBuilder, VectorParamsBuilder, Distance, Value as QdrantValue
-};
-use qdrant_client::{Qdrant, QdrantError, Payload};
-use std::collections::HashMap;
-use std::fs;
-use std::io::{self, Write};
-use std::path::Path;
 
 mod db;
 use db::collection::CollectionRepository;
@@ -21,41 +10,10 @@ use db::services::document_collection::DocumentCollectionService;
 mod models;
 use models::collection::Collection;
 
-const CONFIG_FILE_PATH: &str = "api_key.config";
-
-fn save_api_key(api_key: &str) -> io::Result<()> {
-    let mut file = fs::File::create(CONFIG_FILE_PATH)?;
-    file.write_all(api_key.as_bytes())?;
-    Ok(())
-}
-
-fn load_api_key() -> io::Result<String> {
-    fs::read_to_string(CONFIG_FILE_PATH)
-}
-
-fn split_text(text: &str, max_length: usize) -> Vec<(String, usize)> {
-    text.chars()
-        .collect::<Vec<char>>()
-        .chunks(max_length)
-        .enumerate()
-        .map(|(i, chunk)| (chunk.iter().collect(), i * max_length))
-        .collect()
-}
-
-fn save_pdf_to_storage(pdf_path: &str, book_name: &str) -> io::Result<String> {
-    let storage_dir = Path::new("storage");
-    if !storage_dir.exists() {
-        fs::create_dir(storage_dir)?;
-    }
-
-    let filename = Path::new(pdf_path)
-        .file_name()
-        .ok_or_else(|| io::Error::new(io::ErrorKind::Other, "Invalid PDF path"))?;
-    let new_path = storage_dir.join(format!("{}_{}", book_name, filename.to_string_lossy()));
-    fs::copy(pdf_path, &new_path)?;
-
-    Ok(new_path.to_string_lossy().to_string())
-}
+mod utils;
+use utils::openai::{get_embeddings, load_api_key, save_api_key};
+use utils::file::{split_text, save_pdf_to_storage};
+use utils::qdrant::{ensure_collection_exists, upsert_embedding};
 
 #[command]
 async fn set_api_key(api_key: String) -> Result<(), String> {
@@ -67,83 +25,55 @@ async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String,
     let saved_pdf_path = save_pdf_to_storage(&pdf_path, &book_name)
         .map_err(|e| e.to_string())?;
     
-    let text = extract_text(&saved_pdf_path).map_err(|e| e.to_string())?;
+    let text = pdf_extract::extract_text(&saved_pdf_path).map_err(|e| e.to_string())?;
 
+    // Split text in chunks
     let chunks = split_text(&text, 2500);
     let total_chunks = chunks.len();
 
-    let client = reqwest::Client::new();
+    // Get Api Key
     let api_key = load_api_key().map_err(|e| e.to_string())?;
 
-    let qdrant_client = Qdrant::from_url("http://localhost:6334").build().map_err(|e| e.to_string())?;
-    let collection_name = "pdfs";
+    // Get Qdrant Client
+    let qdrant_client = qdrant_client::Qdrant::from_url("http://localhost:6334")
+        .build()
+        .map_err(|e| e.to_string())?;
 
-    let collections_response = qdrant_client.list_collections().await.map_err(|e| e.to_string())?;
-    let existing_collections: Vec<String> = collections_response.collections.into_iter()
-        .map(|c| c.name)
-        .collect();
+    // Ensure the collection exists
+    ensure_collection_exists(&qdrant_client, &collection.to_string()).await.map_err(|e| e.to_string())?;
 
-    if !existing_collections.contains(&collection_name.to_string()) {
-        qdrant_client
-            .create_collection(
-                CreateCollectionBuilder::new(collection_name)
-                    .vectors_config(VectorParamsBuilder::new(1536, Distance::Cosine))
-            )
-            .await
-            .map_err(|e| e.to_string())?;
-    }
-
+    // Save the document on mysql
     let document_repo = DocumentRepository::new().map_err(|e| e.to_string())?;
     let document_id = document_repo.insert_document(&book_name, &saved_pdf_path).map_err(|e| e.to_string())?;
 
-
+    // Make the embedding on openai and insert into QDrant
     for (index, (chunk, offset)) in chunks.into_iter().enumerate() {
         println!("Embedding {}° chunk", index);
-        let response = client.post("https://api.openai.com/v1/embeddings")
-            .header("Authorization", format!("Bearer {}", api_key))
-            .json(&json!({
-                "input": chunk,
-                "model": "text-embedding-3-small"
-            }))
-            .send()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        let response_json: serde_json::Value = response.json().await.map_err(|e| e.to_string())?;
-
-        let embedding = response_json["data"][0]["embedding"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|v| v.as_f64().unwrap() as f32)
-            .collect::<Vec<f32>>();
-
-        let mut payload = HashMap::new();
-        payload.insert("chunk_number".to_string(), QdrantValue::from((index + 1) as i64));
-        payload.insert("content".to_string(), QdrantValue::from(chunk.clone()));
-        payload.insert("book_name".to_string(), QdrantValue::from(book_name.clone()));
-        payload.insert("offset".to_string(), QdrantValue::from(offset as i64));
-
-        let point = PointStruct::new(
+        let embedding = get_embeddings(&api_key, &chunk).await.map_err(|e| e.to_string())?;
+    
+        // Clone the embedding for the Qdrant upsert and for progress emission
+        let embedding_clone = embedding.clone();
+    
+        // Insert embedding into Qdrant
+        upsert_embedding(
+            &qdrant_client,
+            &collection.to_string(),
             index as u64,
             embedding.clone(),
-            Payload::from(payload)
-        );
-
-        qdrant_client
-            .upsert_points(UpsertPointsBuilder::new(collection_name, vec![point]))
-            .await
-            .map_err(|e| e.to_string())?;
-
+            chunk,
+            book_name.clone(),
+            offset
+        ).await.map_err(|e| e.to_string())?;
+    
         // Add document to collection
         let doc_col_service = DocumentCollectionService::new().map_err(|e| e.to_string())?;
         doc_col_service.add_document_to_collection(document_id, collection)
-
-        .map_err(|e| e.to_string())?;
-        window.emit("embedding_progress", json!({
+            .map_err(|e| e.to_string())?;
+    
+        window.emit("embedding_progress", serde_json::json!({
             "chunk": index + 1,
             "total": total_chunks,
-            "embedding": embedding
+            "embedding": embedding_clone // Use the cloned value here
         })).map_err(|e| e.to_string())?;
     }
 
@@ -173,8 +103,7 @@ async fn get_collections() -> Result<Vec<Collection>, String> {
     let collections = repo.get_collections().map_err(|e| e.to_string())?;
     Ok(collections)
 }
-
-fn main() -> Result<(), QdrantError> {
+fn main() -> Result<(), String> {
     Builder::default()
         .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection])
         .run(tauri::generate_context!())
