@@ -29,6 +29,7 @@ const UploadForm: React.FC = () => {
     try {
       const collections = await invoke<Collection[]>('get_collections');
       setCollections(collections);
+      setCollection(collections[0].id);
     } catch (error) {
       console.error(`Error fetching collections: ${error}`);
     }
