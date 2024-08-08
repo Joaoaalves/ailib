@@ -13,7 +13,10 @@ use std::fs;
 use std::io::{self, Write};
 use std::path::Path;
 
+
 mod db;
+mod models;
+use models::collection::Collection;
 
 const CONFIG_FILE_PATH: &str = "api_key.config";
 
@@ -57,7 +60,7 @@ async fn set_api_key(api_key: String) -> Result<(), String> {
 }
 
 #[command]
-async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String) -> Result<(), String> {
+async fn process_pdf(window: tauri::Window, pdf_path: String, book_name: String, collection: u64) -> Result<(), String> {
     let saved_pdf_path = save_pdf_to_storage(&pdf_path, &book_name)
         .map_err(|e| e.to_string())?;
     
@@ -143,9 +146,15 @@ async fn create_collection(collection_name: String) -> Result<(), String> {
         .map_err(|e| e.to_string())
 }
 
+#[command]
+async fn get_collections() -> Result<Vec<Collection>, String> {
+    let db = db::DbConnection::new().map_err(|e| e.to_string())?;
+    db.get_collections().map_err(|e| e.to_string())
+}
+
 fn main() -> Result<(), QdrantError> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, create_collection])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, create_collection, get_collections])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())

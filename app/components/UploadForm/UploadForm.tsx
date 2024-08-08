@@ -2,29 +2,42 @@
 import React, { useState, useEffect } from 'react';
 import { invoke } from '@tauri-apps/api/tauri';
 import { open } from '@tauri-apps/api/dialog';
-import {  WebviewWindow } from '@tauri-apps/api/window';
+import { WebviewWindow } from '@tauri-apps/api/window';
 import { readBinaryFile } from '@tauri-apps/api/fs';
 import { UnlistenFn } from '@tauri-apps/api/event';
 import styles from './UploadForm.module.css';
 import Input from '../FormComponents/Input';
 import Button from '../FormComponents/Button';
 import Form from '../FormComponents/Form';
+import type { Collection } from '@/types/collection';
+import { Select, SelectOption } from '../FormComponents/Select';
 
 const UploadForm: React.FC = () => {
-  const [appWindow, setAppWindow] = useState<WebviewWindow>()
+  const [appWindow, setAppWindow] = useState<WebviewWindow>();
   const [filePath, setFilePath] = useState<string>('');
   const [bookName, setBookName] = useState<string>('');
+  const [collection, setCollection] = useState<number | null>(null);
+  const [collections, setCollections] = useState<Collection[] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   async function setupAppWindow() {
-      const appWindow = (await import('@tauri-apps/api/window')).appWindow
-      setAppWindow(appWindow)
+    const appWindow = (await import('@tauri-apps/api/window')).appWindow;
+    setAppWindow(appWindow);
+  }
+
+  async function getCollections() {
+    try {
+      const collections = await invoke<Collection[]>('get_collections');
+      setCollections(collections);
+    } catch (error) {
+      console.error(`Error fetching collections: ${error}`);
+    }
   }
 
   useEffect(() => {
-      setupAppWindow()
-  }, [])
-
+    setupAppWindow();
+    getCollections();
+  }, []);
 
   useEffect(() => {
     if (filePath) {
@@ -37,7 +50,7 @@ const UploadForm: React.FC = () => {
     let unlistenFn: UnlistenFn;
 
     const setupListener = async () => {
-      if(appWindow)
+      if (appWindow) {
         unlistenFn = await appWindow.listen<string[]>('tauri://file-drop', (event) => {
           console.log('File drop event:', event);
           const paths = event.payload;
@@ -48,6 +61,7 @@ const UploadForm: React.FC = () => {
             }
           }
         });
+      }
     };
 
     setupListener();
@@ -81,10 +95,11 @@ const UploadForm: React.FC = () => {
       setIsSubmitting(true);
       try {
         const fileContent = await readBinaryFile(filePath);
-        invoke('process_pdf', { pdfPath: filePath, bookName, fileContent });
+        await invoke('process_pdf', { pdfPath: filePath, bookName, collection });
         
-        if(appWindow)
+        if (appWindow) {
           appWindow.close();
+        }
       } catch (error) {
         console.error(`Error: ${error}`);
         setIsSubmitting(false);
@@ -101,16 +116,22 @@ const UploadForm: React.FC = () => {
       >
         {filePath ? filePath.split('\\').pop()?.split('/').pop() : 'Drop PDF here or click to select'}
       </div>
-       <Input         
+      <Input         
         type="text"
         value={bookName}
         onChange={(e) => setBookName(e.target.value)}
         placeholder="Book Name"
         required />
+        <Select onChange={(e) => setCollection(Number(e.target.value))}>
+          {collections &&
+              collections.map((collection) => (
+                <SelectOption value={collection.id} key={collection.id}>{collection.name}</SelectOption>)
+              )
+            }
+        </Select>
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit 2'}
+        {isSubmitting ? 'Submitting...' : 'Submit'}
       </Button>
-
     </Form>
   );
 };

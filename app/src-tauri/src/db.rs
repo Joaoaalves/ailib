@@ -2,6 +2,7 @@ use mysql::*;
 use mysql::prelude::*;
 use std::error::Error;
 use std::env;
+use crate::models::collection::Collection;
 
 pub struct DbConnection {
     pool: Pool,
@@ -28,6 +29,22 @@ impl DbConnection {
             }
         )?;
         Ok(())
+    }
+
+    pub fn get_collections(&self) -> std::result::Result<Vec<Collection>, Box<dyn Error>> {
+        let mut conn = self.pool.get_conn()?;
+        let rows: Vec<Row> = conn.query("SELECT id, name FROM collections")?;
+        
+        let collections: Vec<Collection> = rows
+            .into_iter()
+            .map(|row| {
+                let id: u64 = row.get("id").unwrap_or_default();
+                let name: String = row.get("name").unwrap_or_default();
+                Collection { id, name }
+            })
+            .collect();
+
+        Ok(collections)
     }
 }
 
