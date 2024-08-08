@@ -70,6 +70,7 @@
       {
         "fullscreen": false,
         "height": 600,
+        "maximized": true,
         "resizable": true,
         "title": "AiLib",
         "width": 800

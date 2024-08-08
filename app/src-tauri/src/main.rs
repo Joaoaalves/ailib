@@ -9,6 +9,7 @@ use db::services::document_collection::DocumentCollectionService;
 
 mod models;
 use models::collection::Collection;
+use models::document::Document;
 
 mod utils;
 use utils::openai::{get_embeddings, load_api_key, save_api_key};
@@ -103,9 +104,21 @@ async fn get_collections() -> Result<Vec<Collection>, String> {
     let collections = repo.get_collections().map_err(|e| e.to_string())?;
     Ok(collections)
 }
+
+#[command]
+async fn get_documents() -> Result<Vec<Document>, String>{
+    let repo = match DocumentRepository::new(){
+        Ok(repo) => repo,
+        Err(e) => return Err(e.to_string()),
+    };
+
+    let documents = repo.get_documents().map_err(|e| e.to_string())?;
+    Ok(documents)
+}
+
 fn main() -> Result<(), String> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection, get_documents])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())

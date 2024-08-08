@@ -42,6 +42,7 @@ const FileUploader: React.FC = () => {
       <Button
         onClick={openUploadWindow}
         disabled={isProcessing}
+        variant='outline'
       >
         {isProcessing ? 'Processing...' : 'Upload PDF'}
       </Button>

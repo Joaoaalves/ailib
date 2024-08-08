@@ -7,4 +7,5 @@
     grid-template-columns: 1fr;
     grid-template-rows: 200px 1fr 200px;
     place-items: center;
+    padding: 0 48px;
 }
