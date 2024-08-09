@@ -1,0 +1,19 @@
+.Document{
+    border: solid 1px rgb(var(--primary-border));
+    padding: 8px;
+    border-radius: 8px;
+    width: 250px;
+    height: 350px;
+    text-align: center;
+    transition: all 0.5s;
+    cursor: pointer;
+}
+
+.Document:hover{
+    transform: scale(1.05);
+}
+
+.title{
+    font-size: 1.2em;
+    margin-top: 8px;
+}

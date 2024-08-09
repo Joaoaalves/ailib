@@ -1,4 +1,4 @@
-export interface Collection{
+export interface ICollection{
     id: number,
     name: string
 }

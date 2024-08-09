@@ -3,11 +3,11 @@ use std::error::Error;
 use crate::db::connection::DbConnection;
 use crate::models::document::Document;
 
-pub struct DocumentRepository{
+pub struct DocumentRepository {
     db: DbConnection,
 }
 
-impl DocumentRepository{
+impl DocumentRepository {
     pub fn new() -> std::result::Result<Self, Box<dyn Error>> {
         let db = DbConnection::new()?;
         Ok(DocumentRepository { db })
@@ -22,13 +22,13 @@ impl DocumentRepository{
         Ok(id)
     }
 
-    pub fn get_documents(&self) -> std::result::Result<Vec<Document>,Box<dyn Error>> {
+    pub fn get_documents(&self) -> std::result::Result<Vec<Document>, Box<dyn Error>> {
         let query = "SELECT id, name, path FROM documents";
         let documents = self.db.get::<Document>(query)?;
         Ok(documents)
     }
 
-    pub fn update_document(&self, id: u64, new_name: &str, new_path: &str) -> std::result::Result<(), Box<dyn Error>>{
+    pub fn update_document(&self, id: u64, new_name: &str, new_path: &str) -> std::result::Result<(), Box<dyn Error>> {
         let query = "UPDATE documents SET name = :name, path = :path WHERE id = :id";
         self.db.update(query, params! {
             "id" => id,
@@ -38,11 +38,17 @@ impl DocumentRepository{
         Ok(())
     }
 
-    pub fn delete_document(&self, id:u64) -> std::result::Result<(), Box<dyn Error>>{
+    pub fn delete_document(&self, id: u64) -> std::result::Result<(), Box<dyn Error>> {
         let query = "DELETE FROM documents WHERE id = :id";
         self.db.delete(query, params! {
             "id" => id
         })?;
         Ok(())
+    }
+
+    pub fn get_document_by_id(&self, id: u64) -> std::result::Result<Document, Box<dyn Error>> {
+        let query = "SELECT id, name, path FROM documents WHERE id = :id";
+        let documents = self.db.get_with_params::<Document>(query, params! { "id" => id })?;
+        documents.into_iter().next().ok_or_else(|| "Document not found".into())
     }
 }

@@ -35,6 +35,15 @@ impl DbConnection {
         Ok(result)
     }
 
+    pub fn get_with_params<T>(&self, query: &str, params: Params) -> std::result::Result<Vec<T>, Box<dyn Error>>
+    where
+        T: FromRow,
+    {
+        let mut conn = self.pool.get_conn()?;
+        let result: Vec<T> = conn.exec(query, params)?;
+        Ok(result)
+    }
+
     pub fn update(&self, query: &str, params: Params) -> std::result::Result<(), Box<dyn Error>> {
         let mut conn = self.pool.get_conn()?;
         conn.exec_drop(query, params)?;

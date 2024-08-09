@@ -9,7 +9,7 @@ import styles from './UploadForm.module.css';
 import Input from '../FormComponents/Input';
 import Button from '../FormComponents/Button';
 import Form from '../FormComponents/Form';
-import type { Collection } from '@/types/collection';
+import type { ICollection } from '@/types/collection';
 import { Select, SelectOption } from '../FormComponents/Select';
 
 const UploadForm: React.FC = () => {
@@ -17,7 +17,7 @@ const UploadForm: React.FC = () => {
   const [filePath, setFilePath] = useState<string>('');
   const [bookName, setBookName] = useState<string>('');
   const [collection, setCollection] = useState<number | null>(null);
-  const [collections, setCollections] = useState<Collection[] | null>(null);
+  const [collections, setCollections] = useState<ICollection[] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   async function setupAppWindow() {
@@ -27,7 +27,7 @@ const UploadForm: React.FC = () => {
 
   async function getCollections() {
     try {
-      const collections = await invoke<Collection[]>('get_collections');
+      const collections = await invoke<ICollection[]>('get_collections');
       setCollections(collections);
       setCollection(collections[0].id);
     } catch (error) {

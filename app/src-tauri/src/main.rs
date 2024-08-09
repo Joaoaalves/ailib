@@ -16,6 +16,8 @@ use utils::openai::{get_embeddings, load_api_key, save_api_key};
 use utils::file::{split_text, save_pdf_to_storage};
 use utils::qdrant::{ensure_collection_exists, upsert_embedding};
 
+use std::env;
+
 #[command]
 async fn set_api_key(api_key: String) -> Result<(), String> {
     save_api_key(&api_key).map_err(|e| e.to_string())
@@ -116,9 +118,17 @@ async fn get_documents() -> Result<Vec<Document>, String>{
     Ok(documents)
 }
 
+#[command]
+fn get_document_path_by_id(id: u64) -> Result<String, String> {
+    let repo = DocumentRepository::new().map_err(|e| e.to_string())?;
+    let document = repo.get_document_by_id(id).map_err(|e| e.to_string())?;
+
+    Ok(document.path)
+}
+
 fn main() -> Result<(), String> {
     Builder::default()
-        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection, get_documents])
+        .invoke_handler(tauri::generate_handler![process_pdf, set_api_key, get_collections, create_collection, get_documents, get_document_path_by_id])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())
