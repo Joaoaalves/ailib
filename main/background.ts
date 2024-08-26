@@ -30,7 +30,7 @@ ipcMain.handle("createConversation", async (event, message) => {
 }) 
 
 ipcMain.handle("getConversationMessages", async (event, conversationId)  => {
-    const conversation = await Conversation.findByPk(conversationId, {include: Message});
+    const conversation = await Conversation.findByPk(conversationId, {include: Message, order: [['id', 'ASC']]});
     return JSON.parse(JSON.stringify(conversation));
 })
 

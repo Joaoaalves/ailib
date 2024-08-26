@@ -1,4 +1,5 @@
 export interface IMessage{
+    id?: number;
     role: "assistant" | "user" | "system",
     content: string;
     updatedAt?: Date;

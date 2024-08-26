@@ -40,18 +40,10 @@ export default function TopBar({ children }: TopBarProps) {
                 <Search />
             </div>
             <div className="grid grid-rows-1 grid-cols-3 w-full px-4 relative">
-                <div className="flex items-center justify-start gap-x-4">
-                    <Badge className="p-2 cursor-pointer">Collections</Badge>
-                    <Badge
-                        className="p-2 text-white cursor-pointer"
-                        variant="outline"
-                    >
-                        Summarizer
-                    </Badge>
-                </div>
+
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <button disabled={isEmbedding} className="my-4 rounded-xl text-white font-bold transition-all duration-300 bg-black">
+                        <button disabled={isEmbedding} className="my-4 rounded-xl text-white font-bold transition-all duration-300 bg-black col-start-2">
                             {isEmbedding ? `Progress: ${progressPercentage.toFixed(1)}% (Cost: $${embeddingCost.toFixed(3)})` : "Upload New Document"}
                         </button>
                     </DialogTrigger>

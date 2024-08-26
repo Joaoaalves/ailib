@@ -32,7 +32,7 @@ export default function ChatRoot({children}:{children:ReactNode}){
             </div>
             <div className="flex flex-col rounded-xl gap-y-8 min-h-full">
                 {messages?.length > 0 && messages.map((message) => (
-                    <Message message={message} key={message.content} />
+                    <Message message={message} key={message.id} />
                 ))}
                 {children}
             </div>

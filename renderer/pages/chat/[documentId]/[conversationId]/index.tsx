@@ -54,7 +54,7 @@ function Conversation({conversation, documentId}:{conversation:IConversation, do
             shortcut: '⌘R',
             onClick: () => {
                 window.openai.deleteConversation(conversation.id)
-                router.push(`/chat/${documentId}`)
+                router.refresh()
             }
         }
     ]} />
