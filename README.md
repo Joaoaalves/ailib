@@ -1,24 +1,38 @@
-# AI LIB
+<p align="center"><img src="https://i.imgur.com/a9QWW0v.png"></p>
 
-### Quickstart
+## Usage
 
-1- Install RUST and Tauri dependencies:
-[Tauri Quick Start](https://tauri.app/v1/guides/getting-started/setup/)
+### Create an App
 
-2- Install Docker:
-[Docker Quick Start](https://www.docker.com/get-started/)
+```
+# with npx
+$ npx create-nextron-app my-app --example with-tailwindcss
 
-3- Set the MYSQL vars on docker-compose.yml
+# with yarn
+$ yarn create nextron-app my-app --example with-tailwindcss
 
-4- Run QDrant, MYSQL and Adminer:
-
-```shell
-docker-compose up --build -d
+# with pnpm
+$ pnpm dlx create-nextron-app my-app --example with-tailwindcss
 ```
 
-5- Run Tauri:
+### Install Dependencies
 
-```shell
-cd app/
-npm run tauri dev
+```
+$ cd my-app
+
+# using yarn or npm
+$ yarn (or `npm install`)
+
+# using pnpm
+$ pnpm install --shamefully-hoist
+```
+
+### Use it
+
+```
+# development mode
+$ yarn dev (or `npm run dev` or `pnpm run dev`)
+
+# production build
+$ yarn build (or `npm run build` or `pnpm run build`)
 ```

@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.shadow-primary{
+    @apply shadow-[0px_0px_12px_3px] shadow-primary/20;
+}
+
+code{
+    @apply text-wrap;
+}
+
+.markdown > * {
+    all: revert;
+}

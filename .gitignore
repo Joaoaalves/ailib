@@ -7,8 +7,6 @@ Thumbs.db
 *.pyc
 *.pyo
 *.pyd
-app/src-tauri/target/
-app/src-tauri/storage/*
 *.next
 
 /api/files/*
@@ -90,3 +88,5 @@ next-env.d.ts
 
 api_key.config
 db/mysql_data/*
+
+app

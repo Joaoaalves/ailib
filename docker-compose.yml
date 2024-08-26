@@ -1,31 +1,11 @@
 services:
-  qdrant:
-    image: qdrant/qdrant:latest
-    ports:
-      - "6333:6333"
-      - "6334:6334"
-    volumes:
-      - ./qdrant_storage:/qdrant/storage:z
-    environment:
-      - QDRANTSERVICEGRPC_PORT=6334
-    container_name: vector_db
-
-  mysql:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    volumes:
-      - ./db/mysql_data:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-    container_name: mysql_db
-
-  adminer:
-    image: adminer
-    ports:
-      - "8080:8080"
-    container_name: adminer
+    qdrant:
+        image: qdrant/qdrant:latest
+        ports:
+            - "6333:6333"
+            - "6334:6334"
+        volumes:
+            - ./qdrant_storage:/qdrant/storage:z
+        environment:
+            - QDRANTSERVICEGRPC_PORT=6334
+        container_name: vector_db
