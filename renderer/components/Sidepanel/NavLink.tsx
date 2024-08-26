@@ -34,13 +34,13 @@ export default function NavLink({ href, label, Icon, router, Actions }: NavLinkP
 
     return (
         <ContextMenu>
-            <ContextMenuTrigger>
+            <ContextMenuTrigger className="w-full">
         <li
             onClick={handleNavigate}
-            className="w-full text-center hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr_18px] gap-x-2"
+            className="px-6 text-center hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr_18px] gap-x-6"
         >
             {Icon}
-            <span className="line-clamp-1 text-sm">
+            <span className="line-clamp-1 text-sm place-self-start">
                 {label}
             </span>
         </li>
