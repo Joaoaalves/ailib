@@ -19,18 +19,17 @@ interface TopBarProps {
 import { useUploadDocument } from "@/contexts/DocumentUploadProvider";
 
 export default function TopBar({ children }: TopBarProps) {
-    const {isEmbedding, progressPercentage, embeddingCost} = useUploadDocument();
+    const { isEmbedding, progressPercentage, embeddingCost } =
+        useUploadDocument();
     const [open, setOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        if(isEmbedding == open && !isEmbedding)
-            return
-        
-        if(progressPercentage == 100)
-            return setOpen(false)
+        if (isEmbedding == open && !isEmbedding) return;
 
-        setOpen(!isEmbedding)
-    }, [isEmbedding])
+        if (progressPercentage == 100) return setOpen(false);
+
+        setOpen(!isEmbedding);
+    }, [isEmbedding]);
 
     return (
         <div className="col-start-2 bg-container rounded-b-3xl grid grid-rows-[80px_1fr] grid-cols-1 shadow-custom-outset">
@@ -40,11 +39,15 @@ export default function TopBar({ children }: TopBarProps) {
                 <Search />
             </div>
             <div className="grid grid-rows-1 grid-cols-3 w-full px-4 relative">
-
                 <Dialog open={open} onOpenChange={setOpen}>
                     <DialogTrigger asChild>
-                        <button disabled={isEmbedding} className="my-4 rounded-xl text-white font-bold transition-all duration-300 bg-black col-start-2">
-                            {isEmbedding ? `Progress: ${progressPercentage.toFixed(1)}% (Cost: $${embeddingCost.toFixed(3)})` : "Upload New Document"}
+                        <button
+                            disabled={isEmbedding}
+                            className="my-4 rounded-xl text-white font-bold transition-all duration-300 bg-black col-start-2"
+                        >
+                            {isEmbedding
+                                ? `Progress: ${progressPercentage.toFixed(1)}% (Cost: $${embeddingCost.toFixed(3)})`
+                                : "Upload New Document"}
                         </button>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px] bg-container border-none">

@@ -4,7 +4,6 @@ import { PDFDocument } from "pdf-lib";
 
 import pdfPoppler from "pdf-poppler";
 
-
 export async function savePdfToStorage(
     pdfPath: string,
     bookName: string,
@@ -26,7 +25,6 @@ export async function savePdfToStorage(
 
     return newPath;
 }
-
 
 export async function extractCover(
     pdfPath: string,
@@ -53,6 +51,6 @@ export async function extractCover(
 
 export async function parsePdfBuffer(pdfBuffer) {
     const pdfDoc = await PDFDocument.load(pdfBuffer);
-    
-    return  pdfDoc
+
+    return pdfDoc;
 }

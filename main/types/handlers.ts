@@ -1,7 +1,7 @@
-export interface HProcessPDF{
-    event : Electron.IpcMainInvokeEvent;
+export interface HProcessPDF {
+    event: Electron.IpcMainInvokeEvent;
     pages: string[];
-    pdfPath: string; 
-    bookName: string; 
-    collectionId : number;
+    pdfPath: string;
+    bookName: string;
+    collectionId: number;
 }

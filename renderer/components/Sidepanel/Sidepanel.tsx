@@ -6,11 +6,11 @@ import Nav from "./Nav";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
-interface SidepanelProps{
-    children?: ReactNode
+interface SidepanelProps {
+    children?: ReactNode;
 }
 
-export default function Sidepanel({children}:SidepanelProps) {
+export default function Sidepanel({ children }: SidepanelProps) {
     const router = useRouter();
     return (
         <aside className="bg-container place-items-center row-span-2 row-start-1 flex flex-col">
@@ -20,19 +20,18 @@ export default function Sidepanel({children}:SidepanelProps) {
             >
                 AI<b className="text-primary">Lib</b>
             </h1>
-                {children ? 
-                children :
-                (
-                    <Nav>
-                        <NavLink
-                            href="/collections"
-                            label="Collections"
-                            router={router}
-                            Icon={<VscLibrary />}
-                        />
+            {children ? (
+                children
+            ) : (
+                <Nav>
+                    <NavLink
+                        href="/collections"
+                        label="Collections"
+                        router={router}
+                        Icon={<VscLibrary />}
+                    />
                 </Nav>
-                )    
-            }
+            )}
         </aside>
     );
 }

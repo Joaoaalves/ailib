@@ -3,7 +3,7 @@ import { Chunk } from "./qdrant";
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { TiktokenModel } from "tiktoken";
 
-export interface ProcessChunksData{
+export interface ProcessChunksData {
     event: IpcMainInvokeEvent;
     chunks: Chunk[];
     client: QdrantClient;
@@ -12,7 +12,7 @@ export interface ProcessChunksData{
     totalChunks: number;
 }
 
-export interface  IModel {
+export interface IModel {
     openai: string;
     tiktoken: TiktokenModel;
     pricingPer1M: number;

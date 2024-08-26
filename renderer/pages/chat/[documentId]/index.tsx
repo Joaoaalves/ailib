@@ -9,52 +9,73 @@ import { IoChatbubbleOutline } from "react-icons/io5";
 import NavLink from "@/components/Sidepanel/NavLink";
 import Nav from "@/components/Sidepanel/Nav";
 
-export default function Page(){
-    const [conversations, setConversations] = useState<IConversation[]>([])
+export default function Page() {
+    const [conversations, setConversations] = useState<IConversation[]>([]);
 
-    const inputRef = useRef(null)
+    const inputRef = useRef(null);
     const { documentId } = useParams();
 
     const getConversations = async () => {
         const conversations = await window.backend.getConversations();
         setConversations(conversations);
-        
-    }
+    };
 
     useEffect(() => {
-        if(inputRef.current)
-            inputRef.current.scrollIntoView()
-        getConversations()
-    }, [])
+        if (inputRef.current) inputRef.current.scrollIntoView();
+        getConversations();
+    }, []);
 
     return (
         <ChatProvider documentId={documentId as string}>
-            <Layout sidePanelLinks={
-                conversations ? <Nav>
-                    {conversations.map(conversation => (
-                        <Conversation conversation={conversation} documentId={documentId as string} key={`conv-${conversation.id}`} />
-                    ))}
-                </Nav>
-                : <></>
-            }>
+            <Layout
+                sidePanelLinks={
+                    conversations ? (
+                        <Nav>
+                            {conversations.map((conversation) => (
+                                <Conversation
+                                    conversation={conversation}
+                                    documentId={documentId as string}
+                                    key={`conv-${conversation.id}`}
+                                />
+                            ))}
+                        </Nav>
+                    ) : (
+                        <></>
+                    )
+                }
+            >
                 <ChatRoot>
-                    <ChatInput ref={inputRef}/>
+                    <ChatInput ref={inputRef} />
                 </ChatRoot>
             </Layout>
         </ChatProvider>
-    )
+    );
 }
 
-function Conversation({conversation, documentId}:{conversation:IConversation, documentId:string}){
-    const router = useRouter()
-    return <NavLink href={`/chat/${documentId}/${conversation.id}/`} label={conversation.title} router={router} Icon={<IoChatbubbleOutline />} Actions={[
-        {
-            label: 'Delete',
-            shortcut: '⌘D',
-            onClick: () => {
-                window.openai.deleteConversation(conversation.id)
-                router.push(`/chat/${documentId}`)
-            }
-        }
-    ]} />
+function Conversation({
+    conversation,
+    documentId,
+}: {
+    conversation: IConversation;
+    documentId: string;
+}) {
+    const router = useRouter();
+    return (
+        <NavLink
+            href={`/chat/${documentId}/${conversation.id}/`}
+            label={conversation.title}
+            router={router}
+            Icon={<IoChatbubbleOutline />}
+            Actions={[
+                {
+                    label: "Delete",
+                    shortcut: "⌘D",
+                    onClick: () => {
+                        window.openai.deleteConversation(conversation.id);
+                        router.push(`/chat/${documentId}`);
+                    },
+                },
+            ]}
+        />
+    );
 }

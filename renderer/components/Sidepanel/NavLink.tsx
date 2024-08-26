@@ -14,9 +14,9 @@ import {
 } from "../ui/ContextMenu";
 
 interface Action {
-    label: string,
-    shortcut: string,
-    onClick: Function
+    label: string;
+    shortcut: string;
+    onClick: Function;
 }
 
 interface NavLinkProps {
@@ -27,7 +27,13 @@ interface NavLinkProps {
     Actions?: Action[];
 }
 
-export default function NavLink({ href, label, Icon, router, Actions }: NavLinkProps) {
+export default function NavLink({
+    href,
+    label,
+    Icon,
+    router,
+    Actions,
+}: NavLinkProps) {
     const handleNavigate = () => {
         router.push(href);
     };
@@ -35,23 +41,26 @@ export default function NavLink({ href, label, Icon, router, Actions }: NavLinkP
     return (
         <ContextMenu>
             <ContextMenuTrigger className="w-full">
-        <li
-            onClick={handleNavigate}
-            className="px-6 text-center hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr_18px] gap-x-6"
-        >
-            {Icon}
-            <span className="line-clamp-1 text-sm place-self-start">
-                {label}
-            </span>
-        </li>
-        </ContextMenuTrigger>
+                <li
+                    onClick={handleNavigate}
+                    className="px-6 text-center hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr_18px] gap-x-6"
+                >
+                    {Icon}
+                    <span className="line-clamp-1 text-sm place-self-start">
+                        {label}
+                    </span>
+                </li>
+            </ContextMenuTrigger>
             <ContextMenuContent className="w-64 bg-container text-white shadow-primary border-primary/30">
-                {Actions && Actions.map(action => (
-                    <ContextMenuItem inset onClick={() => action.onClick()}>
-                        {action.label}
-                        <ContextMenuShortcut>{action.shortcut}</ContextMenuShortcut>
-                    </ContextMenuItem>
-                ))}
+                {Actions &&
+                    Actions.map((action) => (
+                        <ContextMenuItem inset onClick={() => action.onClick()}>
+                            {action.label}
+                            <ContextMenuShortcut>
+                                {action.shortcut}
+                            </ContextMenuShortcut>
+                        </ContextMenuItem>
+                    ))}
             </ContextMenuContent>
         </ContextMenu>
     );

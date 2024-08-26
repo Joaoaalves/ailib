@@ -8,7 +8,8 @@ interface CollectionAttributes {
     name: string;
 }
 
-interface CollectionCreationAttributes extends Optional<CollectionAttributes, 'id'> {}
+interface CollectionCreationAttributes
+    extends Optional<CollectionAttributes, "id"> {}
 
 interface CollectionInstance
     extends Model<CollectionAttributes, CollectionCreationAttributes> {
@@ -32,7 +33,7 @@ const Collection = db.define<CollectionInstance>(
     },
     {
         timestamps: false,
-    }
+    },
 );
 
 Collection.hasMany(Document);

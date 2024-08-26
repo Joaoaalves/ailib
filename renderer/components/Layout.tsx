@@ -52,13 +52,9 @@ export default function Layout({ children, sidePanelLinks }: LayoutProps) {
                     <main
                         className={`${font.className} grid grid-cols-[300px_1fr] grid-rows-[150px_1fr] w-screen h-screen gap-x-8 bg-background opacity-[0.99] shadow-custom-inset pe-8`}
                     >
-                            <TopBar />
-                        <Sidepanel>
-                            {sidePanelLinks}
-                        </Sidepanel>
-                        <ScrollArea>
-                            {children}
-                        </ScrollArea>
+                        <TopBar />
+                        <Sidepanel>{sidePanelLinks}</Sidepanel>
+                        <ScrollArea>{children}</ScrollArea>
                     </main>
                 </DocumentUploadProvider>
                 <CommandDialog open={open} setOpen={setOpen} />

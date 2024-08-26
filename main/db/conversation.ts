@@ -7,13 +7,14 @@ interface ConversationAttributes {
     title: string;
 }
 
-interface ConversationCreationAttributes extends Optional<ConversationAttributes, 'id'>{}
+interface ConversationCreationAttributes
+    extends Optional<ConversationAttributes, "id"> {}
 
 interface ConversationInstance
     extends Model<ConversationAttributes, ConversationCreationAttributes> {
     id: number;
     title: string;
-    addMessage: (message: typeof Message) => Promise<void>;       
+    addMessage: (message: typeof Message) => Promise<void>;
 }
 
 const Conversation = db.define<ConversationInstance>(
@@ -26,8 +27,8 @@ const Conversation = db.define<ConversationInstance>(
         },
         title: {
             type: DataTypes.STRING,
-            allowNull: true
-        }
+            allowNull: true,
+        },
     },
     {
         timestamps: true,

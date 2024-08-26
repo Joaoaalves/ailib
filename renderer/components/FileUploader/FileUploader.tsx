@@ -17,20 +17,22 @@ const FileUploader = () => {
         const getPageText = async (pdf, pageNo: number) => {
             const page = await pdf.getPage(pageNo);
             const tokenizedText = await page.getTextContent();
-            const pageText = tokenizedText.items.map(token => token.str).join("");
+            const pageText = tokenizedText.items
+                .map((token) => token.str)
+                .join("");
             return pageText;
-          };
+        };
 
-        const pdf = await pdfjs.getDocument(pdfPath).promise
+        const pdf = await pdfjs.getDocument(pdfPath).promise;
         const maxPages = pdf.numPages;
         const pageTextPromises = [];
         for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
-          pageTextPromises.push(getPageText(pdf, pageNo));
+            pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages = await Promise.all(pageTextPromises);
-        
+
         window.backend.processPdf(pages, pdfPath, bookName, collection);
-    })
+    });
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const file = acceptedFiles[0];
@@ -55,7 +57,6 @@ const FileUploader = () => {
         e.preventDefault();
         await processPDF();
     };
-
 
     const { getRootProps, getInputProps } = useDropzone({
         onDrop,

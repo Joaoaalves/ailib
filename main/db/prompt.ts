@@ -4,24 +4,23 @@ import db from "./connection";
 const Prompt = db.define(
     "Prompt",
     {
-        id:{
+        id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
-            primaryKey: true
+            primaryKey: true,
         },
         role: {
             type: DataTypes.ENUM,
             values: ["system", "user"],
             allowNull: true,
             defaultValue: "system",
-            
         },
         content: {
             type: DataTypes.TEXT,
-            allowNull: false
+            allowNull: false,
         },
     },
     {
         timestamps: true,
     },
-)
+);

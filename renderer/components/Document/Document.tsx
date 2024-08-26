@@ -1,9 +1,4 @@
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/Card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 import { IoReaderOutline, IoChatboxOutline } from "react-icons/io5";
 
@@ -11,8 +6,12 @@ import { IDocument } from "shared/types/document";
 
 import { Button } from "../ui/Button";
 import { useRouter } from "next/navigation";
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "../ui/ContextMenu";
-
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+} from "../ui/ContextMenu";
 
 interface DocumentProps {
     document: IDocument;
@@ -26,26 +25,37 @@ export default function Document({ document }: DocumentProps) {
     };
 
     const handleChat = () => {
-        router.push(`chat/${document.id}`)
+        router.push(`chat/${document.id}`);
     };
 
     const handleDelete = () => {
-        window.backend.deleteDocument(document.id)
-    }
+        window.backend.deleteDocument(document.id);
+    };
 
     const handleSummary = () => {
-        router.push(`summary/${document.id}`)
-    }
+        router.push(`summary/${document.id}`);
+    };
 
     return (
         <ContextMenu>
             <ContextMenuTrigger>
-                <Card id={`document-${document.id}`} className="bg-container border-none text-white w-[400px] transition-all duration-300 shadow-primary">
+                <Card
+                    id={`document-${document.id}`}
+                    className="bg-container border-none text-white w-[400px] transition-all duration-300 shadow-primary"
+                >
                     <CardHeader>
-                        <img className="mb-4 h-64 object-cover object-top rounded-xl bg-primary/10" src={`atom://${document.cover}`} />
+                        <img
+                            className="mb-4 h-64 object-cover object-top rounded-xl bg-primary/10"
+                            src={`atom://${document.cover}`}
+                        />
                         <CardTitle className="text-lg">
-                            <span className="line-clamp-1">{document.name}</span>
-                            <span className="text-neutral-400 text-xs">Pages: {document.lastPageRead} / {document.totalPages}</span>
+                            <span className="line-clamp-1">
+                                {document.name}
+                            </span>
+                            <span className="text-neutral-400 text-xs">
+                                Pages: {document.lastPageRead} /{" "}
+                                {document.totalPages}
+                            </span>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -80,6 +90,6 @@ export default function Document({ document }: DocumentProps) {
                     Delete
                 </ContextMenuItem>
             </ContextMenuContent>
-            </ContextMenu>
+        </ContextMenu>
     );
 }

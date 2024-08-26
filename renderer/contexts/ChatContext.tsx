@@ -1,4 +1,11 @@
-import React, { createContext, useState, ReactNode, useContext, useCallback, useEffect } from "react";
+import React, {
+    createContext,
+    useState,
+    ReactNode,
+    useContext,
+    useCallback,
+    useEffect,
+} from "react";
 import { IConversation, IMessage } from "shared/types/conversation";
 
 interface ChatProviderProps {
@@ -12,25 +19,29 @@ interface ChatContextProps {
     setMessages: React.Dispatch<React.SetStateAction<IMessage[]>>;
     sendMessage: (content: string) => void;
     streamMessage: (content: string) => void;
-    onStreamEnd: () => void; 
+    onStreamEnd: () => void;
 }
 
 const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
-const ChatProvider: React.FC<ChatProviderProps> = ({ children, documentId, conversationId }) => {
+const ChatProvider: React.FC<ChatProviderProps> = ({
+    children,
+    documentId,
+    conversationId,
+}) => {
     const [messages, setMessages] = useState<IMessage[]>([]);
-    const [conversation, setConversation] = useState<IConversation>()
+    const [conversation, setConversation] = useState<IConversation>();
 
     const getConversation = async () => {
-        const conv: IConversation = await window.backend.getConversation(conversationId);
-        setMessages(conv.Messages)
-        setConversation(conv)
-    }
+        const conv: IConversation =
+            await window.backend.getConversation(conversationId);
+        setMessages(conv.Messages);
+        setConversation(conv);
+    };
 
     useEffect(() => {
-        if(conversationId)
-            getConversation()
-    }, [conversationId])
+        if (conversationId) getConversation();
+    }, [conversationId]);
 
     const streamMessage = useCallback((content: string) => {
         setMessages((prevMessages) => {
@@ -42,7 +53,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children, documentId, conve
                     role: "assistant",
                     content: content,
                     updatedAt: new Date(),
-                    createdAt: new Date()
+                    createdAt: new Date(),
                 };
                 return [...updatedMessages, newMessage];
             }
@@ -57,41 +68,48 @@ const ChatProvider: React.FC<ChatProviderProps> = ({ children, documentId, conve
     }, []);
 
     const onStreamEnd = () => {
-        window.backend.saveMessage(conversation.id, messages.at(-1))
-    }
+        window.backend.saveMessage(conversation.id, messages.at(-1));
+    };
 
     const createConversationIfNotExists = async (message: IMessage) => {
-        if(!conversation && !conversationId){
-            const conversation: IConversation = await window.backend.createConversation(message);
-            setConversation(conversation)
-            return conversation.id
+        if (!conversation && !conversationId) {
+            const conversation: IConversation =
+                await window.backend.createConversation(message);
+            setConversation(conversation);
+            return conversation.id;
         }
 
-        return conversation.id
-    }
+        return conversation.id;
+    };
 
     const sendMessage = async (content: string) => {
-        
         const newMessage: IMessage = {
             role: "user",
             content: content,
             updatedAt: new Date(),
             createdAt: new Date(),
         };
-        
-        const convId = await createConversationIfNotExists(newMessage)
-        
+
+        const convId = await createConversationIfNotExists(newMessage);
+
         setMessages((prevMessages) => {
             const newMessagesArr = [...prevMessages, newMessage];
             window.openai.chatWithDocument(newMessagesArr, documentId);
-            window.backend.saveMessage(convId, newMessage)
+            window.backend.saveMessage(convId, newMessage);
             return newMessagesArr;
         });
-
-    }
+    };
 
     return (
-        <ChatContext.Provider value={{ messages, setMessages, sendMessage, streamMessage, onStreamEnd }}>
+        <ChatContext.Provider
+            value={{
+                messages,
+                setMessages,
+                sendMessage,
+                streamMessage,
+                onStreamEnd,
+            }}
+        >
             {children}
         </ChatContext.Provider>
     );

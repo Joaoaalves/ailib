@@ -8,9 +8,14 @@ import {
 } from "electron";
 import path from "path";
 import { createWriteStream, existsSync, mkdirSync } from "fs";
-import {  saveApiKey, chatWithDocument, createConversationTitle, summarizePages } from "./lib/openai";
+import {
+    saveApiKey,
+    chatWithDocument,
+    createConversationTitle,
+    summarizePages,
+} from "./lib/openai";
 
-import { closeWindow, minimizeWindow } from "./lib/window"; 
+import { closeWindow, minimizeWindow } from "./lib/window";
 import Document from "./db/document";
 import Collection from "./db/collection";
 import Conversation from "./db/conversation";
@@ -20,32 +25,33 @@ import { processPDF } from "./lib/document";
 import Message from "./db/message";
 import { deletePointsForDocumentId } from "./lib/qdrant";
 
-
 const isProd = process.env.NODE_ENV === "production";
 
 ipcMain.handle("createConversation", async (event, message) => {
-    const title = await createConversationTitle(message)
-    const conversation = await Conversation.create({title})
+    const title = await createConversationTitle(message);
+    const conversation = await Conversation.create({ title });
     return JSON.parse(JSON.stringify(conversation));
-}) 
+});
 
-ipcMain.handle("getConversationMessages", async (event, conversationId)  => {
-    const conversation = await Conversation.findByPk(conversationId, {include: Message, order: [['id', 'ASC']]});
+ipcMain.handle("getConversationMessages", async (event, conversationId) => {
+    const conversation = await Conversation.findByPk(conversationId, {
+        include: Message,
+        order: [["id", "ASC"]],
+    });
     return JSON.parse(JSON.stringify(conversation));
-})
+});
 
 ipcMain.handle("getConversations", async (event) => {
     const conversations = await Conversation.findAll();
     return JSON.parse(JSON.stringify(conversations));
-
-})
+});
 
 ipcMain.handle("saveMessage", async (event, conversationId, message) => {
     try {
         const conversation = await Conversation.findByPk(conversationId);
-        
+
         if (conversation) {
-            const createdMessage = await Message.create({...message});
+            const createdMessage = await Message.create({ ...message });
 
             // @ts-expect-error
             await conversation.addMessage(createdMessage);
@@ -68,9 +74,18 @@ ipcMain.handle("set-api-key", (event, key) => {
     saveApiKey(key);
 });
 
-ipcMain.handle("process-pdf", async (event: IpcMainEvent, pages: string[], pdfPath: string, bookName: string, collectionId: number) => {
-    processPDF({event, pages, pdfPath, bookName, collectionId})
-});
+ipcMain.handle(
+    "process-pdf",
+    async (
+        event: IpcMainEvent,
+        pages: string[],
+        pdfPath: string,
+        bookName: string,
+        collectionId: number,
+    ) => {
+        processPDF({ event, pages, pdfPath, bookName, collectionId });
+    },
+);
 
 ipcMain.handle("getCollections", async (event) => {
     const collections = await Collection.findAll({ include: Document });
@@ -90,62 +105,79 @@ ipcMain.handle("getDocument", async (event, documentId) => {
 ipcMain.handle("deleteDocument", async (event, documentId) => {
     await Document.destroy({
         where: {
-            id: Number(documentId)
-        }
-    }
-    )
+            id: Number(documentId),
+        },
+    });
 
-    await deletePointsForDocumentId(documentId)
-})
+    await deletePointsForDocumentId(documentId);
+});
 
 ipcMain.handle("deleteConversation", async (event, conversationId) => {
-    const conversation = await Conversation.findByPk(conversationId, {include: Message})
+    const conversation = await Conversation.findByPk(conversationId, {
+        include: Message,
+    });
     await Message.destroy({
         where: {
             id: {
                 // @ts-expect-error
-                includes: conversation.Messages.map(message => message.id)
-            }
-        }
-    })
+                includes: conversation.Messages.map((message) => message.id),
+            },
+        },
+    });
 
     await conversation.destroy();
-})
+});
 
-ipcMain.handle("setLastPageReadSave", async(event, documentId, page) => {
-    const document = await Document.findByPk(documentId)
+ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
+    const document = await Document.findByPk(documentId);
 
-    if(document){
-        document.lastPageRead = page
-        await document.save()
+    if (document) {
+        document.lastPageRead = page;
+        await document.save();
     }
-})
+});
 
-ipcMain.handle("summarizePages", async(event: IpcMainEvent, documentId: number, pages: string[], summaryTitle:string) => {
-    var lastSummary : string;
+ipcMain.handle(
+    "summarizePages",
+    async (
+        event: IpcMainEvent,
+        documentId: number,
+        pages: string[],
+        summaryTitle: string,
+    ) => {
+        var lastSummary: string;
 
-    const outputDir = path.join(__dirname, `/storage/summaries/${documentId}`);
-    const outputPath = path.join(outputDir, `${summaryTitle}.txt`);
+        const outputDir = path.join(
+            __dirname,
+            `/storage/summaries/${documentId}`,
+        );
+        const outputPath = path.join(outputDir, `${summaryTitle}.txt`);
 
-    if (!existsSync(outputDir)) {
-        mkdirSync(outputDir, { recursive: true });
-    }
+        if (!existsSync(outputDir)) {
+            mkdirSync(outputDir, { recursive: true });
+        }
 
-    var writeStream = createWriteStream(outputPath, {flags: 'a'})
+        var writeStream = createWriteStream(outputPath, { flags: "a" });
 
-    for(let i = 0; i < pages.length; i+= 2){
-        const startingPage = i;
-        const endingPage = Math.min(pages.length, i+2);
+        for (let i = 0; i < pages.length; i += 2) {
+            const startingPage = i;
+            const endingPage = Math.min(pages.length, i + 2);
 
-        lastSummary = await summarizePages( event, pages.slice(startingPage, endingPage), lastSummary);
-        
-        writeStream.write('\n\n' + lastSummary);
-        console.log(`Summarized page ${startingPage}-${endingPage} of ${pages.length}`)
-    }
+            lastSummary = await summarizePages(
+                event,
+                pages.slice(startingPage, endingPage),
+                lastSummary,
+            );
 
-    writeStream.end()
-})
+            writeStream.write("\n\n" + lastSummary);
+            console.log(
+                `Summarized page ${startingPage}-${endingPage} of ${pages.length}`,
+            );
+        }
 
+        writeStream.end();
+    },
+);
 
 app.on("ready", async () => {
     await syncDatabase();

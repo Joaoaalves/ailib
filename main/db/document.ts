@@ -10,16 +10,17 @@ interface DocumentAttributes {
     lastPageRead?: number;
 }
 
-interface DocumentCreationAttributes extends Optional<DocumentAttributes, 'id'>{}
+interface DocumentCreationAttributes
+    extends Optional<DocumentAttributes, "id"> {}
 
 interface DocumentInstance
     extends Model<DocumentAttributes, DocumentCreationAttributes> {
-        id: number;
-        name: string;
-        path: string;
-        cover?: string;
-        totalPages?: number;
-        lastPageRead?: number;
+    id: number;
+    name: string;
+    path: string;
+    cover?: string;
+    totalPages?: number;
+    lastPageRead?: number;
 }
 
 const Document = db.define<DocumentInstance>(
@@ -44,13 +45,13 @@ const Document = db.define<DocumentInstance>(
         },
         totalPages: {
             type: DataTypes.NUMBER,
-            allowNull: true
+            allowNull: true,
         },
         lastPageRead: {
             type: DataTypes.NUMBER,
             allowNull: false,
-            defaultValue: 1
-        }
+            defaultValue: 1,
+        },
     },
     {
         timestamps: false,

@@ -17,7 +17,7 @@ export default function Document() {
             );
             setDocument(document);
         } catch (error) {
-            console.error(error)
+            console.error(error);
         }
     };
 
@@ -28,9 +28,11 @@ export default function Document() {
     return (
         <Layout>
             <div className="grid items-center w-full h-full">
-                {document &&  <PDFViewer document={document} path={document.path} /> }
+                {document && (
+                    <PDFViewer document={document} path={document.path} />
+                )}
             </div>
-            <ChatBubble documentId={documentId as string}/>
+            <ChatBubble documentId={documentId as string} />
         </Layout>
     );
 }

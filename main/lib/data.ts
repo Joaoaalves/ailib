@@ -3,9 +3,9 @@ import Collection from "../db/collection";
 
 import type { IDocument } from "shared/types/document";
 
-export async function saveDocument(document : IDocument) {
+export async function saveDocument(document: IDocument) {
     return await Document.create({
-        ...document
+        ...document,
     });
 }
 
