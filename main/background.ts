@@ -13,7 +13,6 @@ import {
     chatWithDocument,
     createConversationTitle,
     summarizePages,
-    getEmbeddings,
     getMoreQueries,
 } from "./lib/openai";
 
@@ -30,8 +29,6 @@ import {
     ensureCollectionExists,
 } from "./lib/qdrant";
 import { RAGFusion } from "./lib/rag";
-import { DocSearchResult, IDocument } from "shared/types/document";
-import { content } from "../renderer/tailwind.config";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -153,7 +150,6 @@ ipcMain.handle("search", async (event, query) => {
 
     const RAGResult = await RAGFusion(queries);
     const document = await Document.findByPk(RAGResult[0].documentId);
-
     return JSON.parse(
         JSON.stringify({
             content: RAGResult[0].content,

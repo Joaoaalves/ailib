@@ -107,7 +107,7 @@ export async function processChunks(
 
             const embedding = await getEmbeddings(chunk);
 
-            metadata.page = index;
+            metadata.page = index - 1;
             await upsertEmbedding({
                 embedding,
                 chunk,
