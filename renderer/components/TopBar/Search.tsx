@@ -6,7 +6,7 @@ import { useSearch } from "@/contexts/SearchContext";
 export default function Search() {
     const inputRef = useRef<HTMLInputElement>();
     const [isFocused, setIsFocused] = useState<boolean>(false);
-    const { search, searchResult, isSearching } = useSearch();
+    const { search } = useSearch();
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -26,10 +26,6 @@ export default function Search() {
         e.preventDefault();
         await search(inputRef.current.value);
     };
-
-    useEffect(() => {
-        if (!isSearching && searchResult) console.log(searchResult);
-    }, [isSearching]);
 
     return (
         <form

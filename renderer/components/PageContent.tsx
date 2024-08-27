@@ -1,8 +1,7 @@
 import { ScrollArea } from "@/components/ui/ScrollArea";
 import { useSearch } from "@/contexts/SearchContext";
 import { ReactNode } from "react";
-import SearchResult from "./SearchResult";
-import PDFViewer from "./PDF/PDFReader";
+import PDFReader from "./PDF/PDFReader";
 
 interface PageContentProps {
     children: ReactNode;
@@ -10,15 +9,32 @@ interface PageContentProps {
 
 export default function PageContent({ children }: PageContentProps) {
     const { isSearching, searchResult } = useSearch();
-    // Have to implement Search Result
 
-    return <ScrollArea>{children}</ScrollArea>;
+    return (
+        <ScrollArea>
+            {isSearching ? (
+                <Searching />
+            ) : searchResult ? (
+                <PDFReader
+                    document={searchResult.document}
+                    path={searchResult.document.path}
+                    page={searchResult.page}
+                />
+            ) : (
+                children
+            )}
+        </ScrollArea>
+    );
 }
 
 function Searching() {
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center">
-            <span className="color-white">Searching...</span>
+        <div className="w-full h-[calc(100vh-150px)] flex flex-col items-center justify-center">
+            <div className="flex space-x-2 justify-center items-center h-screen dark:invert">
+                <div className="h-3 w-3 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                <div className="h-3 w-3 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                <div className="h-3 w-3 bg-black rounded-full animate-bounce"></div>
+            </div>
         </div>
     );
 }

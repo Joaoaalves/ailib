@@ -27,11 +27,7 @@ export default function Document() {
 
     return (
         <Layout>
-            <div className="grid items-center w-full h-full">
-                {document && (
-                    <PDFViewer document={document} path={document.path} />
-                )}
-            </div>
+            {document && <PDFViewer document={document} path={document.path} />}
             <ChatBubble documentId={documentId as string} />
         </Layout>
     );

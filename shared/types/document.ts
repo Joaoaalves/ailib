@@ -9,6 +9,6 @@ export interface IDocument {
 
 export interface DocSearchResult {
     content: string;
-    number: number;
+    page: number;
     document: IDocument;
 }

@@ -40,7 +40,6 @@ export default function Page() {
     const getDocument = async () => {
         const doc = await window.backend.getDocument(documentId as string);
         setDocument(doc);
-        console.log(doc);
     };
 
     useEffect(() => {
