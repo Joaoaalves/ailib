@@ -192,15 +192,20 @@ ipcMain.handle(
             );
 
             writeStream.write("\n\n" + lastSummary);
-            console.log(
-                `Summarized page ${startingPage}-${endingPage} of ${pages.length}`,
-            );
         }
 
         writeStream.end();
     },
 );
 
+ipcMain.handle("close", (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    window?.close();
+});
+ipcMain.handle("minimize", (event) => {
+    const window = BrowserWindow.fromWebContents(event.sender);
+    window?.minimize();
+});
 app.on("ready", async () => {
     await syncDatabase();
 
@@ -213,11 +218,10 @@ app.on("ready", async () => {
             webPreferences: {
                 webSecurity: false,
                 preload: path.join(__dirname, "preload.js"),
-                nodeIntegration: true,
+                nodeIntegration: false,
+                contextIsolation: true,
             },
         });
-        ipcMain.handle("close", () => closeWindow(mainWindow));
-        ipcMain.handle("minimize", () => minimizeWindow(mainWindow));
 
         protocol.registerFileProtocol("atom", (request, callback) => {
             const url = request.url.substr(7);

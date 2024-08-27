@@ -6,6 +6,7 @@ import {
 } from "electron";
 import { IMessage } from "shared/types/conversation";
 import { RankedSearchResult } from "shared/types/qdrant";
+
 const handler = {
     send(channel: string, value: unknown) {
         ipcRenderer.send(channel, value);
@@ -100,13 +101,13 @@ contextBridge.exposeInMainWorld("backend", {
     search: (query: string) => ipcRenderer.invoke("search", query),
 });
 
-contextBridge.exposeInMainWorld("openai", {
-    setApiKey: (apiKey: string) => ipcRenderer.invoke("set-api-key", apiKey),
+contextBridge.exposeInMainWorld("actions", {
+    close: () => ipcRenderer.invoke("close"),
+    minimize: () => ipcRenderer.invoke("minimize"),
 });
 
-contextBridge.exposeInMainWorld("windowAction", {
-    close: (window: BrowserWindow) => ipcRenderer.invoke("close", window),
-    minimize: (window: BrowserWindow) => ipcRenderer.invoke("minimize", window),
+contextBridge.exposeInMainWorld("openai", {
+    setApiKey: (apiKey: string) => ipcRenderer.invoke("set-api-key", apiKey),
 });
 
 export type IpcHandler = typeof handler;

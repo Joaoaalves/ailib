@@ -2,13 +2,12 @@ import { RxCross2, RxDividerHorizontal } from "react-icons/rx";
 
 export default function WindowActions() {
     const handleMinimize = () => {
-        if (window && window.windowAction) window.windowAction.minimize();
+        if (window) window.actions.minimize();
     };
 
     const handleClose = () => {
-        if (window && window.windowAction) window.windowAction.close();
+        if (window) window.actions.close();
     };
-
     return (
         <div className="flex gap-x-3 items-center justify-center fixed  top-4 right-12">
             <button

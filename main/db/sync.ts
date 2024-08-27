@@ -7,5 +7,4 @@ import Message from "./message";
 
 export default async function syncDatabase() {
     await db.sync({ alter: false });
-    console.log("Banco de dados sincronizado");
 }

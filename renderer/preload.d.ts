@@ -58,12 +58,9 @@ declare global {
             ) => Promise<void>;
             search: (query: string) => Promise<DocSearchResult>;
         };
-        windowAction: {
+        actions: {
             close: () => void;
             minimize: () => void;
-        };
-        openai: {
-            setApiKey: (apiKey: string) => void;
         };
     }
 }
