@@ -56,6 +56,7 @@ declare global {
                 documentId: number,
                 page: number,
             ) => Promise<void>;
+            search: (query: string) => Promise<DocSearchResult>;
         };
         windowAction: {
             close: () => void;

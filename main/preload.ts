@@ -6,8 +6,6 @@ import {
 } from "electron";
 import { IMessage } from "shared/types/conversation";
 import { RankedSearchResult } from "shared/types/qdrant";
-import { summarizePages } from "./lib/openai";
-
 const handler = {
     send(channel: string, value: unknown) {
         ipcRenderer.send(channel, value);
@@ -99,6 +97,7 @@ contextBridge.exposeInMainWorld("backend", {
     getConversations: () => ipcRenderer.invoke("getConversations"),
     saveMessage: (conversationId: number, message: IMessage) =>
         ipcRenderer.invoke("saveMessage", conversationId, message),
+    search: (query: string) => ipcRenderer.invoke("search", query),
 });
 
 contextBridge.exposeInMainWorld("openai", {

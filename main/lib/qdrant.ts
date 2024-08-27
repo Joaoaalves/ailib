@@ -60,22 +60,13 @@ export async function deletePointsForDocumentId(documentId: number) {
 }
 
 export async function getMostRelevantItemsFromDocument(
-    documentId: number,
     embeddedMessage: number[],
     limit: number = 5,
+    filter?: Object,
 ): Promise<Object[]> {
     try {
         const result = await client.search(qdrantCollection, {
-            filter: {
-                must: [
-                    {
-                        key: "documentId",
-                        match: {
-                            value: Number(documentId),
-                        },
-                    },
-                ],
-            },
+            ...filter,
             with_vector: false,
             vector: embeddedMessage,
             with_payload: true,
@@ -85,7 +76,7 @@ export async function getMostRelevantItemsFromDocument(
         const docs = result.map((res) => ({
             id: res.id,
             content: res.payload.content,
-            bookName: res.payload.book_name,
+            documentId: res.payload.documentId,
             page: res.payload?.page,
             score: res.score,
         }));

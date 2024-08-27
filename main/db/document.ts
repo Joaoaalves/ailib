@@ -1,20 +1,11 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "./connection";
+import { IDocument } from "shared/types/document";
 
-interface DocumentAttributes {
-    id: number;
-    name: string;
-    path: string;
-    cover?: string;
-    totalPages?: number;
-    lastPageRead?: number;
-}
-
-interface DocumentCreationAttributes
-    extends Optional<DocumentAttributes, "id"> {}
+interface DocumentCreationAttributes extends Optional<IDocument, "id"> {}
 
 interface DocumentInstance
-    extends Model<DocumentAttributes, DocumentCreationAttributes> {
+    extends Model<IDocument, DocumentCreationAttributes> {
     id: number;
     name: string;
     path: string;

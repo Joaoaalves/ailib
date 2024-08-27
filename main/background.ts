@@ -13,6 +13,8 @@ import {
     chatWithDocument,
     createConversationTitle,
     summarizePages,
+    getEmbeddings,
+    getMoreQueries,
 } from "./lib/openai";
 
 import { closeWindow, minimizeWindow } from "./lib/window";
@@ -23,7 +25,13 @@ import Conversation from "./db/conversation";
 import syncDatabase from "./db/sync";
 import { processPDF } from "./lib/document";
 import Message from "./db/message";
-import { deletePointsForDocumentId } from "./lib/qdrant";
+import {
+    deletePointsForDocumentId,
+    ensureCollectionExists,
+} from "./lib/qdrant";
+import { RAGFusion } from "./lib/rag";
+import { DocSearchResult, IDocument } from "shared/types/document";
+import { content } from "../renderer/tailwind.config";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -135,6 +143,24 @@ ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
         document.lastPageRead = page;
         await document.save();
     }
+});
+
+ipcMain.handle("search", async (event, query) => {
+    await ensureCollectionExists();
+
+    const relevantQueries = await getMoreQueries(query, 2);
+    const queries = [query, ...relevantQueries];
+
+    const RAGResult = await RAGFusion(queries);
+    const document = await Document.findByPk(RAGResult[0].documentId);
+
+    return JSON.parse(
+        JSON.stringify({
+            content: RAGResult[0].content,
+            page: RAGResult[0].page,
+            document,
+        }),
+    );
 });
 
 ipcMain.handle(

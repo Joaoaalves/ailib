@@ -144,7 +144,7 @@ export async function chatWithDocument(
     messages: IMessage[],
     documentId: number,
 ) {
-    const relevantQueries = await getMoreQueries(messages.at(-1));
+    const relevantQueries = await getMoreQueries(messages.at(-1).content);
     const queries = [messages.at(-1).content, ...relevantQueries];
 
     const systemMessage = Prompts.defaultChatInstruction;
@@ -209,16 +209,21 @@ export function countTokens(text: string, model: TiktokenModel): number {
     }
 }
 
-async function getMoreQueries(
-    question: IMessage,
+export async function getMoreQueries(
+    query: string,
     queryNum: number = 5,
 ): Promise<string[]> {
     const openai = await OpenAIClient();
     const systemMessage = Prompts.queryCreationInstruction;
 
+    const queryMessage: IMessage = {
+        role: "user",
+        content: query,
+    };
+
     const completion = await openai.chat.completions.create({
         model: Models.chat.openai,
-        messages: [systemMessage, question],
+        messages: [systemMessage, queryMessage],
     });
 
     return completion.choices[0].message.content.split(";");

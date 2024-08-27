@@ -2,7 +2,7 @@ import { RankedSearchResult } from "shared/types/qdrant";
 import { getEmbeddings } from "./openai";
 import { getMostRelevantItemsFromDocument } from "./qdrant";
 
-export async function RAGFusion(queries: string[], documentId: number) {
+export async function RAGFusion(queries: string[], documentId?: number) {
     const results = [];
 
     for (let i = 0; i < queries.length; i++) {
@@ -13,12 +13,29 @@ export async function RAGFusion(queries: string[], documentId: number) {
     return rankResults(results);
 }
 
-async function SimpleRAG(query: string, documentId: number) {
+async function SimpleRAG(query: string, documentId?: number) {
     const embeddedMessage = await getEmbeddings(query);
+    var filter = {};
+
+    if (documentId) {
+        filter = {
+            filter: {
+                must: [
+                    {
+                        key: "documentId",
+                        match: {
+                            value: Number(documentId),
+                        },
+                    },
+                ],
+            },
+        };
+    }
+
     const res = await getMostRelevantItemsFromDocument(
-        documentId,
         embeddedMessage,
         5,
+        filter,
     );
     return res;
 }
@@ -27,7 +44,7 @@ function rankResults(
     results: {
         id: string;
         content: string;
-        bookName: string;
+        documentId: string;
         page: number;
         score: number;
     }[],

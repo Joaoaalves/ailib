@@ -1,6 +1,8 @@
 import Sidepanel from "./Sidepanel/Sidepanel";
 import TopBar from "./TopBar/Topbar";
 
+import { SearchProvider } from "@/contexts/SearchContext";
+
 import {
     ContextMenu,
     ContextMenuCheckboxItem,
@@ -20,6 +22,7 @@ import { Comfortaa } from "next/font/google";
 import { ScrollArea } from "./ui/ScrollArea";
 import CommandDialog from "./ui/CommandDialog";
 import { DocumentUploadProvider } from "@/contexts/DocumentUploadProvider";
+import PageContent from "./PageContent";
 
 const font = Comfortaa({
     subsets: ["latin"],
@@ -52,9 +55,11 @@ export default function Layout({ children, sidePanelLinks }: LayoutProps) {
                     <main
                         className={`${font.className} grid grid-cols-[300px_1fr] grid-rows-[150px_1fr] w-screen h-screen gap-x-8 bg-background opacity-[0.99] shadow-custom-inset pe-8`}
                     >
-                        <TopBar />
-                        <Sidepanel>{sidePanelLinks}</Sidepanel>
-                        <ScrollArea>{children}</ScrollArea>
+                        <SearchProvider>
+                            <TopBar />
+                            <Sidepanel>{sidePanelLinks}</Sidepanel>
+                            <PageContent>{children}</PageContent>
+                        </SearchProvider>
                     </main>
                 </DocumentUploadProvider>
                 <CommandDialog open={open} setOpen={setOpen} />

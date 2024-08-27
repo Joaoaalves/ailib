@@ -1,7 +1,7 @@
 export type RankedSearchResult = {
     id: string;
     content: string;
-    bookName: string;
+    documentId: string;
     page: number;
     score: number;
     occurrences: number;
