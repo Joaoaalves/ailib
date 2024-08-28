@@ -27,7 +27,7 @@ export default function Page() {
         };
 
         const pdf = await pdfjs.getDocument(document.path).promise;
-        const maxPages = pdf.numPages;
+
         const pageTextPromises = [];
         for (let pageNo = startingPage; pageNo <= endingPage; pageNo += 1) {
             pageTextPromises.push(getPageText(pdf, pageNo));
