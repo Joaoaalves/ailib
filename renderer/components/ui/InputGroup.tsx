@@ -1,11 +1,9 @@
-import { ReactNode } from "react"
+import { ReactNode } from "react";
 
-interface InputGroupProps{
-    children: ReactNode
+interface InputGroupProps {
+    children: ReactNode;
 }
 
-export default function InputGroup({children}){
-    return <div className="space-y-4">
-        {children}
-    </div>
+export default function InputGroup({ children }) {
+    return <div className="space-y-4">{children}</div>;
 }
