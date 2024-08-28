@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import Input from "./ui/Input";
+import Input from "@/components/ui/Input";
 import { IDocument } from "shared/types/document";
 import { useParams } from "next/navigation";
 import { usePDFJS } from "@/hooks/usePDFJS";
-import { Label } from "./ui/Label";
-import InputGroup from "./ui/InputGroup";
+import { Label } from "@/components/ui/Label";
+import InputGroup from "@/components/ui/InputGroup";
+
 export default function SummaryForm() {
     const [document, setDocument] = useState<IDocument>();
 
