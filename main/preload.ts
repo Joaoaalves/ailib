@@ -24,6 +24,11 @@ const handler = {
 
 contextBridge.exposeInMainWorld("ipc", handler);
 
+contextBridge.exposeInMainWorld("summary", {
+    get: async () => ipcRenderer.invoke("getSummaries"),
+    getById: async (id: number) => ipcRenderer.invoke("getSummaryById", id),
+});
+
 contextBridge.exposeInMainWorld("openai", {
     embeddingCost: (callback: (cost: number) => void) =>
         ipcRenderer.on("embedding_cost", (event, cost) => callback(cost)),

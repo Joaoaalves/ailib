@@ -46,7 +46,7 @@ export default function Document({ document }: DocumentProps) {
                     <CardHeader>
                         <img
                             className="mb-4 h-64 object-cover object-top rounded-xl bg-primary/10"
-                            src={`atom://${document.cover}`}
+                            src={`${document.cover}`}
                         />
                         <CardTitle className="text-lg">
                             <span className="line-clamp-1">

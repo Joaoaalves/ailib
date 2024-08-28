@@ -28,6 +28,7 @@ export async function processPDF({
         await ensureCollectionExists();
 
         const cover = await extractCover(pdfPath, bookName);
+
         const document = await saveDocument({
             name: bookName,
             path: storagePdfPath,

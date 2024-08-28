@@ -29,6 +29,7 @@ import {
     ensureCollectionExists,
 } from "./lib/qdrant";
 import { RAGFusion } from "./lib/rag";
+import Summary from "./db/summary";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -88,6 +89,7 @@ ipcMain.handle(
         bookName: string,
         collectionId: number,
     ) => {
+        console.log(pdfPath, bookName, collectionId);
         processPDF({ event, pages, pdfPath, bookName, collectionId });
     },
 );
@@ -198,6 +200,14 @@ ipcMain.handle(
     },
 );
 
+ipcMain.handle("getSummaries", async (event) => {
+    return await Summary.findAll();
+});
+
+ipcMain.handle("getSummarryById", async (event, id) => {
+    return await Summary.findByPk(id);
+});
+
 ipcMain.handle("close", (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     window?.close();
@@ -206,6 +216,7 @@ ipcMain.handle("minimize", (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     window?.minimize();
 });
+
 app.on("ready", async () => {
     await syncDatabase();
 
@@ -218,8 +229,6 @@ app.on("ready", async () => {
             webPreferences: {
                 webSecurity: false,
                 preload: path.join(__dirname, "preload.js"),
-                nodeIntegration: false,
-                contextIsolation: true,
             },
         });
 

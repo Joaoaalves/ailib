@@ -12,19 +12,15 @@ import {
 
 export default function CollectionPicker({
     collections,
-    collection,
-    setCollection,
+    value,
+    onChange,
 }: {
     collections: ICollection[];
-    collection: number;
-    setCollection: React.Dispatch<React.SetStateAction<number>>;
+    value: number;
+    onChange: (value: string) => void;
 }) {
     return (
-        <Select
-            onValueChange={(value) => setCollection(Number(value))}
-            defaultValue={String(collection)}
-            required
-        >
+        <Select onValueChange={onChange} defaultValue={String(value)} required>
             <SelectTrigger className="w-full bg-black !text-white">
                 <SelectValue placeholder="Select a collection..." />
             </SelectTrigger>

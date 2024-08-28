@@ -98,7 +98,7 @@ export default function SummaryForm() {
             </div>
 
             <Input
-                className="hover:bg-neutral-400 hover:text-black font-black text-md cursor-pointer transition-all duration-300"
+                className="hover:bg-neutral-100 hover:text-black font-black text-md cursor-pointer transition-all duration-300"
                 type="submit"
                 value="Summarize"
             />

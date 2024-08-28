@@ -1,19 +1,24 @@
 "use client";
 
 import { useDropzone, Accept } from "react-dropzone";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { ICollection } from "shared/types/collection";
 import CollectionPicker from "./CollectionPicker";
 import Input from "../ui/Input";
 import { usePDFJS } from "@/hooks/usePDFJS";
 
 const FileUploader = () => {
-    const [collection, setCollection] = useState<number | null>();
-    const [collections, setCollections] = useState<ICollection[] | null>();
-    const [pdfPath, setPdfPath] = useState<string>("");
-    const [bookName, setBookName] = useState<string>("");
+    const collectionRef = useRef(null);
+    const [collections, setCollections] = useState<ICollection[] | null>(null);
+    const pdfPathRef = useRef<string>("");
+    const bookNameRef = useRef<string>("");
 
     const processPDF = usePDFJS(async (pdfjs) => {
+        if (!pdfPathRef.current) {
+            console.error("No PDF path available");
+            return;
+        }
+
         const getPageText = async (pdf, pageNo: number) => {
             const page = await pdf.getPage(pageNo);
             const tokenizedText = await page.getTextContent();
@@ -23,21 +28,32 @@ const FileUploader = () => {
             return pageText;
         };
 
-        const pdf = await pdfjs.getDocument(pdfPath).promise;
+        const pdf = await pdfjs.getDocument({ url: pdfPathRef.current })
+            .promise;
         const maxPages = pdf.numPages;
         const pageTextPromises = [];
         for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
-        const pages = await Promise.all(pageTextPromises);
+        const pages: string[] = await Promise.all(pageTextPromises);
 
-        window.backend.processPdf(pages, pdfPath, bookName, collection);
+        window.backend.processPdf(
+            pages,
+            pdfPathRef.current,
+            bookNameRef.current,
+            collectionRef.current,
+        );
     });
 
     const onDrop = useCallback(async (acceptedFiles) => {
         const file = acceptedFiles[0];
-        setPdfPath(file.path);
-        setBookName(file.name.replace(".pdf", ""));
+        const path = file.path;
+
+        pdfPathRef.current = path;
+
+        const name = file.name.replace(".pdf", "");
+
+        bookNameRef.current = name;
     }, []);
 
     const acceptConfig: Accept = {
@@ -78,14 +94,14 @@ const FileUploader = () => {
             <Input
                 type="text"
                 placeholder="Set your filename..."
-                value={bookName}
-                onChange={(e) => setBookName(e.target.value)}
+                value={bookNameRef.current}
+                onChange={(e) => (bookNameRef.current = e.target.value)}
             />
             {collections && (
                 <CollectionPicker
                     collections={collections}
-                    collection={collection}
-                    setCollection={setCollection}
+                    value={collectionRef.current}
+                    onChange={(value) => (collectionRef.current = value)}
                 />
             )}
 

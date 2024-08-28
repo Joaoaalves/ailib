@@ -31,7 +31,7 @@ export async function extractCover(
     bookName: string,
 ): Promise<string | null> {
     try {
-        const outputDir = path.dirname("./app/storage/covers/");
+        const outputDir = path.join(__dirname, "storage/covers/");
         const outputImagePath = path.resolve(outputDir, `${bookName}.png`);
 
         const options = {
