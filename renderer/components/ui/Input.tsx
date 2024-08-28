@@ -1,30 +1,20 @@
+import React from "react";
 import { ChangeEvent, HTMLInputTypeAttribute } from "react";
 
-interface InputProps {
-    type: HTMLInputTypeAttribute;
-    className?: string;
-    placeholder?: string;
-    value: string | number;
-    id?: string;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => void;
-}
+export interface InputProps
+    extends React.InputHTMLAttributes<HTMLInputElement> {}
 
-export default function Input({
-    type,
-    className,
-    placeholder,
-    value,
-    onChange,
-    id,
-}: InputProps) {
-    return (
-        <input
-            type={type}
-            className={`${className} w-full border rounded-md px-4 py-2 text-white bg-black border-neutral-400`}
-            placeholder={placeholder}
-            value={value}
-            onChange={onChange}
-            id={id}
-        />
-    );
-}
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+    ({ className, type, ...props }, ref) => {
+        return (
+            <input
+                type={type}
+                className={`${className} w-full border rounded-md px-4 py-2 text-white bg-black border-neutral-400`}
+                ref={ref}
+                {...props}
+            />
+        );
+    },
+);
+
+export default Input;

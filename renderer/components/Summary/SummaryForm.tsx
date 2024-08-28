@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Input from "@/components/ui/Input";
 import { IDocument } from "shared/types/document";
 import { useParams } from "next/navigation";
@@ -7,17 +7,17 @@ import { Label } from "@/components/ui/Label";
 import InputGroup from "@/components/ui/InputGroup";
 
 export default function SummaryForm() {
-    const [document, setDocument] = useState<IDocument>();
+    const document = useRef<IDocument>();
+    const startingPage = useRef<HTMLInputElement>();
+    const endingPage = useRef<HTMLInputElement>();
+    const title = useRef<HTMLInputElement>();
 
     const { documentId } = useParams();
 
-    const [startingPage, setStartingPage] = useState<number>(1);
-    const [endingPage, setEndingPage] = useState<number>(2);
-    const [summaryTitle, setSummaryTitle] = useState<string>("");
-
     const getDocument = async () => {
-        const doc = await window.backend.getDocument(documentId as string);
-        setDocument(doc);
+        document.current = await window.backend.getDocument(
+            documentId as string,
+        );
     };
 
     useEffect(() => {
@@ -25,6 +25,8 @@ export default function SummaryForm() {
     }, []);
 
     const summarizePages = usePDFJS(async (pdfjs) => {
+        if (!document?.current) return;
+
         const getPageText = async (pdf, pageNo: number): Promise<string> => {
             const page = await pdf.getPage(pageNo);
             const tokenizedText = await page.getTextContent();
@@ -34,15 +36,23 @@ export default function SummaryForm() {
             return pageText;
         };
 
-        const pdf = await pdfjs.getDocument(document.path).promise;
+        const pdf = await pdfjs.getDocument(document.current.path).promise;
 
         const pageTextPromises = [];
-        for (let pageNo = startingPage; pageNo <= endingPage; pageNo += 1) {
+        for (
+            let pageNo = Number(startingPage.current.value);
+            pageNo <= Number(endingPage.current.value);
+            pageNo += 1
+        ) {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages: string[] = await Promise.all(pageTextPromises);
 
-        window.openai.summarizePages(document.id, pages, summaryTitle);
+        window.openai.summarizePages(
+            document.current.id,
+            pages,
+            title.current.value,
+        );
     });
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -56,12 +66,7 @@ export default function SummaryForm() {
                 <Label className="text-white font-bold text-md" htmlFor="title">
                     Summary Title
                 </Label>
-                <Input
-                    id="title"
-                    type="text"
-                    value={summaryTitle}
-                    onChange={(e) => setSummaryTitle(e.target.value)}
-                />
+                <Input id="title" type="text" ref={title} />
             </InputGroup>
             <div className="grid grid-cols-2 gap-x-8">
                 <InputGroup>
@@ -74,10 +79,7 @@ export default function SummaryForm() {
                     <Input
                         id="starting-page"
                         type="number"
-                        value={startingPage}
-                        onChange={(e) =>
-                            setStartingPage(Number(e.target.value))
-                        }
+                        ref={startingPage}
                     />
                 </InputGroup>
 
@@ -88,12 +90,7 @@ export default function SummaryForm() {
                     >
                         To:
                     </Label>
-                    <Input
-                        id="ending-page"
-                        type="number"
-                        value={endingPage}
-                        onChange={(e) => setEndingPage(Number(e.target.value))}
-                    />
+                    <Input id="ending-page" type="number" ref={endingPage} />
                 </InputGroup>
             </div>
 

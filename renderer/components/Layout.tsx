@@ -23,19 +23,19 @@ interface LayoutProps {
 
 export default function Layout({ children, sidePanelLinks }: LayoutProps) {
     return (
-        <SearchProvider>
-            <MainCommands>
-                <DocumentUploadProvider>
-                    <main
-                        className={`${font.className} grid grid-cols-[300px_1fr] grid-rows-[150px_1fr] w-screen h-screen gap-x-8 bg-background opacity-[0.99] shadow-custom-inset pe-8`}
-                    >
+        <MainCommands>
+            <main
+                className={`${font.className} grid grid-cols-[300px_1fr] grid-rows-[150px_1fr] w-screen h-screen gap-x-8 bg-background opacity-[0.99] shadow-custom-inset pe-8`}
+            >
+                <SearchProvider>
+                    <DocumentUploadProvider>
                         <TopBar />
                         <Sidepanel>{sidePanelLinks}</Sidepanel>
                         <PageContent>{children}</PageContent>
-                    </main>
-                </DocumentUploadProvider>
-                <WindowActions />
-            </MainCommands>
-        </SearchProvider>
+                    </DocumentUploadProvider>
+                    <WindowActions />
+                </SearchProvider>
+            </main>
+        </MainCommands>
     );
 }
