@@ -20,19 +20,20 @@ interface DocumentProps {
 export default function Document({ document }: DocumentProps) {
     const router = useRouter();
 
-    const handleRead = () => {
+    const handleRead = () : void => {
         router.push(`document/${document.id}`);
     };
 
-    const handleChat = () => {
+    const handleChat = () : void => {
         router.push(`chat/${document.id}`);
     };
 
-    const handleDelete = () => {
+    const handleDelete = () : void =>  {
         window.backend.deleteDocument(document.id);
+        router.refresh()
     };
 
-    const handleSummary = () => {
+    const handleSummary = () : void => {
         router.push(`summary/${document.id}`);
     };
 

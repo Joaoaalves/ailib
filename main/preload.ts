@@ -5,6 +5,7 @@ import {
     IpcRendererEvent,
 } from "electron";
 import { IMessage } from "shared/types/conversation";
+import { IDocument } from "shared/types/document";
 import { RankedSearchResult } from "shared/types/qdrant";
 
 const handler = {
@@ -75,18 +76,20 @@ contextBridge.exposeInMainWorld("openai", {
 contextBridge.exposeInMainWorld("backend", {
     processPdf: (
         pages: string[],
-        pdfPath: string,
-        bookName: string,
+        documentId: number,
         collectionId: number,
+        offset: number
     ) =>
         ipcRenderer.invoke(
             "process-pdf",
             pages,
-            pdfPath,
-            bookName,
+            documentId,
             collectionId,
+            offset
         ),
-
+    createDocument: async (name:string, path:string, collectionId:number) => ipcRenderer.invoke("createDocument", name, path, collectionId),
+    saveCover: async (documentId: number) => ipcRenderer.invoke("saveCover", documentId),
+    updateDocument: async (documentId: number, updateFields: IDocument) => ipcRenderer.invoke("updateDocument", documentId, updateFields),
     getCollections: () => ipcRenderer.invoke("getCollections"),
     createCollection: (collectionName: string) =>
         ipcRenderer.invoke("createCollection", collectionName),

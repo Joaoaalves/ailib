@@ -98,6 +98,7 @@ export async function summarizePages(
 export async function processChunks(
     event: IpcMainInvokeEvent,
     chunks: string[],
+    offset: number,
     metadata: Metadata,
 ) {
     try {
@@ -107,7 +108,7 @@ export async function processChunks(
 
             const embedding = await getEmbeddings(chunk);
 
-            metadata.page = index - 1;
+            metadata.page = offset + index - 1;
             await upsertEmbedding({
                 embedding,
                 chunk,

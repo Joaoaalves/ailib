@@ -46,7 +46,7 @@ export default function TopBar({ children }: TopBarProps) {
                             className="my-4 rounded-xl text-white font-bold transition-all duration-300 bg-black col-start-2"
                         >
                             {isEmbedding
-                                ? `Progress: ${progressPercentage.toFixed(1)}% (Cost: $${embeddingCost.toFixed(3)})`
+                                ? `Processing your document...`
                                 : "Upload New Document"}
                         </button>
                     </DialogTrigger>
