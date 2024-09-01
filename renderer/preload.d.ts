@@ -41,6 +41,7 @@ declare global {
                 pages: string[],
                 documentId: number,
                 collectionId: number,
+                processCount: number,
             ) => void;
             createDocument: (
                 name: string,

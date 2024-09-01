@@ -6,8 +6,6 @@ import { ICollection } from "shared/types/collection";
 import CollectionPicker from "./CollectionPicker";
 import Input from "../ui/Input";
 import { usePDFJS } from "@/hooks/usePDFJS";
-
-// Type of Document model on database
 import { IDocument } from "shared/types/document";
 import { PDFDocumentProxy } from "pdfjs-dist";
 
@@ -16,6 +14,7 @@ const FileUploader = () => {
     const [collections, setCollections] = useState<ICollection[] | null>(null);
     const pdfPathRef = useRef<string>("");
     const bookNameRef = useRef<string>("");
+    const processCountRef = useRef<HTMLInputElement>(null);
 
     const createDocument = async (): Promise<IDocument> => {
         const document = await window.backend.createDocument(
@@ -29,6 +28,7 @@ const FileUploader = () => {
     const getPageText = async (pdf: PDFDocumentProxy, pageNo: number) => {
         const page = await pdf.getPage(pageNo);
         const tokenizedText = await page.getTextContent();
+        // @ts-expect-error
         const pageText = tokenizedText.items.map((token) => token.str).join("");
         return pageText;
     };
@@ -86,8 +86,13 @@ const FileUploader = () => {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages: string[] = await Promise.all(pageTextPromises);
-
-        window.backend.processPdf(pages, document.id, collectionRef.current);
+        console.log(processCountRef.current);
+        window.backend.processPdf(
+            pages,
+            document.id,
+            collectionRef.current,
+            Number(processCountRef.current.value),
+        );
     });
 
     const onDrop = useCallback(async (acceptedFiles) => {
@@ -155,6 +160,15 @@ const FileUploader = () => {
                     onChange={(value) => (collectionRef.current = value)}
                 />
             )}
+            <Input
+                type="number"
+                placeholder="Number of processess..."
+                defaultValue={4}
+                onChange={(e) =>
+                    (processCountRef.current.value = e.target.value)
+                }
+                ref={processCountRef}
+            />
 
             <Input type="submit" value={"Enviar"} />
         </form>

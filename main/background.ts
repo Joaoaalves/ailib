@@ -154,28 +154,31 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-    "process-pdf",
+    "processPdf",
     async (
         event: IpcMainEvent,
         pages: string[],
         documentId: number,
         collectionId: number,
+        processCount: number,
     ) => {
         const document = await Document.findByPk(documentId);
+        if (!document) {
+            return { error: "Document not found!" };
+        }
 
         const totalPages = pages.length;
-        const quarter = Math.ceil(totalPages / 4);
+        const chunkSize = Math.ceil(totalPages / processCount);
 
-        const intervals = [
-            pages.slice(0, quarter),
-            pages.slice(quarter, quarter * 2),
-            pages.slice(quarter * 2, quarter * 3),
-            pages.slice(quarter * 3, totalPages),
-        ];
-
+        const intervals = [];
+        for (let i = 0; i < processCount; i++) {
+            const start = i * chunkSize;
+            const end = start + chunkSize;
+            intervals.push(pages.slice(start, end));
+        }
         await Promise.all(
             intervals.map((pages, index) => {
-                const offset = index * quarter;
+                const offset = index * chunkSize;
                 return processPDF({
                     event,
                     pages,

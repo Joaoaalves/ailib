@@ -78,14 +78,14 @@ contextBridge.exposeInMainWorld("backend", {
         pages: string[],
         documentId: number,
         collectionId: number,
-        offset: number,
+        processCount: number,
     ) =>
         ipcRenderer.invoke(
-            "process-pdf",
+            "processPdf",
             pages,
             documentId,
             collectionId,
-            offset,
+            processCount,
         ),
     createDocument: async (name: string, path: string, collectionId: number) =>
         ipcRenderer.invoke("createDocument", name, path, collectionId),
