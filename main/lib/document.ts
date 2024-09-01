@@ -13,15 +13,14 @@ export async function processPDF({
     pages,
     document,
     collectionId,
-    offset
+    offset,
 }: HProcessPDF) {
     try {
-        
         const embeddingCost =
             (countTokens(pages.join(" "), Models.embedding.tiktoken) *
                 Models.embedding.pricingPer1M) /
             MillionTokens;
-            
+
         event.sender.send("embedding_cost", embeddingCost);
 
         await ensureCollectionExists();
@@ -31,7 +30,6 @@ export async function processPDF({
             bookName: document.name,
             documentId: document.id,
         });
-        
     } catch (error) {
         console.error(error.message);
         throw new Error(error.message);

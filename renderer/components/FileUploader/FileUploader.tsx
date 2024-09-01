@@ -15,27 +15,32 @@ const FileUploader = () => {
     const pdfPathRef = useRef<string>("");
     const bookNameRef = useRef<string>("");
 
-    const createDocument = async() : Promise<IDocument> => {
-        const document = await window.backend.createDocument(bookNameRef.current, pdfPathRef.current, collectionRef.current)
-        return document
-    }
+    const createDocument = async (): Promise<IDocument> => {
+        const document = await window.backend.createDocument(
+            bookNameRef.current,
+            pdfPathRef.current,
+            collectionRef.current,
+        );
+        return document;
+    };
 
     const getPageText = async (pdf, pageNo: number) => {
         const page = await pdf.getPage(pageNo);
         const tokenizedText = await page.getTextContent();
-        const pageText = tokenizedText.items
-            .map((token) => token.str)
-            .join("");
+        const pageText = tokenizedText.items.map((token) => token.str).join("");
         return pageText;
     };
 
-    const saveCover = async(document:IDocument) => {
-        window.backend.saveCover(document.id)
-    }
+    const saveCover = async (document: IDocument) => {
+        window.backend.saveCover(document.id);
+    };
 
-    const saveDocumentTotalPages = async(documentId: number, totalPages:number) => {
-        window.backend.updateDocument(documentId, {totalPages})
-    }
+    const saveDocumentTotalPages = async (
+        documentId: number,
+        totalPages: number,
+    ) => {
+        window.backend.updateDocument(documentId, { totalPages });
+    };
 
     const processPDF = usePDFJS(async (pdfjs) => {
         if (!pdfPathRef.current) {
@@ -43,27 +48,22 @@ const FileUploader = () => {
             return;
         }
 
-        const document = await createDocument()
+        const document = await createDocument();
         await saveCover(document);
 
-        const pdf = await pdfjs.getDocument({ url: pdfPathRef.current }).promise;
+        const pdf = await pdfjs.getDocument({ url: pdfPathRef.current })
+            .promise;
 
         const maxPages = pdf.numPages;
-        saveDocumentTotalPages(document.id, maxPages)
+        saveDocumentTotalPages(document.id, maxPages);
 
         const pageTextPromises = [];
         for (let pageNo = 1; pageNo <= maxPages; pageNo += 1) {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages: string[] = await Promise.all(pageTextPromises);
-        
 
-        window.backend.processPdf(
-            pages,
-            document.id,
-            collectionRef.current,
-        )
-
+        window.backend.processPdf(pages, document.id, collectionRef.current);
     });
 
     const onDrop = useCallback(async (acceptedFiles) => {

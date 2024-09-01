@@ -1,4 +1,4 @@
-import { ErrorResponse } from '../shared/types/api';
+import { ErrorResponse } from "../shared/types/api";
 import { RankedSearchResult } from "shared/types/qdrant";
 import { IpcHandler } from "../main/preload";
 import { IConversation, IMessage } from "./@types/chat";
@@ -40,11 +40,20 @@ declare global {
             processPdf: (
                 pages: string[],
                 documentId: number,
-                collectionId: number
+                collectionId: number,
             ) => void;
-            createDocument: (name:string, path:string, collectionId:number) => Promise<IDocument>;
-            saveCover: (documentId:number) => Promise<IDocument | ErrorResponse>;
-            updateDocument: (documentId:number, updateFields) => Promise<IDocument | ErrorResponse>;
+            createDocument: (
+                name: string,
+                path: string,
+                collectionId: number,
+            ) => Promise<IDocument>;
+            saveCover: (
+                documentId: number,
+            ) => Promise<IDocument | ErrorResponse>;
+            updateDocument: (
+                documentId: number,
+                updateFields,
+            ) => Promise<IDocument | ErrorResponse>;
             getCollections: () => Promise<ICollection[]>;
             createCollection: (collectionName: string) => number;
             getDocument: (documentId: string) => Promise<IDocument | null>;

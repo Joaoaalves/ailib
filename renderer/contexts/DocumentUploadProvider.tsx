@@ -31,8 +31,7 @@ const DocumentUploadProvider: React.FC<{ children: ReactNode }> = ({
     useEffect(() => {
         const handleProgress = (prog: IProgress) => {
             setIsEmbedding(true);
-            if(!progress || prog.chunk > progress.chunk)
-                setProgress(prog);
+            if (!progress || prog.chunk > progress.chunk) setProgress(prog);
         };
 
         if (window.openai && window.openai.embeddingProgress) {

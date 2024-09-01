@@ -83,56 +83,65 @@ ipcMain.handle("set-api-key", (event, key) => {
     saveApiKey(key);
 });
 
-ipcMain.handle("createDocument", async (
-    event:IpcMainEvent, 
-    name:string,
-    path: string,
-    collectionId: number
-) => {
+ipcMain.handle(
+    "createDocument",
+    async (
+        event: IpcMainEvent,
+        name: string,
+        path: string,
+        collectionId: number,
+    ) => {
+        const storagePdfPath = await savePdfToStorage(path, name);
+        const doc = await Document.create({
+            name,
+            path: storagePdfPath,
+        });
+        if (doc) {
+            await associateDocumentToCollection(collectionId, doc.id);
 
-    const storagePdfPath = await savePdfToStorage(path, name);
-    const doc = await Document.create({
-        name,
-        path: storagePdfPath
-    })
-    if(doc){
-        await associateDocumentToCollection(collectionId, doc.id)
-    
-        return JSON.parse(JSON.stringify(doc))
-    }
+            return JSON.parse(JSON.stringify(doc));
+        }
 
-    return {
-        error: "Document not found!"
-    }
-})
+        return {
+            error: "Document not found!",
+        };
+    },
+);
 
 ipcMain.handle("saveCover", async (event: IpcMainEvent, documentId) => {
     const doc = await Document.findByPk(documentId);
-    if(doc){
+    if (doc) {
         const cover = await extractCover(doc.path, doc.name);
         doc.cover = cover;
         await doc.save();
-        return JSON.parse(JSON.stringify(doc))
+        return JSON.parse(JSON.stringify(doc));
     }
 
     return {
-        error: "Document not found!"
-    }
-})
+        error: "Document not found!",
+    };
+});
 
-ipcMain.handle("updateDocument", async(event: IpcMainEvent, documentId: number, updateFields: IDocument) => {
-    const doc = await Document.findByPk(documentId)
+ipcMain.handle(
+    "updateDocument",
+    async (
+        event: IpcMainEvent,
+        documentId: number,
+        updateFields: IDocument,
+    ) => {
+        const doc = await Document.findByPk(documentId);
 
-    if(doc){
-        await doc.update(updateFields)
-        await doc.save()
-        return JSON.parse(JSON.stringify(doc))
-    }
+        if (doc) {
+            await doc.update(updateFields);
+            await doc.save();
+            return JSON.parse(JSON.stringify(doc));
+        }
 
-    return {
-        error: "Document not found!"
-    }
-})
+        return {
+            error: "Document not found!",
+        };
+    },
+);
 
 ipcMain.handle(
     "process-pdf",
@@ -140,11 +149,11 @@ ipcMain.handle(
         event: IpcMainEvent,
         pages: string[],
         documentId: number,
-        collectionId: number
+        collectionId: number,
     ) => {
         const document = await Document.findByPk(documentId);
 
-        const totalPages = pages.length
+        const totalPages = pages.length;
         const quarter = Math.ceil(totalPages / 4);
 
         const intervals = [
@@ -156,10 +165,16 @@ ipcMain.handle(
 
         await Promise.all(
             intervals.map((pages, index) => {
-              const offset = index * quarter;
-              return processPDF({ event, pages, document, collectionId, offset });
-            })
-          );
+                const offset = index * quarter;
+                return processPDF({
+                    event,
+                    pages,
+                    document,
+                    collectionId,
+                    offset,
+                });
+            }),
+        );
 
         event.sender.send("embedding_complete");
     },

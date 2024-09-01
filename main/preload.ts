@@ -78,18 +78,21 @@ contextBridge.exposeInMainWorld("backend", {
         pages: string[],
         documentId: number,
         collectionId: number,
-        offset: number
+        offset: number,
     ) =>
         ipcRenderer.invoke(
             "process-pdf",
             pages,
             documentId,
             collectionId,
-            offset
+            offset,
         ),
-    createDocument: async (name:string, path:string, collectionId:number) => ipcRenderer.invoke("createDocument", name, path, collectionId),
-    saveCover: async (documentId: number) => ipcRenderer.invoke("saveCover", documentId),
-    updateDocument: async (documentId: number, updateFields: IDocument) => ipcRenderer.invoke("updateDocument", documentId, updateFields),
+    createDocument: async (name: string, path: string, collectionId: number) =>
+        ipcRenderer.invoke("createDocument", name, path, collectionId),
+    saveCover: async (documentId: number) =>
+        ipcRenderer.invoke("saveCover", documentId),
+    updateDocument: async (documentId: number, updateFields: IDocument) =>
+        ipcRenderer.invoke("updateDocument", documentId, updateFields),
     getCollections: () => ipcRenderer.invoke("getCollections"),
     createCollection: (collectionName: string) =>
         ipcRenderer.invoke("createCollection", collectionName),

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function Welcome() {
-    const [now, setNow] = useState<Date>(new Date());
+    const [now, setNow] = useState<Date>();
 
     const getFormatedDate = () => {
         return `${now.getHours()}:${now.getMinutes()}, ${now.getDate()}/${now.getMonth()}, ${getWeekDayString(now.getDay())}`;
@@ -19,6 +19,8 @@ export default function Welcome() {
             clearInterval(timer);
         };
     });
+
+    if (!now) return;
 
     return (
         <div className="flex flex-col items-start justify-start p-4">
