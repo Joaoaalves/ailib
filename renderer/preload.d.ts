@@ -49,6 +49,7 @@ declare global {
             ) => Promise<IDocument>;
             saveCover: (
                 documentId: number,
+                cover: ArrayBuffer,
             ) => Promise<IDocument | ErrorResponse>;
             updateDocument: (
                 documentId: number,

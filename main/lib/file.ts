@@ -2,14 +2,13 @@ import fs from "fs";
 import path from "path";
 import { PDFDocument } from "pdf-lib";
 
-import pdfPoppler from "pdf-poppler";
+const storageDir = path.join(__dirname, "storage");
+const coverDir = path.join(storageDir, "covers");
 
 export async function savePdfToStorage(
     pdfPath: string,
     bookName: string,
 ): Promise<string> {
-    const storageDir = path.join(__dirname, "storage");
-
     if (!fs.existsSync(storageDir)) {
         fs.mkdirSync(storageDir);
     }
@@ -26,26 +25,24 @@ export async function savePdfToStorage(
     return newPath;
 }
 
-export async function extractCover(
-    pdfPath: string,
-    bookName: string,
-): Promise<string | null> {
+export async function saveCoverOnStorage(
+    coverBuffer: Buffer,
+    documentName: string,
+): Promise<string> {
     try {
-        const outputDir = path.join(__dirname, "storage/covers/");
-        const outputImagePath = path.resolve(outputDir, `${bookName}.png`);
+        // Crie o diretório se ele não existir
+        if (!fs.existsSync(coverDir)) {
+            fs.mkdirSync(coverDir, { recursive: true });
+        }
+        const fileName = `${documentName.replace(/\s+/g, "_")}.png`;
+        const filePath = path.join(coverDir, fileName);
 
-        const options = {
-            format: "png",
-            out_dir: outputDir,
-            out_prefix: bookName,
-            page: 1,
-        };
+        // Salve o Buffer como um arquivo no sistema de arquivos
+        fs.writeFileSync(filePath, coverBuffer);
 
-        await pdfPoppler.convert(pdfPath, options);
-        return outputImagePath;
+        return filePath;
     } catch (error) {
-        console.error("Erro ao converter PDF para imagem:", error);
-        throw error;
+        console.error("Error saving document cover:", error);
     }
 }
 

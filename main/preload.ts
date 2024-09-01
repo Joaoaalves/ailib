@@ -89,8 +89,8 @@ contextBridge.exposeInMainWorld("backend", {
         ),
     createDocument: async (name: string, path: string, collectionId: number) =>
         ipcRenderer.invoke("createDocument", name, path, collectionId),
-    saveCover: async (documentId: number) =>
-        ipcRenderer.invoke("saveCover", documentId),
+    saveCover: async (documentId: number, cover: ArrayBuffer) =>
+        ipcRenderer.invoke("saveCover", documentId, cover),
     updateDocument: async (documentId: number, updateFields: IDocument) =>
         ipcRenderer.invoke("updateDocument", documentId, updateFields),
     getCollections: () => ipcRenderer.invoke("getCollections"),

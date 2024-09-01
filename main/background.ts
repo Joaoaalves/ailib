@@ -31,7 +31,7 @@ import {
 import { RAGFusion } from "./lib/rag";
 import Summary from "./db/summary";
 import { associateDocumentToCollection } from "./lib/data";
-import { extractCover, savePdfToStorage } from "./lib/file";
+import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -108,19 +108,29 @@ ipcMain.handle(
     },
 );
 
-ipcMain.handle("saveCover", async (event: IpcMainEvent, documentId) => {
-    const doc = await Document.findByPk(documentId);
-    if (doc) {
-        const cover = await extractCover(doc.path, doc.name);
-        doc.cover = cover;
-        await doc.save();
-        return JSON.parse(JSON.stringify(doc));
-    }
+ipcMain.handle(
+    "saveCover",
+    async (event: IpcMainEvent, documentId: number, cover: ArrayBuffer) => {
+        const doc = await Document.findByPk(documentId);
 
-    return {
-        error: "Document not found!",
-    };
-});
+        if (doc) {
+            const buffer = Buffer.from(cover);
+
+            //save cover on /storage/covers/ with the document.name value
+            const coverPath = await saveCoverOnStorage(buffer, doc.name);
+
+            //save cover path to document on db
+            doc.cover = coverPath;
+
+            await doc.save();
+            return JSON.parse(JSON.stringify(doc));
+        }
+
+        return {
+            error: "Document not found!",
+        };
+    },
+);
 
 ipcMain.handle(
     "updateDocument",

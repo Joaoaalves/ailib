@@ -6,8 +6,10 @@ import { ICollection } from "shared/types/collection";
 import CollectionPicker from "./CollectionPicker";
 import Input from "../ui/Input";
 import { usePDFJS } from "@/hooks/usePDFJS";
+
+// Type of Document model on database
 import { IDocument } from "shared/types/document";
-import { ErrorResponse } from "shared/types/api";
+import { PDFDocumentProxy } from "pdfjs-dist";
 
 const FileUploader = () => {
     const collectionRef = useRef(null);
@@ -24,15 +26,41 @@ const FileUploader = () => {
         return document;
     };
 
-    const getPageText = async (pdf, pageNo: number) => {
+    const getPageText = async (pdf: PDFDocumentProxy, pageNo: number) => {
         const page = await pdf.getPage(pageNo);
         const tokenizedText = await page.getTextContent();
         const pageText = tokenizedText.items.map((token) => token.str).join("");
         return pageText;
     };
 
-    const saveCover = async (document: IDocument) => {
-        window.backend.saveCover(document.id);
+    const saveCover = async (pdf: PDFDocumentProxy, doc: IDocument) => {
+        const page = await pdf.getPage(1);
+
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = window.document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+            canvasContext: context,
+            viewport: viewport,
+        };
+
+        await page.render(renderContext).promise;
+
+        // Converte o canvas para Blob
+        canvas.toBlob(async (blob) => {
+            if (blob) {
+                const coverBuffer = await blob.arrayBuffer();
+                try {
+                    window.backend.saveCover(doc.id, coverBuffer);
+                } catch (error) {
+                    console.error("Erro ao salvar a capa do documento:", error);
+                }
+            }
+        }, "image/png");
     };
 
     const saveDocumentTotalPages = async (
@@ -43,16 +71,12 @@ const FileUploader = () => {
     };
 
     const processPDF = usePDFJS(async (pdfjs) => {
-        if (!pdfPathRef.current) {
-            console.error("No PDF path available");
-            return;
-        }
-
         const document = await createDocument();
-        await saveCover(document);
 
         const pdf = await pdfjs.getDocument({ url: pdfPathRef.current })
             .promise;
+
+        await saveCover(pdf, document);
 
         const maxPages = pdf.numPages;
         saveDocumentTotalPages(document.id, maxPages);
@@ -92,6 +116,12 @@ const FileUploader = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!pdfPathRef.current) {
+            console.error("No PDF path available");
+            return;
+        }
+
         await processPDF();
     };
 
