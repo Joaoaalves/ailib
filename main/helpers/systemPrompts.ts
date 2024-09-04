@@ -43,6 +43,16 @@ export const Prompts: IPrompts = {
             " deve ser linear, então não faça conclusões nem introduções, você está apenas " +
             "continuando um resumo anterior. Lembre-se de estruturar o resumo em tópicos e ser " +
             "um especialista no assunto. Use bullet points e tente continuar a partir do assunto " +
-            "anterior.",
+            "anterior. Template de resumo:\n" +
+            "### Titulo do capitulo atual (Só adicionar quando encontrar um)\n" +
+            "* Bullet Points dos temas abordados (Apenas títulos)\n" +
+            "* 2\n" +
+            "* 3\n" +
+            "##### Tema abordado 1\n" +
+            "Texto descrevendo o tema, utilizando o conteúdo do escritor\n\n" +
+            "##### Tema abordado 2\n\n" +
+            "----\n" +
+            "Exemplos:\n\n" +
+            "    enter code here\n\nResumo Anterior:",
     },
 };
