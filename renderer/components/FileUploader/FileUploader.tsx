@@ -13,12 +13,12 @@ const FileUploader = () => {
     const collectionRef = useRef(null);
     const [collections, setCollections] = useState<ICollection[] | null>(null);
     const pdfPathRef = useRef<string>("");
-    const bookNameRef = useRef<string>("");
+    const bookNameRef = useRef<HTMLInputElement>(null);
     const processCountRef = useRef<HTMLInputElement>(null);
 
     const createDocument = async (): Promise<IDocument> => {
         const document = await window.backend.createDocument(
-            bookNameRef.current,
+            bookNameRef.current?.value || "",
             pdfPathRef.current,
             collectionRef.current,
         );
@@ -50,7 +50,6 @@ const FileUploader = () => {
 
         await page.render(renderContext).promise;
 
-        // Converte o canvas para Blob
         canvas.toBlob(async (blob) => {
             if (blob) {
                 const coverBuffer = await blob.arrayBuffer();
@@ -86,12 +85,11 @@ const FileUploader = () => {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages: string[] = await Promise.all(pageTextPromises);
-        console.log(processCountRef.current);
         window.backend.processPdf(
             pages,
             document.id,
             collectionRef.current,
-            Number(processCountRef.current.value),
+            Number(processCountRef.current?.value || 0),
         );
     });
 
@@ -103,7 +101,9 @@ const FileUploader = () => {
 
         const name = file.name.replace(".pdf", "");
 
-        bookNameRef.current = name;
+        if (bookNameRef.current) {
+            bookNameRef.current.value = name;
+        }
     }, []);
 
     const acceptConfig: Accept = {
@@ -150,8 +150,12 @@ const FileUploader = () => {
             <Input
                 type="text"
                 placeholder="Set your filename..."
-                value={bookNameRef.current}
-                onChange={(e) => (bookNameRef.current = e.target.value)}
+                ref={bookNameRef}
+                onChange={(e) => {
+                    if (bookNameRef.current) {
+                        bookNameRef.current.value = e.target.value;
+                    }
+                }}
             />
             {collections && (
                 <CollectionPicker
@@ -164,9 +168,11 @@ const FileUploader = () => {
                 type="number"
                 placeholder="Number of processess..."
                 defaultValue={4}
-                onChange={(e) =>
-                    (processCountRef.current.value = e.target.value)
-                }
+                onChange={(e) => {
+                    if (processCountRef.current) {
+                        processCountRef.current.value = e.target.value;
+                    }
+                }}
                 ref={processCountRef}
             />
 
