@@ -1,17 +1,13 @@
+import { IConversation } from "./../../shared/types/conversation";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "./connection";
 import Message from "./message";
 
-interface ConversationAttributes {
-    id: number;
-    title: string;
-}
-
 interface ConversationCreationAttributes
-    extends Optional<ConversationAttributes, "id"> {}
+    extends Optional<IConversation, "id"> {}
 
 interface ConversationInstance
-    extends Model<ConversationAttributes, ConversationCreationAttributes> {
+    extends Model<IConversation, ConversationCreationAttributes> {
     id: number;
     title: string;
     addMessage: (message: typeof Message) => Promise<void>;

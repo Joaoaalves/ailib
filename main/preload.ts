@@ -69,6 +69,15 @@ contextBridge.exposeInMainWorld("openai", {
         pages: string[],
         summaryTitle: string,
     ) => ipcRenderer.invoke("summarizePages", documentId, pages, summaryTitle),
+    summaryzingProgress: (
+        callback: (progress: number) => void,
+        onEnd: () => void,
+    ) => {
+        ipcRenderer.on("summaryzingProgress", (event, progress) =>
+            callback(progress),
+        );
+        ipcRenderer.on("summaryzingComplete", onEnd);
+    },
     deleteConversation: (conversationId: number) =>
         ipcRenderer.invoke("deleteConversation", conversationId),
 });

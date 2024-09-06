@@ -4,6 +4,7 @@ import { IpcHandler } from "../main/preload";
 import { IConversation, IMessage } from "./@types/chat";
 import { ICollection } from "./@types/collection";
 import { IDocument } from "shared/types/document";
+import { ISummary } from "shared/types/summary";
 
 interface IProgress {
     chunk: number;
@@ -34,6 +35,10 @@ declare global {
                 documentId: number,
                 pages: string[],
                 summaryTitle: string,
+            ) => void;
+            summaryzingProgress: (
+                callback: (data) => void,
+                onEnd: () => void,
             ) => void;
         };
         backend: {
@@ -72,6 +77,10 @@ declare global {
                 page: number,
             ) => Promise<void>;
             search: (query: string) => Promise<DocSearchResult>;
+        };
+        summary: {
+            get: () => Promise<ISummary[]>;
+            getById: (id: string) => Promise<ISummary>;
         };
         actions: {
             close: () => void;

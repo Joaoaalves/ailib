@@ -11,5 +11,5 @@ export interface IConversation {
     title: string;
     updatedAt?: Date;
     createdAt?: Date;
-    Messages: IMessage[];
+    Messages?: IMessage[];
 }

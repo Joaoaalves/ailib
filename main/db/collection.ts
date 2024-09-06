@@ -1,21 +1,20 @@
+import { ICollection } from "./../../shared/types/collection";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "./connection";
 import Document from "./document";
 
-// Interface para o tipo Collection
 interface CollectionAttributes {
     id: number;
     name: string;
 }
 
-interface CollectionCreationAttributes
-    extends Optional<CollectionAttributes, "id"> {}
+interface CollectionCreationAttributes extends Optional<ICollection, "id"> {}
 
 interface CollectionInstance
     extends Model<CollectionAttributes, CollectionCreationAttributes> {
     id: number;
     name: string;
-    addDocument: (document: typeof Document) => Promise<void>; // Adicione este método
+    addDocument: (document: typeof Document) => Promise<void>;
 }
 
 const Collection = db.define<CollectionInstance>(

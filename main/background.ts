@@ -7,7 +7,7 @@ import {
     IpcMainEvent,
 } from "electron";
 import path from "path";
-import { createWriteStream, existsSync, mkdirSync } from "fs";
+import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import {
     saveApiKey,
     chatWithDocument,
@@ -16,7 +16,6 @@ import {
     getMoreQueries,
 } from "./lib/openai";
 
-import { closeWindow, minimizeWindow } from "./lib/window";
 import Document from "./db/document";
 import Collection from "./db/collection";
 import Conversation from "./db/conversation";
@@ -28,6 +27,7 @@ import {
     deletePointsForDocumentId,
     ensureCollectionExists,
 } from "./lib/qdrant";
+
 import { RAGFusion } from "./lib/rag";
 import Summary from "./db/summary";
 import { associateDocumentToCollection } from "./lib/data";
@@ -292,19 +292,53 @@ ipcMain.handle(
                 lastSummary,
             );
 
-            writeStream.write("\n\n" + lastSummary);
+            event.sender.send("summaryzingProgress", {
+                progress: (endingPage * 100) / pages.length,
+            });
+
+            writeStream.write(lastSummary + "\n\n");
         }
 
         writeStream.end();
+
+        const summary = await Summary.create({
+            title: summaryTitle,
+            path: outputPath,
+            summaryType: "interval",
+        });
+
+        const document = await Document.findByPk(documentId);
+
+        if (document) {
+            //@ts-expect-error
+            document.addSummary(summary);
+        }
+
+        event.sender.send("summaryzingComplete");
+        return JSON.parse(JSON.stringify(summary));
     },
 );
 
 ipcMain.handle("getSummaries", async (event) => {
-    return await Summary.findAll();
+    return JSON.parse(JSON.stringify(await Summary.findAll()));
 });
 
-ipcMain.handle("getSummarryById", async (event, id) => {
-    return await Summary.findByPk(id);
+ipcMain.handle("getSummaryById", async (event, id) => {
+    try {
+        const summary = await Summary.findByPk(id);
+
+        if (summary) {
+            const data = readFileSync(summary.path, "utf-8");
+            summary.dataValues.text = data;
+            return JSON.parse(JSON.stringify(summary));
+        }
+
+        return JSON.parse(JSON.stringify({ error: "Summary Not Found!" }));
+    } catch (error) {
+        return JSON.parse(
+            JSON.stringify({ error: "Error looking for Summary File." }),
+        );
+    }
 });
 
 ipcMain.handle("close", (event) => {
@@ -318,7 +352,6 @@ ipcMain.handle("minimize", (event) => {
 
 app.on("ready", async () => {
     await syncDatabase();
-
     if (BrowserWindow.getAllWindows().length == 0) {
         const mainWindow = new BrowserWindow({
             width: 1000,

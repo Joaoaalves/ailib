@@ -9,7 +9,10 @@ export async function saveDocument(document: IDocument) {
     });
 }
 
-export async function associateDocumentToCollection(collectionId, document) {
+export async function associateDocumentToCollection(
+    collectionId: number,
+    document,
+) {
     const collection = await Collection.findByPk(collectionId);
     await collection.addDocument(document);
 }

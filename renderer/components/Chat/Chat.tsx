@@ -13,7 +13,7 @@ export default function ChatRoot({ children }: { children: ReactNode }) {
             (chunk) => {
                 streamMessage(chunk.choices[0]?.delta?.content || "");
             },
-            (result) => console.log(result),
+            (result) => {},
             () => setStreamEnd(true),
         );
     }, []);

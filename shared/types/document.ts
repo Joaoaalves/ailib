@@ -1,3 +1,5 @@
+import { ISummary } from "./summary";
+
 export interface IDocument {
     id?: number;
     name: string;
@@ -5,6 +7,7 @@ export interface IDocument {
     cover?: string;
     totalPages?: number;
     lastPageRead?: number;
+    summaries?: ISummary[];
 }
 
 export interface DocSearchResult {

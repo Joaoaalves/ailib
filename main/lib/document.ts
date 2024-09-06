@@ -1,7 +1,5 @@
 import { HProcessPDF } from "../types/handlers";
 import { ensureCollectionExists } from "./qdrant";
-import { extractCover, savePdfToStorage } from "./file";
-import { associateDocumentToCollection, saveDocument } from "./data";
 import { countTokens, processChunks } from "./openai";
 
 import { Models } from "./openai";

@@ -1,8 +1,20 @@
-import { DataTypes } from "sequelize";
+import { ISummary } from "shared/types/summary";
+import { DataTypes, Model, Optional } from "sequelize";
 import db from "./connection";
-import Document from "./document";
 
-const Summary = db.define(
+interface SummaryCreationAttributes extends Optional<ISummary, "id"> {}
+
+interface SummaryInstance extends Model<ISummary, SummaryCreationAttributes> {
+    id?: number;
+    title: string;
+    path: string;
+    summaryType: "page" | "chapter" | "file";
+    page?: number;
+    chapter?: number;
+    createAt: Date;
+}
+
+const Summary = db.define<SummaryInstance>(
     "Summary",
     {
         id: {
@@ -10,12 +22,16 @@ const Summary = db.define(
             autoIncrement: true,
             primaryKey: true,
         },
-        text: {
+        title: {
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        summary_type: {
-            type: DataTypes.ENUM("page", "chapter", "file"),
+        path: {
+            type: DataTypes.TEXT,
+            allowNull: false,
+        },
+        summaryType: {
+            type: DataTypes.ENUM("page", "chapter", "file", "interval"),
             allowNull: false,
         },
         page: {
@@ -35,7 +51,5 @@ const Summary = db.define(
         timestamps: false,
     },
 );
-
-Summary.hasOne(Document);
 
 export default Summary;

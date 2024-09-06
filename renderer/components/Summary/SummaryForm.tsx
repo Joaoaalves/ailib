@@ -1,18 +1,17 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Input from "@/components/ui/Input";
 import { IDocument } from "shared/types/document";
-import { useParams } from "next/navigation";
 import { usePDFJS } from "@/hooks/usePDFJS";
 import { Label } from "@/components/ui/Label";
 import InputGroup from "@/components/ui/InputGroup";
+import { useSummaryDocument } from "@/contexts/SummaryProvider";
 
-export default function SummaryForm() {
+export default function SummaryForm({ documentId }) {
     const document = useRef<IDocument>();
     const startingPage = useRef<HTMLInputElement>();
     const endingPage = useRef<HTMLInputElement>();
     const title = useRef<HTMLInputElement>();
-
-    const { documentId } = useParams();
+    const { isSummaryzing, progress } = useSummaryDocument();
 
     const getDocument = async () => {
         document.current = await window.backend.getDocument(
@@ -62,6 +61,16 @@ export default function SummaryForm() {
 
     return (
         <form className="space-y-8 p-8" onSubmit={handleSubmit}>
+            {isSummaryzing && (
+                <div className="h-2 bg-black rounded-xl w-full flex">
+                    <div
+                        className={"bg-primary rounded-xl h-2"}
+                        style={{
+                            width: `${progress}%`,
+                        }}
+                    ></div>
+                </div>
+            )}
             <InputGroup>
                 <Label className="text-white font-bold text-md" htmlFor="title">
                     Summary Title
@@ -98,6 +107,7 @@ export default function SummaryForm() {
                 className="hover:bg-neutral-100 hover:text-black font-black text-md cursor-pointer transition-all duration-300"
                 type="submit"
                 value="Summarize"
+                disabled={isSummaryzing}
             />
         </form>
     );
