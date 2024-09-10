@@ -4,7 +4,6 @@ import SummaryList from "@/components/Summary/SummaryList";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ISummary } from "shared/types/summary";
-import { Textarea } from "@/components/ui/TextArea";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 
 export default function Page() {
