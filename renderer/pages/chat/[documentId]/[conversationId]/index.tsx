@@ -9,12 +9,15 @@ import { IConversation } from "shared/types/conversation";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import NavLink from "@/components/Sidepanel/NavLink";
 import Nav from "@/components/Sidepanel/Nav";
+import ChatList from "@/components/Chat/ChatList";
 
 export default function Page() {
-    const [conversations, setConversations] = useState<IConversation[]>([]);
-
+    const { documentId, conversationId } = useParams<{
+        documentId: string;
+        conversationId: string;
+    }>();
     const inputRef = useRef(null);
-    const { documentId, conversationId } = useParams();
+    const [conversations, setConversations] = useState<IConversation[]>([]);
 
     const getConversations = async () => {
         const conversations = await window.backend.getConversations();
@@ -33,19 +36,10 @@ export default function Page() {
         >
             <Layout
                 sidePanelLinks={
-                    conversations ? (
-                        <Nav>
-                            {conversations.map((conversation) => (
-                                <Conversation
-                                    conversation={conversation}
-                                    documentId={documentId as string}
-                                    key={`conv-${conversation.id}`}
-                                />
-                            ))}
-                        </Nav>
-                    ) : (
-                        <></>
-                    )
+                    <ChatList
+                        documentId={documentId}
+                        conversations={conversations}
+                    />
                 }
             >
                 <ChatRoot>
