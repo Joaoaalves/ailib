@@ -1,3 +1,4 @@
+import { useConversations } from "@/hooks/use-conversations";
 import { useRouter } from "next/navigation";
 import React, {
     createContext,
@@ -32,13 +33,14 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 }) => {
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [conversation, setConversation] = useState<IConversation>();
+    const { createConversation } = useConversations();
     const router = useRouter();
 
     const getConversation = async () => {
         let conv: IConversation =
             await window.backend.getConversation(conversationId);
 
-        if (!conv) conv = { id: 0, title: "", Messages: [] };
+        if (!conv) return router.push("/chat/" + documentId);
 
         setMessages(conv.Messages);
         setConversation(conv);
@@ -73,18 +75,34 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
     }, []);
 
     const onStreamEnd = () => {
-        window.backend.saveMessage(conversation.id, messages.at(-1));
+        if (conversation) {
+            window.backend.saveMessage(conversation.id, messages.at(-1));
+        }
     };
 
     const createConversationIfNotExists = async (message: IMessage) => {
         if (!conversation && !conversationId) {
-            const conversation: IConversation =
-                await window.backend.createConversation(message);
-            setConversation(conversation);
-            return conversation.id;
+            const newConversation = await new Promise<IConversation>(
+                (resolve, reject) => {
+                    createConversation(message, {
+                        onSuccess: (createdConversation) => {
+                            setConversation(createdConversation);
+                            resolve(createdConversation);
+                        },
+                        onError: (error) => {
+                            console.error(
+                                "Failed to create conversation",
+                                error,
+                            );
+                            reject(error);
+                        },
+                    });
+                },
+            );
+            return newConversation.id;
         }
 
-        return conversation.id;
+        return conversation?.id;
     };
 
     const sendMessage = async (content: string) => {

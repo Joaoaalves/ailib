@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "react-query";
-import { IMessage } from "shared/types/conversation";
+import { IConversation, IMessage } from "shared/types/conversation";
 
 const getConversations = async () => {
     const conversations = await window.backend.getConversations();
@@ -11,7 +11,7 @@ const deleteConversation = async (conversationId: number) => {
 };
 
 const addConversation = async (message: IMessage) => {
-    await window.backend.createConversation(message);
+    return await window.backend.createConversation(message);
 };
 
 export function useConversations() {
@@ -26,14 +26,21 @@ export function useConversations() {
     });
 
     const addMutation = useMutation(addConversation, {
-        onSuccess: () => {
-            queryClient.invalidateQueries("conversations");
+        onSuccess: (newConversation) => {
+            queryClient.setQueryData(
+                "conversations",
+                (oldData: IMessage[] | undefined) => {
+                    return oldData
+                        ? [...oldData, newConversation]
+                        : [newConversation];
+                },
+            );
         },
     });
 
     return {
         conversations: query.data,
         deleteConversation: deleteMutation.mutate,
-        addConversation: addMutation.mutate,
+        createConversation: addMutation.mutate,
     };
 }
