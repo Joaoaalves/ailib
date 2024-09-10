@@ -282,9 +282,9 @@ ipcMain.handle(
 
         var writeStream = createWriteStream(outputPath, { flags: "a" });
 
-        for (let i = 0; i < pages.length; i += 2) {
+        for (let i = 0; i < pages.length; i += 4) {
             const startingPage = i;
-            const endingPage = Math.min(pages.length, i + 2);
+            const endingPage = Math.min(pages.length, i + 4);
 
             lastSummary = await summarizePages(
                 event,
