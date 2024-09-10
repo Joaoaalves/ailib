@@ -3,11 +3,8 @@ import ChatRoot from "@/components/Chat/Chat";
 import Layout from "@/components/Layout";
 import ChatInput from "@/components/Chat/ChatInput";
 import { ChatProvider } from "@/contexts/ChatContext";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { IConversation } from "shared/types/conversation";
-import { IoChatbubbleOutline } from "react-icons/io5";
-import NavLink from "@/components/Sidepanel/NavLink";
-import Nav from "@/components/Sidepanel/Nav";
 import ChatList from "@/components/Chat/ChatList";
 
 export default function Page() {
