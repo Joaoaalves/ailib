@@ -8,6 +8,7 @@ import { IConversation } from "shared/types/conversation";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import NavLink from "@/components/Sidepanel/NavLink";
 import Nav from "@/components/Sidepanel/Nav";
+import ChatList from "@/components/Chat/ChatList";
 
 export default function Page() {
     const [conversations, setConversations] = useState<IConversation[]>([]);
@@ -29,19 +30,10 @@ export default function Page() {
         <ChatProvider documentId={documentId as string}>
             <Layout
                 sidePanelLinks={
-                    conversations ? (
-                        <Nav>
-                            {conversations.map((conversation) => (
-                                <Conversation
-                                    conversation={conversation}
-                                    documentId={documentId as string}
-                                    key={`conv-${conversation.id}`}
-                                />
-                            ))}
-                        </Nav>
-                    ) : (
-                        <></>
-                    )
+                    <ChatList
+                        documentId={documentId as string}
+                        conversations={conversations}
+                    />
                 }
             >
                 <ChatRoot>
@@ -49,33 +41,5 @@ export default function Page() {
                 </ChatRoot>
             </Layout>
         </ChatProvider>
-    );
-}
-
-function Conversation({
-    conversation,
-    documentId,
-}: {
-    conversation: IConversation;
-    documentId: string;
-}) {
-    const router = useRouter();
-    return (
-        <NavLink
-            href={`/chat/${documentId}/${conversation.id}/`}
-            label={conversation.title}
-            router={router}
-            Icon={<IoChatbubbleOutline />}
-            Actions={[
-                {
-                    label: "Delete",
-                    shortcut: "⌘D",
-                    onClick: () => {
-                        window.openai.deleteConversation(conversation.id);
-                        router.push(`/chat/${documentId}`);
-                    },
-                },
-            ]}
-        />
     );
 }
