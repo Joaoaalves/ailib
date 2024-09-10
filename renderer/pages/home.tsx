@@ -22,7 +22,6 @@ export default function HomePage() {
                 <title>AILib</title>
             </Head>
             <Layout>
-                <a href="/chat/42/1">Test</a>
                 {collections.length > 0 &&
                     collections.map((collection: ICollection) => (
                         <Collection

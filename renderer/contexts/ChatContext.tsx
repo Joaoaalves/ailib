@@ -35,10 +35,10 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
     const router = useRouter();
 
     const getConversation = async () => {
-        const conv: IConversation =
+        let conv: IConversation =
             await window.backend.getConversation(conversationId);
 
-        if (!conv) return router.push(`/chat/${documentId}`);
+        if (!conv) conv = { id: 0, title: "", Messages: [] };
 
         setMessages(conv.Messages);
         setConversation(conv);
