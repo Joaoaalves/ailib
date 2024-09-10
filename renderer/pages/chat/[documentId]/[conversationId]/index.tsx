@@ -49,31 +49,3 @@ export default function Page() {
         </ChatProvider>
     );
 }
-
-function Conversation({
-    conversation,
-    documentId,
-}: {
-    conversation: IConversation;
-    documentId: string;
-}) {
-    const router = useRouter();
-    return (
-        <NavLink
-            href={`/chat/${documentId}/${conversation.id}/`}
-            label={conversation.title}
-            router={router}
-            Icon={<IoChatbubbleOutline />}
-            Actions={[
-                {
-                    label: "Delete",
-                    shortcut: "⌘R",
-                    onClick: () => {
-                        window.openai.deleteConversation(conversation.id);
-                        router.refresh();
-                    },
-                },
-            ]}
-        />
-    );
-}
