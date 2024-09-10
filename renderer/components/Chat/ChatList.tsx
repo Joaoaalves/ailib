@@ -1,15 +1,21 @@
 import { IConversation } from "shared/types/conversation";
 import Nav from "../Sidepanel/Nav";
-import { useRouter } from "next/navigation";
 import NavLink from "../Sidepanel/NavLink";
 import { IoChatbubbleOutline } from "react-icons/io5";
+import { useConversations } from "@/hooks/use-conversations";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 interface ChatListProps {
     documentId: string;
     conversations: IConversation[];
+    router: AppRouterInstance;
 }
 
-export default function ChatList({ documentId, conversations }: ChatListProps) {
+export default function ChatList({
+    documentId,
+    conversations,
+    router,
+}: ChatListProps) {
     if (!conversations?.length) return;
 
     return (
@@ -19,6 +25,7 @@ export default function ChatList({ documentId, conversations }: ChatListProps) {
                     conversation={conversation}
                     documentId={documentId}
                     key={`conv-${conversation.id}`}
+                    router={router}
                 />
             ))}
         </Nav>
@@ -28,11 +35,14 @@ export default function ChatList({ documentId, conversations }: ChatListProps) {
 function Conversation({
     conversation,
     documentId,
+    router,
 }: {
     conversation: IConversation;
     documentId: string;
+    router: AppRouterInstance;
 }) {
-    const router = useRouter();
+    const { deleteConversation } = useConversations();
+
     return (
         <NavLink
             href={`/chat/${documentId}/${conversation.id}/`}
@@ -44,8 +54,9 @@ function Conversation({
                     label: "Delete",
                     shortcut: "⌘D",
                     onClick: () => {
-                        window.openai.deleteConversation(conversation.id);
+                        deleteConversation(conversation.id);
                         router.push(`/chat/${documentId}`);
+                        router.refresh();
                     },
                 },
             ]}

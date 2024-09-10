@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import React, {
     createContext,
     useState,
@@ -31,10 +32,14 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 }) => {
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [conversation, setConversation] = useState<IConversation>();
+    const router = useRouter();
 
     const getConversation = async () => {
         const conv: IConversation =
             await window.backend.getConversation(conversationId);
+
+        if (!conv) return router.push(`/chat/${documentId}`);
+
         setMessages(conv.Messages);
         setConversation(conv);
     };
