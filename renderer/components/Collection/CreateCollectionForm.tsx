@@ -3,7 +3,7 @@ import { useState } from "react";
 import Input from "../ui/Input";
 import { useCollections } from "@/hooks/use-collections";
 
-export default function CreateCollectionForm() {
+export default function CreateCollectionForm({ setOpen }) {
     const { createCollection } = useCollections();
     const [collectionName, setCollectionName] = useState<string>("");
 
@@ -11,6 +11,7 @@ export default function CreateCollectionForm() {
         e.preventDefault();
 
         createCollection(collectionName);
+        setOpen(false);
     };
 
     return (

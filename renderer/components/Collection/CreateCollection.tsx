@@ -1,3 +1,5 @@
+"use client";
+import { useState } from "react";
 import {
     Dialog,
     DialogContent,
@@ -10,8 +12,9 @@ import { HiPlus } from "react-icons/hi";
 import CreateCollectionForm from "./CreateCollectionForm";
 
 export default function CreateCollection() {
+    const [open, setOpen] = useState<boolean>(false);
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <button className="bg-container grid grid-cols-[8px_1fr] gap-x-4 items-center my-4 rounded-xl text-white font-bold transition-all duration-300 hover:bg-black p-4 w-80">
                     <HiPlus className="text-xl" />
@@ -22,7 +25,7 @@ export default function CreateCollection() {
                 <DialogHeader>
                     <DialogTitle>Upload New Document</DialogTitle>
                 </DialogHeader>
-                <CreateCollectionForm />
+                <CreateCollectionForm setOpen={setOpen} />
             </DialogContent>
         </Dialog>
     );
