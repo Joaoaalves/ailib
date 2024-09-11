@@ -203,6 +203,13 @@ ipcMain.handle("createCollection", async (event, collectionName) => {
     return collectionId;
 });
 
+ipcMain.handle("deleteCollection", async (event, collectionId) => {
+    await Collection.destroy({
+        where: {
+            id: Number(collectionId),
+        },
+    });
+});
 ipcMain.handle("getDocument", async (event, documentId) => {
     const document = await Document.findByPk(Number(documentId));
     return JSON.parse(JSON.stringify(document));

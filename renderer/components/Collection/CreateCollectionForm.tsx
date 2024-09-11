@@ -1,14 +1,16 @@
 "use client";
 import { useState } from "react";
 import Input from "../ui/Input";
+import { useCollections } from "@/hooks/use-collections";
 
 export default function CreateCollectionForm() {
+    const { createCollection } = useCollections();
     const [collectionName, setCollectionName] = useState<string>("");
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const collectionId = window.backend.createCollection(collectionName);
+        createCollection(collectionName);
     };
 
     return (

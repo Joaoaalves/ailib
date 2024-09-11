@@ -96,6 +96,8 @@ contextBridge.exposeInMainWorld("backend", {
             collectionId,
             processCount,
         ),
+    getDocument: (documentId: string) =>
+        ipcRenderer.invoke("getDocument", documentId),
     createDocument: async (name: string, path: string, collectionId: number) =>
         ipcRenderer.invoke("createDocument", name, path, collectionId),
     saveCover: async (documentId: number, cover: ArrayBuffer) =>
@@ -105,8 +107,8 @@ contextBridge.exposeInMainWorld("backend", {
     getCollections: () => ipcRenderer.invoke("getCollections"),
     createCollection: (collectionName: string) =>
         ipcRenderer.invoke("createCollection", collectionName),
-    getDocument: (documentId: string) =>
-        ipcRenderer.invoke("getDocument", documentId),
+    deleteCollection: async (collectionId: number) =>
+        ipcRenderer.invoke("deleteCollection", collectionId),
     setLastPageRead: (documentId: number, page: number) =>
         ipcRenderer.invoke("setLastPageReadSave", documentId, page),
     deleteDocument: (documentId: number) =>
