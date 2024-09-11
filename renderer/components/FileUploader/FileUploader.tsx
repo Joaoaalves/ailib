@@ -8,10 +8,11 @@ import Input from "../ui/Input";
 import { usePDFJS } from "@/hooks/usePDFJS";
 import { IDocument } from "shared/types/document";
 import { PDFDocumentProxy } from "pdfjs-dist";
+import { useCollections } from "@/hooks/use-collections";
 
 const FileUploader = () => {
     const collectionRef = useRef(null);
-    const [collections, setCollections] = useState<ICollection[] | null>(null);
+    const { collections } = useCollections();
     const pdfPathRef = useRef<string>("");
     const bookNameRef = useRef<HTMLInputElement>(null);
     const processCountRef = useRef<HTMLInputElement>(null);
@@ -109,15 +110,6 @@ const FileUploader = () => {
     const acceptConfig: Accept = {
         "application/pdf": [".pdf"],
     };
-
-    const getCollections = async () => {
-        const cols = await window.backend.getCollections();
-        setCollections(cols);
-    };
-
-    useEffect(() => {
-        getCollections();
-    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
