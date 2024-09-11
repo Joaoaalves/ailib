@@ -1,8 +1,7 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-
+import { IDocument } from "shared/types/document";
 import { IoReaderOutline, IoChatboxOutline } from "react-icons/io5";
 
-import { IDocument } from "shared/types/document";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 
 import { Button } from "../ui/Button";
 import { useRouter } from "next/navigation";
@@ -14,10 +13,11 @@ import {
 } from "../ui/ContextMenu";
 
 interface DocumentProps {
+    collectionId: number;
     document: IDocument;
 }
 
-export default function Document({ document }: DocumentProps) {
+export default function Document({ collectionId, document }: DocumentProps) {
     const router = useRouter();
 
     const handleRead = (): void => {
@@ -25,7 +25,7 @@ export default function Document({ document }: DocumentProps) {
     };
 
     const handleChat = (): void => {
-        router.push(`chat/${document.id}`);
+        router.push(`chat/${collectionId}/${document.id}`);
     };
 
     const handleDelete = (): void => {

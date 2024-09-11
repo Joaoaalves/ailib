@@ -1,41 +1,36 @@
-"use client";
 import { useEffect, useRef } from "react";
 import ChatRoot from "@/components/Chat/Chat";
 import Layout from "@/components/Layout";
 import ChatInput from "@/components/Chat/ChatInput";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { useParams } from "next/navigation";
-import ChatList from "@/components/Chat/ChatList";
 import { useRouter } from "next/navigation";
+import ChatList from "@/components/Chat/ChatList";
 import { useConversations } from "@/hooks/use-conversations";
 
 export default function Page() {
     // Prevent useParamsBug
     if (!useParams()) return;
 
-    const { documentId, conversationId } = useParams<{
-        documentId: string;
-        conversationId: string;
-    }>();
-    const inputRef = useRef(null);
-
     const { conversations } = useConversations();
+    const inputRef = useRef(null);
     const router = useRouter();
-
-    useEffect(() => {
-        if (!documentId || !conversationId) router.push("/home");
-    }, [documentId]);
+    const { collectionId } = useParams<{ collectionId: string }>();
 
     useEffect(() => {
         if (inputRef.current) inputRef.current.scrollIntoView();
     }, []);
 
+    useEffect(() => {
+        if (!collectionId) router.push("/home");
+    }, [collectionId]);
+
     return (
-        <ChatProvider documentId={documentId} conversationId={conversationId}>
+        <ChatProvider collectionId={collectionId}>
             <Layout
                 sidePanelLinks={
                     <ChatList
-                        documentId={documentId}
+                        collectionId={collectionId}
                         conversations={conversations}
                         router={router}
                     />

@@ -15,7 +15,10 @@ export default function Page() {
     const { conversations } = useConversations();
     const inputRef = useRef(null);
     const router = useRouter();
-    const { documentId } = useParams<{ documentId: string }>();
+    const { collectionId, documentId } = useParams<{
+        collectionId: string;
+        documentId: string;
+    }>();
 
     useEffect(() => {
         if (inputRef.current) inputRef.current.scrollIntoView();
@@ -26,10 +29,11 @@ export default function Page() {
     }, [documentId]);
 
     return (
-        <ChatProvider documentId={documentId}>
+        <ChatProvider collectionId={collectionId} documentId={documentId}>
             <Layout
                 sidePanelLinks={
                     <ChatList
+                        collectionId={collectionId}
                         documentId={documentId}
                         conversations={conversations}
                         router={router}

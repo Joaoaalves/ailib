@@ -140,23 +140,24 @@ export async function createConversationTitle(message: IMessage) {
     return completion.choices[0].message.content;
 }
 
-export async function chatWithDocument(
+async function chat(
     event: IpcMainInvokeEvent,
     messages: IMessage[],
-    documentId: number,
+    filter: Object,
 ) {
     const relevantQueries = await getMoreQueries(messages.at(-1).content);
     const queries = [messages.at(-1).content, ...relevantQueries];
 
     const systemMessage = Prompts.defaultChatInstruction;
 
-    RAGFusion(queries, documentId).then(async (RAGResult) => {
+    RAGFusion(queries, filter).then(async (RAGResult) => {
         const result = RAGResult.map((result) => result.content);
         const lastMessage = messages.pop();
 
         lastMessage.content =
+            "Contexto retornado do Retrieval Augmented Generation:\n---\n" +
             JSON.stringify(result) +
-            "\nMensagem original do usuário:\n" +
+            "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;
 
         messages = [systemMessage, ...messages, lastMessage];
@@ -167,6 +168,48 @@ export async function chatWithDocument(
 
         event.sender.send("chat-stream-end");
     });
+}
+
+export async function chatWithCollection(
+    event: IpcMainInvokeEvent,
+    messages: IMessage[],
+    collectionId: number,
+) {
+    const filter = {
+        filter: {
+            must: [
+                {
+                    key: "collectionId",
+                    match: {
+                        value: collectionId,
+                    },
+                },
+            ],
+        },
+    };
+
+    return chat(event, messages, filter);
+}
+
+export async function chatWithDocument(
+    event: IpcMainInvokeEvent,
+    messages: IMessage[],
+    documentId: number,
+) {
+    const filter = {
+        filter: {
+            must: [
+                {
+                    key: "documentId",
+                    match: {
+                        value: Number(documentId),
+                    },
+                },
+            ],
+        },
+    };
+
+    return chat(event, messages, filter);
 }
 
 function streamDocumentContext(

@@ -21,6 +21,10 @@ declare global {
                 callback: (progress: IProgress) => void,
                 onEnd: () => void,
             ) => void;
+            chatWithCollection: (
+                messages: IMessage[],
+                collectionId: string,
+            ) => Promise<void>;
             chatWithDocument: (
                 messages: IMessage[],
                 documentId: string,

@@ -12,7 +12,8 @@ import { IConversation, IMessage } from "shared/types/conversation";
 
 interface ChatProviderProps {
     children: ReactNode;
-    documentId: string;
+    collectionId: string;
+    documentId?: string;
     conversationId?: string;
 }
 
@@ -28,6 +29,7 @@ const ChatContext = createContext<ChatContextProps | undefined>(undefined);
 
 const ChatProvider: React.FC<ChatProviderProps> = ({
     children,
+    collectionId,
     documentId,
     conversationId,
 }) => {
@@ -40,7 +42,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
         let conv: IConversation =
             await window.backend.getConversation(conversationId);
 
-        if (!conv) return router.push("/chat/" + documentId);
+        if (!conv) return router.push(`/chat/${collectionId}/${documentId}`);
 
         setMessages(conv.Messages);
         setConversation(conv);
@@ -117,8 +119,14 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 
         setMessages((prevMessages) => {
             const newMessagesArr = [...prevMessages, newMessage];
-            window.openai.chatWithDocument(newMessagesArr, documentId);
             window.backend.saveMessage(convId, newMessage);
+
+            if (!documentId) {
+                window.openai.chatWithCollection(newMessagesArr, collectionId);
+                return newMessagesArr;
+            }
+
+            window.openai.chatWithDocument(newMessagesArr, documentId);
             return newMessagesArr;
         });
     };

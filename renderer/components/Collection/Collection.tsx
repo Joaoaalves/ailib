@@ -18,6 +18,7 @@ export default function Collection({ collection }: CollectionProps) {
                     {collection?.Documents?.length > 0 &&
                         collection.Documents.map((document: IDocument) => (
                             <Document
+                                collectionId={collection.id}
                                 document={document}
                                 key={`document-${document.id}`}
                             />

@@ -12,7 +12,7 @@ export const Prompts: IPrompts = {
         role: "system",
         content:
             "Responda a questão do usuário baseando-se MARJORITARIAMENTE no conteúdo do contexto," +
-            "que será enviado ao inicio da ultima mensagem do usuário. Caso não tenha contexto, " +
+            "que será enviado ao inicio da ultima mensagem do usuário. Caso o contexto não te ajude, " +
             "responda: Não obtive contexto suficiente. Haja como um especialista no assunto, " +
             "podendo incrementar ideias do contexto recebido, porém, deixando claro trechos " +
             "que você inventou e trechos que você utilizou do contexto.",

@@ -7,6 +7,7 @@ import {
 import { IMessage } from "shared/types/conversation";
 import { IDocument } from "shared/types/document";
 import { RankedSearchResult } from "shared/types/qdrant";
+import { chatWithCollection } from "./lib/openai";
 
 const handler = {
     send(channel: string, value: unknown) {
@@ -42,17 +43,10 @@ contextBridge.exposeInMainWorld("openai", {
         );
         ipcRenderer.on("embedding_complete", onEnd);
     },
-    chatWithDocument: (
-        messages: IMessage[],
-        documentId: number,
-        collectionId: number,
-    ) =>
-        ipcRenderer.invoke(
-            "chatWithDocument",
-            messages,
-            documentId,
-            collectionId,
-        ),
+    chatWithCollection: (messages: IMessage[], collectionId: number) =>
+        ipcRenderer.invoke("chatWithCollection", messages, collectionId),
+    chatWithDocument: (messages: IMessage[], documentId: number) =>
+        ipcRenderer.invoke("chatWithDocument", messages, documentId),
     onChatStream: (
         callback: (chunk: any) => void,
         streamFile: (result: RankedSearchResult) => void,

@@ -16,7 +16,7 @@ export default function CreateCollection() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <button className="bg-container grid grid-cols-[8px_1fr] items-center my-4 rounded-xl text-white font-bold transition-all duration-300 hover:bg-black p-4 w-80 bg-black">
+                <button className="bg-container grid grid-cols-[8px_1fr] items-center my-4 rounded-xl text-white font-bold transition-all duration-300 hover:bg-black p-4 w-80">
                     <HiPlus className="text-xl" />
                     New Collection
                 </button>

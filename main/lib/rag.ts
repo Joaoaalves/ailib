@@ -2,35 +2,19 @@ import { RankedSearchResult } from "shared/types/qdrant";
 import { getEmbeddings } from "./openai";
 import { getMostRelevantItemsFromDocument } from "./qdrant";
 
-export async function RAGFusion(queries: string[], documentId?: number) {
+export async function RAGFusion(queries: string[], filter: Object = {}) {
     const results = [];
 
     for (let i = 0; i < queries.length; i++) {
-        const ragResult = await SimpleRAG(queries[i], documentId);
+        const ragResult = await SimpleRAG(queries[i], filter);
         results.push(...ragResult);
     }
 
     return rankResults(results);
 }
 
-async function SimpleRAG(query: string, documentId?: number) {
+async function SimpleRAG(query: string, filter: Object = {}) {
     const embeddedMessage = await getEmbeddings(query);
-    var filter = {};
-
-    if (documentId) {
-        filter = {
-            filter: {
-                must: [
-                    {
-                        key: "documentId",
-                        match: {
-                            value: Number(documentId),
-                        },
-                    },
-                ],
-            },
-        };
-    }
 
     const res = await getMostRelevantItemsFromDocument(
         embeddedMessage,

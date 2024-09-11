@@ -14,6 +14,7 @@ import {
     createConversationTitle,
     summarizePages,
     getMoreQueries,
+    chatWithCollection,
 } from "./lib/openai";
 
 import Document from "./db/document";
@@ -73,6 +74,10 @@ ipcMain.handle("saveMessage", async (event, conversationId, message) => {
         console.error("Error saving message:", error);
         throw error;
     }
+});
+
+ipcMain.handle("chatWithCollection", async (event, messages, collectionId) => {
+    await chatWithCollection(event, messages, collectionId);
 });
 
 ipcMain.handle("chatWithDocument", async (event, messages, documentId) => {
