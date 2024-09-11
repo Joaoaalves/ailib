@@ -21,7 +21,7 @@ export default function CreateCollection() {
                     New Collection
                 </button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-container border-none">
+            <DialogContent className="sm:max-w-[425px] bg-container border-none text-white">
                 <DialogHeader>
                     <DialogTitle>Upload New Document</DialogTitle>
                 </DialogHeader>
