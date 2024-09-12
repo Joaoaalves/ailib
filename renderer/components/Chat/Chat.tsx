@@ -4,7 +4,13 @@ import { ReactNode, useEffect, useState } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { ScrollArea } from "../ui/ScrollArea";
 
-export default function ChatRoot({ children }: { children: ReactNode }) {
+export default function ChatRoot({
+    children,
+    chatAgent = "Document",
+}: {
+    children: ReactNode;
+    chatAgent?: string;
+}) {
     const { messages, streamMessage, onStreamEnd } = useChat();
     const [streamEnd, setStreamEnd] = useState<boolean>(false);
 
@@ -29,7 +35,7 @@ export default function ChatRoot({ children }: { children: ReactNode }) {
         <div className="grid grid-cols-1 grid-rows-[60px_1fr] h-[calc(100vh-200px)] place-content-center w-full mt-8 pt-6 p-3 rounded-2xl">
             <div className="relative">
                 <h1 className="text-white text-3xl text-center">
-                    Chat with Document
+                    Chating With {chatAgent}
                 </h1>
                 <CiSettings className="text-white text-3xl fixed bottom-8 right-8 cursor-pointer bg-primary hover:scale-110 rounded-full w-12 h-12 p-2 transition-all duration-300" />
             </div>

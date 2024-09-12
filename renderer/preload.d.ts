@@ -67,6 +67,10 @@ declare global {
             ) => Promise<IDocument | ErrorResponse>;
             getCollections: () => Promise<ICollection[]>;
             createCollection: (collectionName: string) => number;
+            updateCollection: (
+                collectionId: number,
+                data: ICollection,
+            ) => Promise<ICollection>;
             deleteCollection: (collectionId: number) => void;
             getDocument: (documentId: string) => Promise<IDocument | null>;
             deleteDocument: (documentId: number) => void;

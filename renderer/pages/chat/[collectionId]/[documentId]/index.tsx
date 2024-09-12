@@ -15,6 +15,7 @@ export default function Page() {
     const { conversations } = useConversations();
     const inputRef = useRef(null);
     const router = useRouter();
+
     const { collectionId, documentId } = useParams<{
         collectionId: string;
         documentId: string;

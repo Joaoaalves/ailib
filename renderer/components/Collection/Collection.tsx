@@ -1,7 +1,6 @@
 import { IDocument } from "shared/types/document";
 import { ICollection } from "shared/types/collection";
 import Document from "@/components/Document/Document";
-import { ScrollArea, ScrollBar } from "@/components/ui/ScrollArea";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 
@@ -12,6 +11,7 @@ import {
     CarouselNext,
     CarouselPrevious,
 } from "@/components/ui/Carousel";
+import UpdateCollection from "./UpdateCollection";
 
 interface CollectionProps {
     collection: ICollection;
@@ -25,22 +25,23 @@ export default function Collection({ collection }: CollectionProps) {
     };
     return (
         <div className="pt-8">
-            <div
-                className="flex items-center gap-x-4 group cursor-pointer mb-4"
-                onClick={handleNavigateChatCollection}
-            >
+            <div className="flex items-center gap-x-4 group cursor-pointer mb-4">
                 <h2 className="text-3xl text-white group-hover:font-black transition-all duration-300">
                     {collection.name}
                 </h2>
+                <div className="flex items-center gap-x-2 ms-auto mr-8">
+                    <button className="grid place-items-center rounded text-white font-bold transition-all duration-300 bg-black hover:bg-primary size-12">
+                        <IoChatbubbleOutline
+                            onClick={handleNavigateChatCollection}
+                            className="text-white text-xl size-8 p-1 rounded"
+                        />
+                    </button>
 
-                <IoChatbubbleOutline className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-white text-2xl size-8 p-1 rounded-full" />
-
-                <span className="ms-auto me-10 text-white">
-                    {collection.Documents.length} Documents
-                </span>
+                    <UpdateCollection collection={collection} />
+                </div>
             </div>
             <Carousel className="w-[calc(100vw-360px)]">
-                <CarouselContent>
+                <CarouselContent className="p-2">
                     {collection?.Documents?.length > 0 &&
                         collection.Documents.map((document: IDocument) => (
                             <CarouselItem className="basis-1/3">

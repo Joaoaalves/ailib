@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatRoot from "@/components/Chat/Chat";
 import Layout from "@/components/Layout";
 import ChatInput from "@/components/Chat/ChatInput";
@@ -7,6 +7,8 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import ChatList from "@/components/Chat/ChatList";
 import { useConversations } from "@/hooks/use-conversations";
+import { useCollections } from "@/hooks/use-collections";
+import { ICollection } from "shared/types/collection";
 
 export default function Page() {
     // Prevent useParamsBug
@@ -17,12 +19,17 @@ export default function Page() {
     const router = useRouter();
     const { collectionId } = useParams<{ collectionId: string }>();
 
+    const { collections } = useCollections();
+    const [collection, setCollection] = useState<ICollection>();
+
     useEffect(() => {
         if (inputRef.current) inputRef.current.scrollIntoView();
     }, []);
 
     useEffect(() => {
-        if (!collectionId) router.push("/home");
+        if (!collectionId) return router.push("/home");
+
+        setCollection(collections?.filter((col) => col.id == collectionId)[0]);
     }, [collectionId]);
 
     return (
@@ -36,7 +43,7 @@ export default function Page() {
                     />
                 }
             >
-                <ChatRoot>
+                <ChatRoot chatAgent={collection?.name}>
                     <ChatInput ref={inputRef} />
                 </ChatRoot>
             </Layout>

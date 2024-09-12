@@ -208,6 +208,18 @@ ipcMain.handle("createCollection", async (event, collectionName) => {
     return collectionId;
 });
 
+ipcMain.handle("updateCollection", async (event, collectionId, data) => {
+    const collection = await Collection.findByPk(collectionId, {
+        include: Document,
+    });
+
+    collection.set(data);
+
+    await collection.save();
+
+    return JSON.parse(JSON.stringify(collection));
+});
+
 ipcMain.handle("deleteCollection", async (event, collectionId) => {
     await Collection.destroy({
         where: {

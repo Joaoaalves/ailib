@@ -4,17 +4,10 @@ import Head from "next/head";
 import Layout from "@/components/Layout";
 import { ICollection } from "shared/types/collection";
 import Collection from "@/components/Collection/Collection";
+import { useCollections } from "@/hooks/use-collections";
 
 export default function HomePage() {
-    const [collections, setCollections] = useState<ICollection[] | []>([]);
-
-    const getCollections = async () => {
-        const colls = await window.backend.getCollections();
-        setCollections(colls);
-    };
-    useEffect(() => {
-        getCollections();
-    }, []);
+    const { collections } = useCollections();
 
     return (
         <React.Fragment>
@@ -22,7 +15,7 @@ export default function HomePage() {
                 <title>AILib</title>
             </Head>
             <Layout>
-                {collections.length > 0 &&
+                {collections?.length > 0 &&
                     collections.map((collection: ICollection) => (
                         <Collection
                             collection={collection}

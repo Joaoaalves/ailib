@@ -1,13 +1,8 @@
-import {
-    BrowserWindow,
-    contextBridge,
-    ipcRenderer,
-    IpcRendererEvent,
-} from "electron";
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+import { ICollection } from "shared/types/collection";
 import { IMessage } from "shared/types/conversation";
 import { IDocument } from "shared/types/document";
 import { RankedSearchResult } from "shared/types/qdrant";
-import { chatWithCollection } from "./lib/openai";
 
 const handler = {
     send(channel: string, value: unknown) {
@@ -101,6 +96,8 @@ contextBridge.exposeInMainWorld("backend", {
     getCollections: () => ipcRenderer.invoke("getCollections"),
     createCollection: (collectionName: string) =>
         ipcRenderer.invoke("createCollection", collectionName),
+    updateCollection: (collectionId: number, data: ICollection) =>
+        ipcRenderer.invoke("updateCollection", collectionId, data),
     deleteCollection: async (collectionId: number) =>
         ipcRenderer.invoke("deleteCollection", collectionId),
     setLastPageRead: (documentId: number, page: number) =>
