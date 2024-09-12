@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 export default function Welcome() {
     const [now, setNow] = useState<Date>();
 
+    const padNumber = (number: number) => String(number).padStart(2, "0");
+
     const getFormatedDate = () => {
-        return `${now.getHours()}:${now.getMinutes()}, ${now.getDate()}/${now.getMonth()}, ${getWeekDayString(now.getDay())}`;
+        return `${padNumber(now.getHours())}:${padNumber(now.getMinutes())}, ${padNumber(now.getDate())}/${padNumber(now.getMonth())}, ${getWeekDayString(now.getDay())}`;
     };
 
     const getWeekDayString = (weekDay: number) => {
