@@ -42,11 +42,11 @@ export default function Document({ collectionId, document }: DocumentProps) {
             <ContextMenuTrigger>
                 <Card
                     id={`document-${document.id}`}
-                    className="bg-container border-none text-white w-[400px] transition-all duration-300 shadow-primary"
+                    className="bg-container border-none text-white w-[90%] transition-all duration-300 shadow-primary"
                 >
                     <CardHeader>
                         <img
-                            className="mb-4 h-64 object-cover object-top rounded-xl bg-primary/10"
+                            className="mb-4 h-[350px] object-cover object-top rounded-xl bg-primary/10"
                             src={`${document.cover}`}
                         />
                         <CardTitle className="text-lg">

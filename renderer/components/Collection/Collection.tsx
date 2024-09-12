@@ -4,6 +4,15 @@ import Document from "@/components/Document/Document";
 import { ScrollArea, ScrollBar } from "@/components/ui/ScrollArea";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
+
+import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselNext,
+    CarouselPrevious,
+} from "@/components/ui/Carousel";
+
 interface CollectionProps {
     collection: ICollection;
 }
@@ -15,9 +24,9 @@ export default function Collection({ collection }: CollectionProps) {
         router.push(`/chat/${collection.id}`);
     };
     return (
-        <div className="pt-8 flex flex-col">
+        <div className="pt-8">
             <div
-                className="flex items-center gap-x-4 group w-64 cursor-pointer"
+                className="flex items-center gap-x-4 group cursor-pointer mb-4"
                 onClick={handleNavigateChatCollection}
             >
                 <h2 className="text-3xl text-white group-hover:font-black transition-all duration-300">
@@ -25,20 +34,32 @@ export default function Collection({ collection }: CollectionProps) {
                 </h2>
 
                 <IoChatbubbleOutline className="opacity-0 group-hover:opacity-100 transition-all duration-300 bg-primary text-white text-2xl size-8 p-1 rounded-full" />
+
+                <span className="ms-auto me-10 text-white">
+                    {collection.Documents.length} Documents
+                </span>
             </div>
-            <ScrollArea className="w-[calc(100vw-400px)] h-full">
-                <div className="flex items-center flex-nowrap gap-x-8 py-8 px-2">
+            <Carousel className="w-[calc(100vw-360px)]">
+                <CarouselContent>
                     {collection?.Documents?.length > 0 &&
                         collection.Documents.map((document: IDocument) => (
-                            <Document
-                                collectionId={collection.id}
-                                document={document}
-                                key={`document-${document.id}`}
-                            />
+                            <CarouselItem className="basis-1/3">
+                                <Document
+                                    collectionId={collection.id}
+                                    document={document}
+                                    key={`document-${document.id}`}
+                                />
+                            </CarouselItem>
                         ))}
-                </div>
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+            </Carousel>
+            {/* 
+            <ScrollArea className="w-[calc(100vw-360px)] h-full px-2">
+
                 <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+            </ScrollArea> */}
         </div>
     );
 }
