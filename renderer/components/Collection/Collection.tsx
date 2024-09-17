@@ -42,7 +42,7 @@ export default function Collection({ collection }: CollectionProps) {
             </div>
             <Carousel className="w-[calc(100vw-360px)]">
                 <CarouselContent className="p-2">
-                    {collection?.Documents?.length > 0 &&
+                    {collection?.Documents?.length > 0 ? (
                         collection.Documents.map((document: IDocument) => (
                             <CarouselItem className="basis-1/3">
                                 <Document
@@ -51,7 +51,14 @@ export default function Collection({ collection }: CollectionProps) {
                                     key={`document-${document.id}`}
                                 />
                             </CarouselItem>
-                        ))}
+                        ))
+                    ) : (
+                        <div className="bg-container rounded-xl w-full h-72 me-12  ms-4 grid place-items-center">
+                            <h2 className="text-neutral-300 text-3xl">
+                                This Collection is Empty!
+                            </h2>
+                        </div>
+                    )}
                 </CarouselContent>
                 <CarouselPrevious />
                 <CarouselNext />
