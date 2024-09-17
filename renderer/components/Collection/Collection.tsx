@@ -24,7 +24,7 @@ export default function Collection({ collection }: CollectionProps) {
         router.push(`/chat/${collection.id}`);
     };
     return (
-        <div className="pt-8">
+        <div className="pt-8 mb-28">
             <div className="flex items-center gap-x-4 group cursor-pointer mb-4">
                 <h2 className="text-3xl text-white group-hover:font-black transition-all duration-300">
                     {collection.name}
@@ -56,11 +56,6 @@ export default function Collection({ collection }: CollectionProps) {
                 <CarouselPrevious />
                 <CarouselNext />
             </Carousel>
-            {/* 
-            <ScrollArea className="w-[calc(100vw-360px)] h-full px-2">
-
-                <ScrollBar orientation="horizontal" />
-            </ScrollArea> */}
         </div>
     );
 }
