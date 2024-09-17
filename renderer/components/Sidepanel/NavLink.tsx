@@ -43,7 +43,7 @@ export default function NavLink({
             <ContextMenuTrigger className="w-full">
                 <li
                     onClick={handleNavigate}
-                    className="px-6 text-center hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr_18px] gap-x-6"
+                    className="px-6 hover:bg-black transition-all duration-300 py-2 cursor-pointer text-white font-black text-xl grid grid-cols-[18px_1fr] gap-x-6"
                 >
                     {Icon}
                     <span className="line-clamp-1 text-sm place-self-start">
@@ -51,9 +51,9 @@ export default function NavLink({
                     </span>
                 </li>
             </ContextMenuTrigger>
-            <ContextMenuContent className="w-64 bg-container text-white shadow-primary border-primary/30">
-                {Actions &&
-                    Actions.map((action) => (
+            {Actions && (
+                <ContextMenuContent className="w-64 bg-container text-white shadow-primary border-primary/30">
+                    {Actions.map((action) => (
                         <ContextMenuItem inset onClick={() => action.onClick()}>
                             {action.label}
                             <ContextMenuShortcut>
@@ -61,7 +61,8 @@ export default function NavLink({
                             </ContextMenuShortcut>
                         </ContextMenuItem>
                     ))}
-            </ContextMenuContent>
+                </ContextMenuContent>
+            )}
         </ContextMenu>
     );
 }

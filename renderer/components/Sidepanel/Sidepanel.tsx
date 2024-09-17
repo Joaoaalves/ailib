@@ -1,4 +1,5 @@
 import { VscLibrary } from "react-icons/vsc";
+import { HiOutlineDocumentDuplicate } from "react-icons/hi";
 
 import NavLink from "./NavLink";
 import Nav from "./Nav";
@@ -24,6 +25,12 @@ export default function Sidepanel({ children }: SidepanelProps) {
                 children
             ) : (
                 <Nav>
+                    <NavLink
+                        href="/home"
+                        label="Documents"
+                        router={router}
+                        Icon={<HiOutlineDocumentDuplicate />}
+                    />
                     <NavLink
                         href="/collections"
                         label="Collections"
