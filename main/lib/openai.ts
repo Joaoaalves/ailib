@@ -102,28 +102,85 @@ export async function processChunks(
     metadata: Metadata,
 ) {
     try {
-        for (let index = 1; index <= chunks.length; index++) {
+        for (let index = 0; index < chunks.length; index++) {
             const chunk = chunks[index];
-            if (chunk.length < 100) continue;
 
-            const embedding = await getEmbeddings(chunk);
+            // Divida o chunk em 5 partes semânticas (com base em pontos finais)
+            const chunkParts = splitChunkSemantically(chunk, 5);
 
-            metadata.page = offset + index - 1;
-            await upsertEmbedding({
-                embedding,
-                chunk,
-                metadata,
-            });
+            // Use Promise.all para obter os embeddings de cada parte em paralelo
+            const embeddings = await Promise.all(
+                chunkParts.map(async (part) => {
+                    return await getEmbeddings(part);
+                }),
+            );
 
+            // Insira os embeddings individualmente no Qdrant
+            for (const [partIndex, embedding] of embeddings.entries()) {
+                metadata.page = offset + index;
+                await upsertEmbedding({
+                    embedding,
+                    chunk: chunk,
+                    metadata,
+                });
+            }
+
+            // Envie o progresso de embedding para o front-end
             event.sender.send("embedding_progress", {
                 chunk: index + 1,
                 total: chunks.length,
-                embedding: embedding,
+                embedding: embeddings,
             });
         }
     } catch (error) {
         console.error("Error processing chunks:", error);
     }
+}
+
+function splitChunkSemantically(chunk: string, parts: number): string[] {
+    const sentences = chunk.match(/[^.!?]+[.!?]+/g) || [chunk]; // Divide por pontos finais
+    const totalLength = sentences.reduce(
+        (sum, sentence) => sum + sentence.length,
+        0,
+    );
+    const targetPartLength = totalLength / parts;
+
+    const chunkParts = [];
+    let currentPart = "";
+    let currentLength = 0;
+
+    for (let i = 0; i < sentences.length; i++) {
+        const sentence = sentences[i];
+        currentPart += sentence;
+        currentLength += sentence.length;
+
+        // Verifique se o comprimento acumulado está próximo do comprimento alvo para a parte
+        if (
+            currentLength >= targetPartLength ||
+            (i === sentences.length - 1 && chunkParts.length < parts - 1)
+        ) {
+            chunkParts.push(currentPart.trim());
+            currentPart = "";
+            currentLength = 0;
+        }
+    }
+
+    // Se restar algum texto, adicione como última parte
+    if (currentPart) {
+        chunkParts.push(currentPart.trim());
+    }
+
+    // Se houver menos partes do que o necessário, redistribuir
+    while (chunkParts.length < parts) {
+        const lastPart = chunkParts.pop()!;
+        const splitIndex = Math.floor(lastPart.length / 2);
+        chunkParts.push(
+            lastPart.slice(0, splitIndex).trim(),
+            lastPart.slice(splitIndex).trim(),
+        );
+    }
+
+    return chunkParts;
 }
 
 export async function createConversationTitle(message: IMessage) {
