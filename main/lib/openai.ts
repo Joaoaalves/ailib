@@ -2,39 +2,36 @@ import { OpenAI } from "openai";
 import { promises as fs } from "fs";
 import { upsertEmbedding } from "./qdrant";
 import { IpcMainInvokeEvent } from "electron";
-import { IModels } from "shared/types/openai";
 import { IMessage } from "shared/types/conversation";
 import { encoding_for_model, Tiktoken, TiktokenModel } from "tiktoken";
 import { Prompts } from "../helpers/systemPrompts";
 import { RAGFusion } from "./rag";
 import { Metadata, RankedSearchResult } from "shared/types/qdrant";
-
-const CONFIG_FILE_PATH = "api_key.config";
+import Config from "../db/config";
 
 async function OpenAIClient() {
-    const apiKey = await loadApiKey();
-    return new OpenAI({ apiKey });
+    const apiKey = await Config.findByPk("openaiAPIKey");
+    return new OpenAI({ apiKey: apiKey.value });
 }
 
-export const Models: IModels = {
-    embedding: {
-        openai: "text-embedding-3-small",
-        tiktoken: "text-embedding-ada-002",
-        pricingPer1M: 0.02,
+export const Models = {
+    chat: async () => {
+        const model = await Config.findByPk("conversationModel");
+        return model.value;
     },
-    chat: {
-        openai: "gpt-4o-mini",
-        tiktoken: "gpt-4o-mini",
-        pricingPer1M: 0.15,
+    embeddings: async () => {
+        const model = await Config.findByPk("embeddingModel");
+        return model.value;
     },
 };
 
 export async function getEmbeddings(textChunk: string): Promise<number[]> {
     const openai = await OpenAIClient();
+    const model = await Models.embeddings();
 
     try {
         const response = await openai.embeddings.create({
-            model: Models.embedding.openai,
+            model,
             input: textChunk,
         });
 
@@ -46,24 +43,6 @@ export async function getEmbeddings(textChunk: string): Promise<number[]> {
     }
 }
 
-export async function saveApiKey(apiKey: string): Promise<void> {
-    try {
-        await fs.writeFile(CONFIG_FILE_PATH, apiKey);
-    } catch (error) {
-        throw new Error(`Failed to save API key: ${error.message}`);
-    }
-}
-
-export async function loadApiKey(): Promise<string> {
-    try {
-        const apiKey = await fs.readFile(CONFIG_FILE_PATH, "utf8");
-        return apiKey;
-    } catch (error) {
-        console.error(`Failed to load API key: ${error.message}`);
-        return "";
-    }
-}
-
 export async function summarizePages(
     event: IpcMainInvokeEvent,
     pages: string[],
@@ -71,10 +50,11 @@ export async function summarizePages(
 ): Promise<string> {
     const openai = await OpenAIClient();
     const summaryCreationInstruction = Prompts.summaryCreationInstruction;
+    const model = await Models.chat();
 
     try {
         const response = await openai.chat.completions.create({
-            model: Models.chat.openai,
+            model,
             messages: [
                 summaryCreationInstruction,
                 {
@@ -184,13 +164,12 @@ function splitChunkSemantically(chunk: string, parts: number): string[] {
 }
 
 export async function createConversationTitle(message: IMessage) {
-    const apiKey = await loadApiKey();
-    const openai = new OpenAI({ apiKey });
-
+    const openai = await OpenAIClient();
+    const model = await Models.chat();
     const systemMessage = Prompts.titleCreationInstruction;
 
     const completion = await openai.chat.completions.create({
-        model: Models.chat.openai,
+        model,
         messages: [systemMessage, message],
     });
 
@@ -282,9 +261,9 @@ async function streamCompletion(
     channel: string,
 ) {
     const openai = await OpenAIClient();
-
+    const model = await Models.chat();
     const stream = await openai.chat.completions.create({
-        model: Models.chat.openai,
+        model,
         messages: messages,
         stream: true,
     });
@@ -310,12 +289,10 @@ export function countTokens(text: string, model: TiktokenModel): number {
     }
 }
 
-export async function getMoreQueries(
-    query: string,
-    queryNum: number = 5,
-): Promise<string[]> {
+export async function getMoreQueries(query: string): Promise<string[]> {
     const openai = await OpenAIClient();
     const systemMessage = Prompts.queryCreationInstruction;
+    const model = await Models.chat();
 
     const queryMessage: IMessage = {
         role: "user",
@@ -323,7 +300,7 @@ export async function getMoreQueries(
     };
 
     const completion = await openai.chat.completions.create({
-        model: Models.chat.openai,
+        model,
         messages: [systemMessage, queryMessage],
     });
 

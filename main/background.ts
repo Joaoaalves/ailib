@@ -9,7 +9,6 @@ import {
 import path from "path";
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import {
-    saveApiKey,
     chatWithDocument,
     createConversationTitle,
     summarizePages,
@@ -84,10 +83,6 @@ ipcMain.handle("chatWithCollection", async (event, messages, collectionId) => {
 
 ipcMain.handle("chatWithDocument", async (event, messages, documentId) => {
     await chatWithDocument(event, messages, documentId);
-});
-
-ipcMain.handle("set-api-key", (event, key) => {
-    saveApiKey(key);
 });
 
 ipcMain.handle(
@@ -272,7 +267,7 @@ ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
 ipcMain.handle("search", async (event, query) => {
     await ensureCollectionExists();
 
-    const relevantQueries = await getMoreQueries(query, 2);
+    const relevantQueries = await getMoreQueries(query);
     const queries = [query, ...relevantQueries];
 
     const RAGResult = await RAGFusion(queries);

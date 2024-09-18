@@ -2,8 +2,6 @@ import { HProcessPDF } from "../types/handlers";
 import { ensureCollectionExists } from "./qdrant";
 import { countTokens, processChunks } from "./openai";
 
-import { Models } from "./openai";
-
 const MillionTokens = 1000000;
 
 export async function processPDF({
@@ -15,8 +13,7 @@ export async function processPDF({
 }: HProcessPDF) {
     try {
         const embeddingCost =
-            (countTokens(pages.join(" "), Models.embedding.tiktoken) *
-                Models.embedding.pricingPer1M) /
+            (countTokens(pages.join(" "), "text-embedding-ada-002") * 0.02) /
             MillionTokens;
 
         event.sender.send("embedding_cost", embeddingCost);

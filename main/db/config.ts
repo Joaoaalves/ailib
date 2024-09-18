@@ -6,7 +6,7 @@ interface ConfigCreationAttributes extends Optional<IConfig, "key"> {}
 
 interface ConfigInstance extends Model<ConfigCreationAttributes, IConfig> {
     key: string;
-    value: string | number;
+    value: string;
     niceName: string;
 }
 
