@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import Input from "@/components/ui/Input";
 import { IDocument } from "shared/types/document";
-import { usePDFJS } from "@/hooks/usePDFJS";
+import { usePDFJS } from "@/hooks/use-pdfjs";
 import { Label } from "@/components/ui/Label";
 import InputGroup from "@/components/ui/InputGroup";
 import { useSummaryDocument } from "@/contexts/SummaryProvider";

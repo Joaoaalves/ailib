@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { IDocument } from "shared/types/document";
-import { usePDFJS } from "@/hooks/usePDFJS";
+import { usePDFJS } from "@/hooks/use-pdfjs";
 
 interface PDFViewerProps {
     document: IDocument;

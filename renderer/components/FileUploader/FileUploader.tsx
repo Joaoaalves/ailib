@@ -5,7 +5,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { ICollection } from "shared/types/collection";
 import CollectionPicker from "./CollectionPicker";
 import Input from "../ui/Input";
-import { usePDFJS } from "@/hooks/usePDFJS";
+import { usePDFJS } from "@/hooks/use-pdfjs";
 import { IDocument } from "shared/types/document";
 import { PDFDocumentProxy } from "pdfjs-dist";
 import { useCollections } from "@/hooks/use-collections";
