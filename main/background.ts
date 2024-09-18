@@ -34,6 +34,8 @@ import Summary from "./db/summary";
 import { associateDocumentToCollection } from "./lib/data";
 import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
+import Configuration from "./db/configuration";
+import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -347,9 +349,9 @@ ipcMain.handle("getSummaries", async (event) => {
     return JSON.parse(JSON.stringify(await Summary.findAll()));
 });
 
-ipcMain.handle("getSummaryById", async (event, id) => {
+ipcMain.handle("getSummaryById", async (event, key) => {
     try {
-        const summary = await Summary.findByPk(id);
+        const summary = await Summary.findByPk(key);
 
         if (summary) {
             const data = readFileSync(summary.path, "utf-8");
@@ -365,6 +367,34 @@ ipcMain.handle("getSummaryById", async (event, id) => {
     }
 });
 
+ipcMain.handle("updateConfiguration", async (event, id, value) => {
+    try {
+        const configuration = await Configuration.findByPk(id);
+
+        if (configuration) {
+            configuration.value = value;
+            await configuration.save();
+            return JSON.parse(JSON.stringify(configuration));
+        }
+    } catch (error) {
+        return {
+            error: "Error updating Configuration",
+        };
+    }
+});
+
+ipcMain.handle("getConfigurations", async () => {
+    try {
+        const configurations = await Configuration.findAll();
+
+        return JSON.parse(JSON.stringify(configurations));
+    } catch (error) {
+        return {
+            error: "Error geting Configurations",
+        };
+    }
+});
+
 ipcMain.handle("close", (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     window?.close();
@@ -376,6 +406,9 @@ ipcMain.handle("minimize", (event) => {
 
 app.on("ready", async () => {
     await syncDatabase();
+
+    await createDefaultConfigsIfNotExists();
+
     if (BrowserWindow.getAllWindows().length == 0) {
         const mainWindow = new BrowserWindow({
             width: 1000,
