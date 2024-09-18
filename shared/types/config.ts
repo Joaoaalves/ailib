@@ -1,4 +1,5 @@
 export interface IConfig {
     key: string;
-    value: string | number;
+    value: string;
+    niceName?: string;
 }

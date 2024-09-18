@@ -109,6 +109,9 @@ contextBridge.exposeInMainWorld("backend", {
     getConversation: (conversationId: number) =>
         ipcRenderer.invoke("getConversationMessages", conversationId),
     getConversations: () => ipcRenderer.invoke("getConversations"),
+    getConfigs: () => ipcRenderer.invoke("getConfigs"),
+    updateConfig: (key: string, value: string) =>
+        ipcRenderer.invoke("updateConfig", key, value),
     saveMessage: (conversationId: number, message: IMessage) =>
         ipcRenderer.invoke("saveMessage", conversationId, message),
     search: (query: string) => ipcRenderer.invoke("search", query),

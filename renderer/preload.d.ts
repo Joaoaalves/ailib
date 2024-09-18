@@ -5,6 +5,7 @@ import { IConversation, IMessage } from "./@types/chat";
 import { ICollection } from "./@types/collection";
 import { IDocument } from "shared/types/document";
 import { ISummary } from "shared/types/summary";
+import { IConfig } from "shared/types/config";
 
 interface IProgress {
     chunk: number;
@@ -77,6 +78,8 @@ declare global {
             createConversation: (message: IMessage) => Promise<Conversation>;
             getConversations: () => Promise<IConversation[]>;
             getConversation: (collectionId: string) => Promise<Conversation>;
+            getConfigs: () => Promise<IConfig[]>;
+            updateConfig: (key: string, value: string) => Promise<IConfig>;
             saveMessage: (
                 conversationId: number,
                 message: IMessage,

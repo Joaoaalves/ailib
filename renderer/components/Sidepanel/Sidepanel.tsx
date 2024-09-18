@@ -6,6 +6,7 @@ import Nav from "./Nav";
 
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
+import Settings from "./Settings";
 
 interface SidepanelProps {
     children?: ReactNode;
@@ -39,6 +40,8 @@ export default function Sidepanel({ children }: SidepanelProps) {
                     />
                 </Nav>
             )}
+
+            <Settings />
         </aside>
     );
 }

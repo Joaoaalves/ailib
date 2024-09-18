@@ -1,4 +1,3 @@
-import { Badge } from "../ui/Badge";
 import { ReactNode, useEffect, useState } from "react";
 import {
     Dialog,

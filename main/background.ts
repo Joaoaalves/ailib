@@ -34,7 +34,7 @@ import Summary from "./db/summary";
 import { associateDocumentToCollection } from "./lib/data";
 import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
-import Configuration from "./db/configuration";
+import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -367,30 +367,30 @@ ipcMain.handle("getSummaryById", async (event, key) => {
     }
 });
 
-ipcMain.handle("updateConfiguration", async (event, id, value) => {
+ipcMain.handle("updateConfig", async (event, id, value) => {
     try {
-        const configuration = await Configuration.findByPk(id);
+        const config = await Config.findByPk(id);
 
-        if (configuration) {
-            configuration.value = value;
-            await configuration.save();
-            return JSON.parse(JSON.stringify(configuration));
+        if (config) {
+            config.value = value;
+            await config.save();
+            return JSON.parse(JSON.stringify(config));
         }
     } catch (error) {
         return {
-            error: "Error updating Configuration",
+            error: "Error updating Config",
         };
     }
 });
 
-ipcMain.handle("getConfigurations", async () => {
+ipcMain.handle("getConfigs", async () => {
     try {
-        const configurations = await Configuration.findAll();
+        const configs = await Config.findAll();
 
-        return JSON.parse(JSON.stringify(configurations));
+        return JSON.parse(JSON.stringify(configs));
     } catch (error) {
         return {
-            error: "Error geting Configurations",
+            error: "Error geting Configs",
         };
     }
 });
