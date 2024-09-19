@@ -8,6 +8,7 @@ interface ConfigInstance extends Model<ConfigCreationAttributes, IConfig> {
     key: string;
     value: string;
     niceName: string;
+    allowedValues?: string[];
 }
 
 const Config = db.define<ConfigInstance>("Config", {
@@ -25,6 +26,10 @@ const Config = db.define<ConfigInstance>("Config", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    allowedValues: {
+        type: DataTypes.JSON,
+        allowNull: true
+    }
 });
 
 export default Config;
