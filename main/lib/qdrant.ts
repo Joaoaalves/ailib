@@ -21,11 +21,9 @@ export async function ensureCollectionExists(): Promise<void> {
 
 export async function upsertEmbedding({
     embedding,
-    chunk,
     metadata,
 }: UpsertEmbeddingParams): Promise<void> {
     const payload = {
-        content: chunk,
         ...metadata,
     };
 
@@ -75,10 +73,10 @@ export async function getMostRelevantItemsFromDocument(
 
         const docs = result.map((res) => ({
             id: res.id,
-            content: res.payload.content,
             documentId: res.payload.documentId,
             page: res.payload?.page,
             score: res.score,
+            chunkId: res.payload.chunkId,
         }));
 
         return docs;

@@ -1,5 +1,5 @@
 import { OpenAI } from "openai";
-import { promises as fs } from "fs";
+import { Op } from "sequelize";
 import { upsertEmbedding } from "./qdrant";
 import { IpcMainInvokeEvent } from "electron";
 import { IMessage } from "shared/types/conversation";
@@ -8,6 +8,7 @@ import { Prompts } from "../helpers/systemPrompts";
 import { RAGFusion } from "./rag";
 import { Metadata, RankedSearchResult } from "shared/types/qdrant";
 import Config from "../db/config";
+import TextChunk from "../db/textChunk";
 
 async function OpenAIClient() {
     const apiKey = await Config.findByPk("openaiAPIKey");
@@ -85,6 +86,10 @@ export async function processChunks(
         for (let index = 0; index < chunks.length; index++) {
             const chunk = chunks[index];
 
+            const textChunk = await TextChunk.create({
+                text: chunk,
+            });
+
             // Divida o chunk em 5 partes semânticas (com base em pontos finais)
             const chunkParts = splitChunkSemantically(chunk, 5);
 
@@ -98,9 +103,9 @@ export async function processChunks(
             // Insira os embeddings individualmente no Qdrant
             for (const [partIndex, embedding] of embeddings.entries()) {
                 metadata.page = offset + index;
+                metadata.chunkId = textChunk.id;
                 await upsertEmbedding({
                     embedding,
-                    chunk: chunk,
                     metadata,
                 });
             }
@@ -187,12 +192,22 @@ async function chat(
     const systemMessage = Prompts.defaultChatInstruction;
 
     RAGFusion(queries, filter).then(async (RAGResult) => {
-        const result = RAGResult.map((result) => result.content);
+        const chunkIds = RAGResult.map((result) => result.chunkId);
+
+        const textChunks = await TextChunk.findAll({
+            where: {
+                id: {
+                    [Op.or]: chunkIds,
+                },
+            },
+            attributes: ["text"],
+        });
+
         const lastMessage = messages.pop();
 
         lastMessage.content =
             "Contexto retornado do Retrieval Augmented Generation:\n---\n" +
-            JSON.stringify(result) +
+            JSON.stringify(textChunks) +
             "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;
 

@@ -9,7 +9,7 @@ export async function RAGFusion(queries: string[], filter: Object = {}) {
         const ragResult = await SimpleRAG(queries[i], filter);
         results.push(...ragResult);
     }
-
+    console.log(results);
     return rankResults(results);
 }
 
@@ -27,10 +27,10 @@ async function SimpleRAG(query: string, filter: Object = {}) {
 function rankResults(
     results: {
         id: string;
-        content: string;
         documentId: string;
         page: number;
         score: number;
+        chunkId: number;
     }[],
 ): RankedSearchResult[] {
     const rankedResults = new Map<string, RankedSearchResult>();

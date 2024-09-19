@@ -35,6 +35,7 @@ import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
 import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
+import TextChunk from "./db/textChunk";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -272,9 +273,10 @@ ipcMain.handle("search", async (event, query) => {
 
     const RAGResult = await RAGFusion(queries);
     const document = await Document.findByPk(RAGResult[0].documentId);
+    const textChunk = await TextChunk.findByPk(RAGResult[0].chunkId);
     return JSON.parse(
         JSON.stringify({
-            content: RAGResult[0].content,
+            content: textChunk.text,
             page: RAGResult[0].page,
             document,
         }),
