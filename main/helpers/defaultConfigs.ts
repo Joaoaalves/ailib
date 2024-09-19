@@ -1,6 +1,7 @@
+import { IConfig } from "shared/types/config";
 import Config from "../db/config";
 
-const defaultConfigs = [
+const defaultConfigs : IConfig[] = [
     {
         key: "openaiAPIKey",
         value: "",
@@ -19,17 +20,9 @@ const defaultConfigs = [
 ];
 export default async function createDefaultConfigsIfNotExists() {
     try {
-        await Promise.all(
-            defaultConfigs.map(async (config) => {
-                await Config.findOrCreate({
-                    where: { key: config.key }, // Verifica se já existe
-                    defaults: {
-                        value: config.value, // Se não existir, cria com o valor default
-                        niceName: config.niceName,
-                    },
-                });
-            }),
-        );
+        await Config.bulkCreate(defaultConfigs, {
+            ignoreDuplicates: true
+        })
         console.log("Configurações padrão verificadas/criadas.");
     } catch (error) {
         console.error("Erro ao criar configurações padrão:", error);
