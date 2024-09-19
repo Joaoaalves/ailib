@@ -15,3 +15,8 @@ export interface DocSearchResult {
     page: number;
     document: IDocument;
 }
+
+export interface ITextChunk {
+    id?: number;
+    text: string;
+}

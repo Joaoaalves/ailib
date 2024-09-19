@@ -28,8 +28,8 @@ const Config = db.define<ConfigInstance>("Config", {
     },
     allowedValues: {
         type: DataTypes.JSON,
-        allowNull: true
-    }
+        allowNull: true,
+    },
 });
 
 export default Config;

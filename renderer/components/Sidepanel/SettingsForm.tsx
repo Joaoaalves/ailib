@@ -18,7 +18,7 @@ export default function SettingsForm({ setOpen }) {
     const [formValues, setFormValues] = useState<Object>({});
 
     const handleInputChange = (key: string, value: string) => {
-        console.log(formValues)
+        console.log(formValues);
         setFormValues({
             ...formValues,
             [key]: value,
@@ -45,39 +45,51 @@ export default function SettingsForm({ setOpen }) {
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {configs?.length &&
-                configs.map((config) => 
+                configs.map((config) => (
                     <div key={config.key} className="space-y-1 mb-6">
                         <Label className="text-white">{config.niceName}</Label>
-                        {config.allowedValues ? 
-                            <Select defaultValue={config.value} onValueChange={
-                                (e) =>
+                        {config.allowedValues ? (
+                            <Select
+                                defaultValue={config.value}
+                                onValueChange={(e) =>
                                     handleInputChange(config.key, e)
-                            } required>
+                                }
+                                required
+                            >
                                 <SelectTrigger className="!text-neutral-400">
-                                    <SelectValue placeholder={config.niceName} />
+                                    <SelectValue
+                                        placeholder={config.niceName}
+                                    />
                                 </SelectTrigger>
                                 <SelectContent className="bg-black text-white">
                                     <SelectGroup>
-                                        {config.allowedValues.map(allowedValue => 
-                                            <SelectItem value={allowedValue} key={allowedValue}>
-                                                {allowedValue}
-                                            </SelectItem>
+                                        {config.allowedValues.map(
+                                            (allowedValue) => (
+                                                <SelectItem
+                                                    value={allowedValue}
+                                                    key={allowedValue}
+                                                >
+                                                    {allowedValue}
+                                                </SelectItem>
+                                            ),
                                         )}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                        :
+                        ) : (
                             <Input
                                 value={formValues[config.key] || config.value}
                                 onChange={(e) =>
-                                    handleInputChange(config.key, e.target.value)
+                                    handleInputChange(
+                                        config.key,
+                                        e.target.value,
+                                    )
                                 }
                                 placeholder={config.niceName}
                             />
-                        }
+                        )}
                     </div>
-                
-                )}
+                ))}
 
             <Button type="submit" className="text-white w-full">
                 Save Settings
