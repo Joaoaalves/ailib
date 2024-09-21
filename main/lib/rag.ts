@@ -6,14 +6,14 @@ export async function RAGFusion(queries: string[], filter: Object = {}) {
     const results = [];
 
     for (let i = 0; i < queries.length; i++) {
-        const ragResult = await SimpleRAG(queries[i], filter);
+        const ragResult = await simpleRAG(queries[i], filter);
         results.push(...ragResult);
     }
     console.log(results);
     return rankResults(results);
 }
 
-async function SimpleRAG(query: string, filter: Object = {}) {
+async function simpleRAG(query: string, filter: Object = {}) {
     const embeddedMessage = await getEmbeddings(query);
 
     const res = await getMostRelevantItemsFromDocument(
