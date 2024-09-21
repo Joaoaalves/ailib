@@ -186,12 +186,24 @@ async function chat(
     messages: IMessage[],
     filter: Object,
 ) {
-    const relevantQueries = await getMoreQueries(messages.at(-1).content);
-    const queries = [messages.at(-1).content, ...relevantQueries];
+    const userQuery = messages.at(-1).content;
 
+    const relevantQueries = await getMoreQueries(userQuery);
+    const queries = [userQuery, ...relevantQueries];
+
+    console.log(queries);
+    console.log("\n\n\n");
+    const hypotethicalDocuments = await Promise.all(
+        queries.map(async (query) => {
+            return await createHypotheticalDocument(query);
+        }),
+    );
+
+    console.log(hypotethicalDocuments);
+    console.log("\n\n\n");
     const systemMessage = Prompts.defaultChatInstruction;
 
-    RAGFusion(queries, filter).then(async (RAGResult) => {
+    RAGFusion(hypotethicalDocuments, filter).then(async (RAGResult) => {
         const chunkIds = RAGResult.map((result) => result.chunkId);
 
         const textChunks = await TextChunk.findAll({
@@ -204,13 +216,13 @@ async function chat(
         });
 
         const lastMessage = messages.pop();
-
+        console.log(textChunks);
+        console.log("\n\n\n");
         lastMessage.content =
             "Contexto retornado do Retrieval Augmented Generation:\n---\n" +
             JSON.stringify(textChunks) +
             "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;
-
         messages = [systemMessage, ...messages, lastMessage];
 
         await streamCompletion(event, messages, "chat-stream");
@@ -302,6 +314,24 @@ export function countTokens(text: string, model: TiktokenModel): number {
         console.error("Erro ao contar tokens:", error);
         return 0;
     }
+}
+
+export async function createHypotheticalDocument(query: string) {
+    const openai = await OpenAIClient();
+    const systemMessage = Prompts.createHyDEInstruction;
+    const model = await Models.chat();
+
+    const queryMessage: IMessage = {
+        role: "user",
+        content: query,
+    };
+
+    const hypotheticalDocument = await openai.chat.completions.create({
+        model,
+        messages: [systemMessage, queryMessage],
+    });
+
+    return hypotheticalDocument.choices[0].message.content;
 }
 
 export async function getMoreQueries(query: string): Promise<string[]> {

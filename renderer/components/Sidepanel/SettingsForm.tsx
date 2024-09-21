@@ -18,7 +18,6 @@ export default function SettingsForm({ setOpen }) {
     const [formValues, setFormValues] = useState<Object>({});
 
     const handleInputChange = (key: string, value: string) => {
-        console.log(formValues);
         setFormValues({
             ...formValues,
             [key]: value,

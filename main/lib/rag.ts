@@ -9,7 +9,7 @@ export async function RAGFusion(queries: string[], filter: Object = {}) {
         const ragResult = await simpleRAG(queries[i], filter);
         results.push(...ragResult);
     }
-    console.log(results);
+
     return rankResults(results);
 }
 

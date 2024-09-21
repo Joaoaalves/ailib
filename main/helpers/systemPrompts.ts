@@ -4,6 +4,7 @@ interface IPrompts {
     defaultChatInstruction: IMessage;
     titleCreationInstruction: IMessage;
     queryCreationInstruction: IMessage;
+    createHyDEInstruction: IMessage;
     summaryCreationInstruction: IMessage;
 }
 
@@ -26,10 +27,16 @@ export const Prompts: IPrompts = {
     queryCreationInstruction: {
         role: "system",
         content:
-            "Você é um assistente de criação de querys para um sistema de RAG, crie mais 5 queries" +
+            "Você é um assistente de criação de querys para um sistema de RAG, crie mais 2 queries" +
             " Que tenham ESTRITA RELAÇÃO com a recebida, NÃO ADICIONE OUTROS TÓPICOS AS QUERIES. " +
             ' Você deve responder apenas as queries, separadas por um caractere de ";". Não digite' +
             " nenhuma outra palavra fora disso em hipotese alguma.",
+    },
+    createHyDEInstruction: {
+        role: "system",
+        content:
+            "Escreva uma breve passagem sobre a pergunta do usuário, ela deve ter no máximo um" +
+            "paragrafo e ser estritamente relacionada ao que ele está perguntando/falando.",
     },
     summaryCreationInstruction: {
         role: "system",
