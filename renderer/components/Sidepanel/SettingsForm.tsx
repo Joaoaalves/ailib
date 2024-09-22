@@ -12,6 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/Select";
+import { Switch } from "@/components/ui/Switch";
 
 export default function SettingsForm({ setOpen }) {
     const { configs, updateConfig } = useConfigs();
@@ -45,9 +46,12 @@ export default function SettingsForm({ setOpen }) {
         <form onSubmit={handleSubmit} className="space-y-6">
             {configs?.length &&
                 configs.map((config) => (
-                    <div key={config.key} className="space-y-1 mb-6">
+                    <div
+                        key={config.key}
+                        className="flex flex-col gap-y-2 mb-6"
+                    >
                         <Label className="text-white">{config.niceName}</Label>
-                        {config.allowedValues ? (
+                        {config.type == "select" && (
                             <Select
                                 defaultValue={config.value}
                                 onValueChange={(e) =>
@@ -75,7 +79,9 @@ export default function SettingsForm({ setOpen }) {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                        ) : (
+                        )}
+
+                        {config.type == "text" && (
                             <Input
                                 value={formValues[config.key] || config.value}
                                 onChange={(e) =>
@@ -85,6 +91,19 @@ export default function SettingsForm({ setOpen }) {
                                     )
                                 }
                                 placeholder={config.niceName}
+                            />
+                        )}
+
+                        {config.type == "boolean" && (
+                            <Switch
+                                className="mt-2"
+                                checked={
+                                    formValues[config.key] == "true" ||
+                                    config.value == "true"
+                                }
+                                onCheckedChange={(e) =>
+                                    handleInputChange(config.key, String(e))
+                                }
                             />
                         )}
                     </div>

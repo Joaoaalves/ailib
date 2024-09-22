@@ -8,6 +8,7 @@ interface ConfigInstance extends Model<ConfigCreationAttributes, IConfig> {
     key: string;
     value: string;
     niceName: string;
+    type: string;
     allowedValues?: string[];
 }
 
@@ -29,6 +30,10 @@ const Config = db.define<ConfigInstance>("Config", {
     allowedValues: {
         type: DataTypes.JSON,
         allowNull: true,
+    },
+    type: {
+        type: DataTypes.ENUM("text", "boolean", "select", "number"),
+        allowNull: false,
     },
 });
 

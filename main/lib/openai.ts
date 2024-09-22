@@ -24,6 +24,18 @@ export const Models = {
         const model = await Config.findByPk("embeddingModel");
         return model.value;
     },
+    hyde: async () => {
+        const model = await Config.findByPk("hydeModel");
+        return model.value;
+    },
+    sqr: async () => {
+        const model = await Config.findByPk("selfQueryRetrievalModel");
+        return model.value;
+    },
+    summary: async () => {
+        const model = await Config.findByPk("summaryModel");
+        return model.value;
+    },
 };
 
 export async function getEmbeddings(textChunk: string): Promise<number[]> {
@@ -51,7 +63,7 @@ export async function summarizePages(
 ): Promise<string> {
     const openai = await OpenAIClient();
     const summaryCreationInstruction = Prompts.summaryCreationInstruction;
-    const model = await Models.chat();
+    const model = await Models.summary();
 
     try {
         const response = await openai.chat.completions.create({
@@ -191,16 +203,12 @@ async function chat(
     const relevantQueries = await getMoreQueries(userQuery);
     const queries = [userQuery, ...relevantQueries];
 
-    console.log(queries);
-    console.log("\n\n\n");
     const hypotethicalDocuments = await Promise.all(
         queries.map(async (query) => {
             return await createHypotheticalDocument(query);
         }),
     );
 
-    console.log(hypotethicalDocuments);
-    console.log("\n\n\n");
     const systemMessage = Prompts.defaultChatInstruction;
 
     RAGFusion(hypotethicalDocuments, filter).then(async (RAGResult) => {
@@ -216,8 +224,7 @@ async function chat(
         });
 
         const lastMessage = messages.pop();
-        console.log(textChunks);
-        console.log("\n\n\n");
+
         lastMessage.content =
             "Contexto retornado do Retrieval Augmented Generation:\n---\n" +
             JSON.stringify(textChunks) +
@@ -319,7 +326,7 @@ export function countTokens(text: string, model: TiktokenModel): number {
 export async function createHypotheticalDocument(query: string) {
     const openai = await OpenAIClient();
     const systemMessage = Prompts.createHyDEInstruction;
-    const model = await Models.chat();
+    const model = await Models.hyde();
 
     const queryMessage: IMessage = {
         role: "user",
@@ -337,7 +344,7 @@ export async function createHypotheticalDocument(query: string) {
 export async function getMoreQueries(query: string): Promise<string[]> {
     const openai = await OpenAIClient();
     const systemMessage = Prompts.queryCreationInstruction;
-    const model = await Models.chat();
+    const model = await Models.sqr();
 
     const queryMessage: IMessage = {
         role: "user",

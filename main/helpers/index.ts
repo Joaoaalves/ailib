@@ -1,2 +1,3 @@
-export * from "./create-window";
+export * from "./createWindow";
 export * from "./systemPrompts";
+export * from "./defaultConfigs";
