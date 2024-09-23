@@ -199,19 +199,26 @@ async function chat(
     filter: Object,
 ) {
     const userQuery = messages.at(-1).content;
+    let queries = [userQuery];
 
-    const relevantQueries = await getMoreQueries(userQuery);
-    const queries = [userQuery, ...relevantQueries];
+    if (await isSQREnabled()) {
+        const relevantQueries = await getMoreQueries(userQuery);
+        queries.push(...relevantQueries);
+    }
 
-    const hypotethicalDocuments = await Promise.all(
-        queries.map(async (query) => {
-            return await createHypotheticalDocument(query);
-        }),
-    );
+    if (await isHyDEEnabled()) {
+        const hypotethicalDocuments = await Promise.all(
+            queries.map(async (query) => {
+                return await createHypotheticalDocument(query);
+            }),
+        );
+
+        queries = hypotethicalDocuments;
+    }
 
     const systemMessage = Prompts.defaultChatInstruction;
 
-    RAGFusion(hypotethicalDocuments, filter).then(async (RAGResult) => {
+    RAGFusion(queries, filter).then(async (RAGResult) => {
         const chunkIds = RAGResult.map((result) => result.chunkId);
 
         const textChunks = await TextChunk.findAll({
@@ -323,6 +330,11 @@ export function countTokens(text: string, model: TiktokenModel): number {
     }
 }
 
+async function isHyDEEnabled() {
+    const hydeEnabled = await Config.findByPk("hydeEnabled");
+    return hydeEnabled.value == "true";
+}
+
 export async function createHypotheticalDocument(query: string) {
     const openai = await OpenAIClient();
     const systemMessage = Prompts.createHyDEInstruction;
@@ -339,6 +351,11 @@ export async function createHypotheticalDocument(query: string) {
     });
 
     return hypotheticalDocument.choices[0].message.content;
+}
+
+async function isSQREnabled() {
+    const sqrEnabled = await Config.findByPk("selfQueryRetrievalEnabled");
+    return sqrEnabled.value == "true";
 }
 
 export async function getMoreQueries(query: string): Promise<string[]> {

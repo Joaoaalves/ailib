@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useConfigs } from "@/hooks/use-config";
 import { Label } from "../ui/Label";
 import Input from "../ui/Input";
@@ -41,6 +41,16 @@ export default function SettingsForm({ setOpen }) {
 
         setOpen(false);
     };
+
+    useEffect(() => {
+        if (configs && configs?.length) {
+            const initialFormValues = configs.reduce((acc, config) => {
+                acc[config.key] = config.value;
+                return acc;
+            }, {});
+            setFormValues(initialFormValues);
+        }
+    }, [configs]);
 
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -97,10 +107,7 @@ export default function SettingsForm({ setOpen }) {
                         {config.type == "boolean" && (
                             <Switch
                                 className="mt-2"
-                                checked={
-                                    formValues[config.key] == "true" ||
-                                    config.value == "true"
-                                }
+                                checked={formValues[config.key] == "true"}
                                 onCheckedChange={(e) =>
                                     handleInputChange(config.key, String(e))
                                 }
