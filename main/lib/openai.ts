@@ -233,7 +233,7 @@ async function chat(
         const lastMessage = messages.pop();
 
         lastMessage.content =
-            "Contexto retornado do Retrieval Augmented Generation:\n---\n" +
+            "Contexto:\n---\n" +
             JSON.stringify(textChunks) +
             "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;

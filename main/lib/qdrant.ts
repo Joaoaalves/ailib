@@ -1,28 +1,54 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { v4 as uuid } from "uuid";
 import { UpsertEmbeddingParams } from "shared/types/qdrant";
+import Config from "../db/config";
 
 export const client = createQdrantClient();
 
-const qdrantCollection = "AILib";
+const largeCollectionName = "AILib-Large";
+const smallCollectionName = "AILib-Small";
 
-export async function ensureCollectionExists(): Promise<void> {
+export async function ensureCollectionsExists(): Promise<void> {
     try {
-        await client.createCollection(qdrantCollection, {
-            vectors: {
-                size: 1536,
-                distance: "Cosine",
-            },
-        });
+        const smallCollection =
+            await client.collectionExists(smallCollectionName);
+        if (!smallCollection.exists) {
+            await client.createCollection(smallCollectionName, {
+                vectors: {
+                    size: 1536,
+                    distance: "Cosine",
+                },
+            });
+        }
+
+        const largeCollection =
+            await client.collectionExists(largeCollectionName);
+        if (!largeCollection.exists) {
+            await client.createCollection(largeCollectionName, {
+                vectors: {
+                    size: 3072,
+                    distance: "Cosine",
+                },
+            });
+        }
     } catch (error) {
-        //
+        console.error(error);
     }
+}
+
+async function getSelectedCollection() {
+    const config = await Config.findByPk("embeddingModel");
+
+    if (config.value == "text-embedding-3-large") return largeCollectionName;
+
+    return smallCollectionName;
 }
 
 export async function upsertEmbedding({
     embedding,
     metadata,
 }: UpsertEmbeddingParams): Promise<void> {
+    const collection = await getSelectedCollection();
     const payload = {
         ...metadata,
     };
@@ -33,7 +59,7 @@ export async function upsertEmbedding({
         payload: payload,
     };
 
-    await client.upsert(qdrantCollection, {
+    await client.upsert(collection, {
         points: [point],
     });
 }
@@ -43,7 +69,8 @@ export function createQdrantClient() {
 }
 
 export async function deletePointsForDocumentId(documentId: number) {
-    await client.delete(qdrantCollection, {
+    const collection = await getSelectedCollection();
+    await client.delete(collection, {
         filter: {
             must: [
                 {
@@ -63,7 +90,9 @@ export async function getMostRelevantItemsFromDocument(
     filter?: Object,
 ): Promise<Object[]> {
     try {
-        const result = await client.search(qdrantCollection, {
+        const collection = await getSelectedCollection();
+
+        const result = await client.search(collection, {
             ...filter,
             with_vector: false,
             vector: embeddedMessage,

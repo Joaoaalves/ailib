@@ -25,7 +25,7 @@ import { processPDF } from "./lib/document";
 import Message from "./db/message";
 import {
     deletePointsForDocumentId,
-    ensureCollectionExists,
+    ensureCollectionsExists,
 } from "./lib/qdrant";
 
 import { RAGFusion } from "./lib/rag";
@@ -266,8 +266,6 @@ ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
 });
 
 ipcMain.handle("search", async (event, query) => {
-    await ensureCollectionExists();
-
     const relevantQueries = await getMoreQueries(query);
     const queries = [query, ...relevantQueries];
 
@@ -403,7 +401,7 @@ ipcMain.handle("minimize", (event) => {
 
 app.on("ready", async () => {
     await syncDatabase();
-
+    await ensureCollectionsExists();
     await createDefaultConfigsIfNotExists();
 
     if (BrowserWindow.getAllWindows().length == 0) {

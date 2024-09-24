@@ -14,7 +14,7 @@ const defaultConfigs: IConfig[] = [
         niceName: "Embedding Model",
         allowedValues: [
             "text-embedding-3-small",
-            "text-embedding-2-large",
+            "text-embedding-3-large",
             "text-embedding-ada-002",
         ],
         type: "select",

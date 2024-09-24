@@ -1,5 +1,4 @@
 import { HProcessPDF } from "../types/handlers";
-import { ensureCollectionExists } from "./qdrant";
 import { countTokens, processChunks } from "./openai";
 
 const MillionTokens = 1000000;
@@ -17,8 +16,6 @@ export async function processPDF({
             MillionTokens;
 
         event.sender.send("embedding_cost", embeddingCost);
-
-        await ensureCollectionExists();
 
         await processChunks(event, pages, offset, {
             collectionId,
