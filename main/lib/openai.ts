@@ -237,6 +237,7 @@ async function chat(
             JSON.stringify(textChunks) +
             "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;
+
         messages = [systemMessage, ...messages, lastMessage];
 
         await streamCompletion(event, messages, "chat-stream");

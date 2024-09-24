@@ -3,12 +3,11 @@ import { getEmbeddings } from "./openai";
 import { getMostRelevantItemsFromDocument } from "./qdrant";
 
 export async function RAGFusion(queries: string[], filter: Object = {}) {
-    const results = [];
+    const promises = queries.map((query) => simpleRAG(query, filter));
 
-    for (let i = 0; i < queries.length; i++) {
-        const ragResult = await simpleRAG(queries[i], filter);
-        results.push(...ragResult);
-    }
+    const resultsArray = await Promise.all(promises);
+
+    const results: any = resultsArray.flat();
 
     return rankResults(results);
 }
