@@ -1,3 +1,4 @@
+import { IChatStatus } from "./../../shared/types/conversation";
 import { OpenAI } from "openai";
 import { Op } from "sequelize";
 import { upsertEmbedding } from "./qdrant";
@@ -102,17 +103,14 @@ export async function processChunks(
                 text: chunk,
             });
 
-            // Divida o chunk em 5 partes semânticas (com base em pontos finais)
             const chunkParts = splitChunkSemantically(chunk, 5);
 
-            // Use Promise.all para obter os embeddings de cada parte em paralelo
             const embeddings = await Promise.all(
                 chunkParts.map(async (part) => {
                     return await getEmbeddings(part);
                 }),
             );
 
-            // Insira os embeddings individualmente no Qdrant
             for (const [partIndex, embedding] of embeddings.entries()) {
                 metadata.page = offset + index;
                 metadata.chunkId = textChunk.id;
@@ -122,7 +120,6 @@ export async function processChunks(
                 });
             }
 
-            // Envie o progresso de embedding para o front-end
             event.sender.send("embedding_progress", {
                 chunk: index + 1,
                 total: chunks.length,
@@ -135,7 +132,7 @@ export async function processChunks(
 }
 
 function splitChunkSemantically(chunk: string, parts: number): string[] {
-    const sentences = chunk.match(/[^.!?]+[.!?]+/g) || [chunk]; // Divide por pontos finais
+    const sentences = chunk.match(/[^.!?]+[.!?]+/g) || [chunk];
     const totalLength = sentences.reduce(
         (sum, sentence) => sum + sentence.length,
         0,
@@ -151,7 +148,6 @@ function splitChunkSemantically(chunk: string, parts: number): string[] {
         currentPart += sentence;
         currentLength += sentence.length;
 
-        // Verifique se o comprimento acumulado está próximo do comprimento alvo para a parte
         if (
             currentLength >= targetPartLength ||
             (i === sentences.length - 1 && chunkParts.length < parts - 1)
@@ -162,12 +158,10 @@ function splitChunkSemantically(chunk: string, parts: number): string[] {
         }
     }
 
-    // Se restar algum texto, adicione como última parte
     if (currentPart) {
         chunkParts.push(currentPart.trim());
     }
 
-    // Se houver menos partes do que o necessário, redistribuir
     while (chunkParts.length < parts) {
         const lastPart = chunkParts.pop()!;
         const splitIndex = Math.floor(lastPart.length / 2);
@@ -193,6 +187,17 @@ export async function createConversationTitle(message: IMessage) {
     return completion.choices[0].message.content;
 }
 
+async function streamChatStatus(
+    event: IpcMainInvokeEvent,
+    message: string,
+    isLoading: boolean = true,
+) {
+    return event.sender.send("chat-status", {
+        isLoading,
+        message,
+    });
+}
+
 async function chat(
     event: IpcMainInvokeEvent,
     messages: IMessage[],
@@ -202,11 +207,15 @@ async function chat(
     let queries = [userQuery];
 
     if (await isSQREnabled()) {
+        await streamChatStatus(event, "Doing Self Query Retrieval");
+
         const relevantQueries = await getMoreQueries(userQuery);
         queries.push(...relevantQueries);
     }
 
     if (await isHyDEEnabled()) {
+        await streamChatStatus(event, "Doing Hypotethical Document Embeddings");
+
         const hypotethicalDocuments = await Promise.all(
             queries.map(async (query) => {
                 return await createHypotheticalDocument(query);
@@ -218,7 +227,10 @@ async function chat(
 
     const systemMessage = Prompts.defaultChatInstruction;
 
+    streamChatStatus(event, "Doing RAG Fusion");
+
     RAGFusion(queries, filter).then(async (RAGResult) => {
+        await streamChatStatus(event, "Sending best results to AI");
         const chunkIds = RAGResult.map((result) => result.chunkId);
 
         const textChunks = await TextChunk.findAll({
@@ -245,6 +257,7 @@ async function chat(
         streamDocumentContext(event, RAGResult);
 
         event.sender.send("chat-stream-end");
+        await streamChatStatus(event, "", false);
     });
 }
 

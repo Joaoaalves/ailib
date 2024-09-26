@@ -25,7 +25,7 @@ const ChatInput = forwardRef<HTMLTextAreaElement, ChatInputProps>(
 
         return (
             <Textarea
-                className="text-white font-bold bg-container shadow-primary border-none h-28 row-start-2"
+                className="text-white font-bold bg-container shadow-primary border-none h-28 row-start-3"
                 ref={ref}
                 id="input"
                 value={message}

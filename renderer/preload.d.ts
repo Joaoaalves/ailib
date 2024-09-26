@@ -6,6 +6,7 @@ import { ICollection } from "./@types/collection";
 import { IDocument } from "shared/types/document";
 import { ISummary } from "shared/types/summary";
 import { IConfig } from "shared/types/config";
+import { IChatStatus } from "shared/types/conversation";
 
 interface IProgress {
     chunk: number;
@@ -35,6 +36,7 @@ declare global {
                 streamFile: (result: RankedSearchResult) => void,
                 onEnd: () => void,
             ) => void;
+            onChatStatus: (callback: (chatStatus: IChatStatus) => void) => void;
             deleteConversation: (conversationId: number) => void;
             summarizePages: (
                 documentId: number,

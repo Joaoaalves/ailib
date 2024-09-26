@@ -13,3 +13,8 @@ export interface IConversation {
     createdAt?: Date;
     Messages?: IMessage[];
 }
+
+export interface IChatStatus {
+    isLoading: boolean;
+    message?: string;
+}

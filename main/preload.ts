@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { ICollection } from "shared/types/collection";
-import { IMessage } from "shared/types/conversation";
+import { IChatStatus, IMessage } from "shared/types/conversation";
 import { IDocument } from "shared/types/document";
 import { RankedSearchResult } from "shared/types/qdrant";
 
@@ -52,6 +52,11 @@ contextBridge.exposeInMainWorld("openai", {
             streamFile(result),
         );
         ipcRenderer.on("chat-stream-end", onEnd);
+    },
+    onChatStatus: (callback: (chatStatus: IChatStatus) => void) => {
+        ipcRenderer.on("chat-status", (event, chatStatus) =>
+            callback(chatStatus),
+        );
     },
     summarizePages: (
         documentId: number,

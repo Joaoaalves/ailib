@@ -8,7 +8,11 @@ import React, {
     useCallback,
     useEffect,
 } from "react";
-import { IConversation, IMessage } from "shared/types/conversation";
+import {
+    IChatStatus,
+    IConversation,
+    IMessage,
+} from "shared/types/conversation";
 
 interface ChatProviderProps {
     children: ReactNode;
