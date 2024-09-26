@@ -17,7 +17,7 @@ async function simpleRAG(query: string, filter: Object = {}) {
 
     const res = await getMostRelevantItemsFromDocument(
         embeddedMessage,
-        5,
+        10,
         filter,
     );
     return res;
@@ -32,15 +32,15 @@ function rankResults(
         chunkId: number;
     }[],
 ): RankedSearchResult[] {
-    const rankedResults = new Map<string, RankedSearchResult>();
+    const rankedResults = new Map<number, RankedSearchResult>();
 
     for (const result of results) {
-        if (rankedResults.has(result.id)) {
-            const existingResult = rankedResults.get(result.id)!;
+        if (rankedResults.has(result.page)) {
+            const existingResult = rankedResults.get(result.page)!;
             existingResult.score += result.score;
             existingResult.occurrences += 1;
         } else {
-            rankedResults.set(result.id, { ...result, occurrences: 1 });
+            rankedResults.set(result.page, { ...result, occurrences: 1 });
         }
     }
 
