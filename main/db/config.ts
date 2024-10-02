@@ -7,6 +7,7 @@ interface ConfigCreationAttributes extends Optional<IConfig, "key"> {}
 interface ConfigInstance extends Model<ConfigCreationAttributes, IConfig> {
     key: string;
     value: string;
+    description: string;
     niceName: string;
     type: string;
     allowedValues?: string[];
@@ -18,6 +19,10 @@ const Config = db.define<ConfigInstance>("Config", {
         allowNull: false,
         primaryKey: true,
         unique: true,
+    },
+    description: {
+        type: DataTypes.STRING,
+        allowNull: false,
     },
     value: {
         type: DataTypes.STRING,

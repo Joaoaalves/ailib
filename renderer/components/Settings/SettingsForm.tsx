@@ -1,18 +1,26 @@
 import { useEffect, useState } from "react";
 import { useConfigs } from "@/hooks/use-config";
-import { Label } from "../ui/Label";
+
 import Input from "../ui/Input";
+import { Label } from "../ui/Label";
 import { Button } from "../ui/Button";
 import {
     Select,
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/Select";
 import { Switch } from "@/components/ui/Switch";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/Tooltip";
+
+import { GoQuestion } from "react-icons/go";
 
 export default function SettingsForm({ setOpen }) {
     const { configs, updateConfig } = useConfigs();
@@ -60,7 +68,21 @@ export default function SettingsForm({ setOpen }) {
                         key={config.key}
                         className="flex flex-col gap-y-2 mb-6"
                     >
-                        <Label className="text-white">{config.niceName}</Label>
+                        <div className="flex items-center justify-start gap-x-2">
+                            <Label className="text-white">
+                                {config.niceName}
+                            </Label>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <GoQuestion className="text-white" />
+                                    </TooltipTrigger>
+                                    <TooltipContent className="bg-black text-white p-2 max-w-80">
+                                        <p>{config.description}</p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </div>
                         {config.type == "select" && (
                             <Select
                                 defaultValue={config.value}
