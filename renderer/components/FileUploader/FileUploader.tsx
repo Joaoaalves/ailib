@@ -9,8 +9,10 @@ import { usePDFJS } from "@/hooks/use-pdfjs";
 import { IDocument } from "shared/types/document";
 import { PDFDocumentProxy } from "pdfjs-dist";
 import { useCollections } from "@/hooks/use-collections";
+import { Button } from "../ui/Button";
 
 const FileUploader = () => {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const collectionRef = useRef(null);
     const { collections } = useCollections();
     const pdfPathRef = useRef<string>("");
@@ -113,6 +115,7 @@ const FileUploader = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (!pdfPathRef.current) {
             console.error("No PDF path available");
@@ -120,6 +123,7 @@ const FileUploader = () => {
         }
 
         await processPDF();
+        setIsLoading(false);
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -168,7 +172,9 @@ const FileUploader = () => {
                 ref={processCountRef}
             />
 
-            <Input type="submit" value={"Enviar"} />
+            <Button className="w-full bg-black text-white" disabled={isLoading}>
+                {isLoading ? "Processing your pdf..." : "Send"}
+            </Button>
         </form>
     );
 };
