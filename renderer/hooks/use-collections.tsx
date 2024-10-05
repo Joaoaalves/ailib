@@ -2,20 +2,20 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import { ICollection } from "shared/types/collection";
 
 const getCollections = async () => {
-    const collections = await window.backend.getCollections();
+    const collections = await window.api.collection.getAll();
     return collections;
 };
 
 const deleteCollection = async (collectionId: number) => {
-    window.backend.deleteCollection(collectionId);
+    window.api.collection.delete(collectionId);
 };
 
 const addCollection = async (collectionName: string) => {
-    return window.backend.createCollection(collectionName);
+    return window.api.collection.create(collectionName);
 };
 
 const updateCollection = async (collection: ICollection) => {
-    return window.backend.updateCollection(collection.id, collection);
+    return window.api.collection.update(collection.id, collection);
 };
 
 export function useCollections() {

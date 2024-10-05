@@ -29,7 +29,7 @@ export default function Document({ collectionId, document }: DocumentProps) {
     };
 
     const handleDelete = (): void => {
-        window.backend.deleteDocument(document.id);
+        window.api.document.delete(document.id);
         router.refresh();
     };
 

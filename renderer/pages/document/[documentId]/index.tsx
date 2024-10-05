@@ -12,7 +12,7 @@ export default function Document() {
 
     const getDocument = async () => {
         try {
-            const document = await window.backend.getDocument(
+            const document = await window.api.document.get(
                 documentId as string,
             );
             setDocument(document);

@@ -17,7 +17,7 @@ export default function ChatRoot({
     const [chatStatus, setChatStatus] = useState<IChatStatus>();
 
     useEffect(() => {
-        window.openai.onChatStream(
+        window.api.openai.onChatStream(
             (chunk) => {
                 streamMessage(chunk.choices[0]?.delta?.content || "");
             },
@@ -27,7 +27,9 @@ export default function ChatRoot({
     }, []);
 
     useEffect(() => {
-        window.openai.onChatStatus((chatStatus) => setChatStatus(chatStatus));
+        window.api.openai.onChatStatus((chatStatus) =>
+            setChatStatus(chatStatus),
+        );
     }, []);
 
     useEffect(() => {

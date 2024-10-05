@@ -10,7 +10,7 @@ export default function SummaryList({ documentId }) {
     const [summaries, setSummaries] = useState<ISummary[]>();
     const router = useRouter();
     const getSummaries = async () => {
-        const summaries = await window.summary.get();
+        const summaries = await window.api.summary.getAll();
 
         setSummaries(summaries);
     };

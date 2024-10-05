@@ -21,114 +21,126 @@ const handler = {
 
 contextBridge.exposeInMainWorld("ipc", handler);
 
-contextBridge.exposeInMainWorld("summary", {
-    get: async () => ipcRenderer.invoke("getSummaries"),
-    getById: async (id: number) => ipcRenderer.invoke("getSummaryById", id),
-});
-
-contextBridge.exposeInMainWorld("openai", {
-    embeddingCost: (callback: (cost: number) => void) =>
-        ipcRenderer.on("embedding_cost", (event, cost) => callback(cost)),
-    embeddingProgress: (
-        callback: (progress: any) => void,
-        onEnd: () => void,
-    ) => {
-        ipcRenderer.on("embedding_progress", (event, progress) =>
-            callback(progress),
-        );
-        ipcRenderer.on("embedding_complete", onEnd);
+contextBridge.exposeInMainWorld("api", {
+    document: {
+        create: async (name: string, path: string, collectionId: number) =>
+            ipcRenderer.invoke("createDocument", name, path, collectionId),
+        get: (documentId: string) =>
+            ipcRenderer.invoke("getDocument", documentId),
+        update: async (documentId: number, updateFields: IDocument) =>
+            ipcRenderer.invoke("updateDocument", documentId, updateFields),
+        delete: (documentId: number) =>
+            ipcRenderer.invoke("deleteDocument", documentId),
+        setLastPageRead: (documentId: number, page: number) =>
+            ipcRenderer.invoke("setLastPageReadSave", documentId, page),
     },
-    chatWithCollection: (messages: IMessage[], collectionId: number) =>
-        ipcRenderer.invoke("chatWithCollection", messages, collectionId),
-    chatWithDocument: (messages: IMessage[], documentId: number) =>
-        ipcRenderer.invoke("chatWithDocument", messages, documentId),
-    onChatStream: (
-        callback: (chunk: any) => void,
-        streamFile: (result: RankedSearchResult) => void,
-        onEnd: () => void,
-    ) => {
-        ipcRenderer.on("chat-stream", (event, chunk) => callback(chunk));
-        ipcRenderer.on("chat-stream-files", (event, result) =>
-            streamFile(result),
-        );
-        ipcRenderer.on("chat-stream-end", onEnd);
+    collection: {
+        getAll: () => ipcRenderer.invoke("getCollections"),
+        create: (collectionName: string) =>
+            ipcRenderer.invoke("createCollection", collectionName),
+        update: (collectionId: number, data: ICollection) =>
+            ipcRenderer.invoke("updateCollection", collectionId, data),
+        delete: async (collectionId: number) =>
+            ipcRenderer.invoke("deleteCollection", collectionId),
+        saveMessage: (conversationId: number, message: IMessage) =>
+            ipcRenderer.invoke("saveMessage", conversationId, message),
     },
-    onChatStatus: (callback: (chatStatus: IChatStatus) => void) => {
-        ipcRenderer.on("chat-status", (event, chatStatus) =>
-            callback(chatStatus),
-        );
+    conversation: {
+        get: (conversationId: number) =>
+            ipcRenderer.invoke("getConversationMessages", conversationId),
+        getAll: () => ipcRenderer.invoke("getConversations"),
+        create: (message: IMessage) =>
+            ipcRenderer.invoke("createConversation", message),
+        delete: (conversationId: number) =>
+            ipcRenderer.invoke("deleteConversation", conversationId),
+        saveMessage: (conversationId: number, message: IMessage) =>
+            ipcRenderer.invoke("saveMessage", conversationId, message),
     },
-    summarizePages: (
-        documentId: number,
-        pages: string[],
-        summaryTitle: string,
-    ) => ipcRenderer.invoke("summarizePages", documentId, pages, summaryTitle),
-    summaryzingProgress: (
-        callback: (progress: number) => void,
-        onEnd: () => void,
-    ) => {
-        ipcRenderer.on("summaryzingProgress", (event, progress) =>
-            callback(progress),
-        );
-        ipcRenderer.on("summaryzingComplete", onEnd);
+    fileHandler: {
+        processPdf: (
+            pages: string[],
+            documentId: number,
+            collectionId: number,
+            processCount: number,
+        ) =>
+            ipcRenderer.invoke(
+                "processPdf",
+                pages,
+                documentId,
+                collectionId,
+                processCount,
+            ),
+        saveCover: async (documentId: number, cover: ArrayBuffer) =>
+            ipcRenderer.invoke("saveCover", documentId, cover),
     },
-    deleteConversation: (conversationId: number) =>
-        ipcRenderer.invoke("deleteConversation", conversationId),
-});
-
-contextBridge.exposeInMainWorld("backend", {
-    processPdf: (
-        pages: string[],
-        documentId: number,
-        collectionId: number,
-        processCount: number,
-    ) =>
-        ipcRenderer.invoke(
-            "processPdf",
-            pages,
-            documentId,
-            collectionId,
-            processCount,
-        ),
-    getDocument: (documentId: string) =>
-        ipcRenderer.invoke("getDocument", documentId),
-    createDocument: async (name: string, path: string, collectionId: number) =>
-        ipcRenderer.invoke("createDocument", name, path, collectionId),
-    saveCover: async (documentId: number, cover: ArrayBuffer) =>
-        ipcRenderer.invoke("saveCover", documentId, cover),
-    updateDocument: async (documentId: number, updateFields: IDocument) =>
-        ipcRenderer.invoke("updateDocument", documentId, updateFields),
-    getCollections: () => ipcRenderer.invoke("getCollections"),
-    createCollection: (collectionName: string) =>
-        ipcRenderer.invoke("createCollection", collectionName),
-    updateCollection: (collectionId: number, data: ICollection) =>
-        ipcRenderer.invoke("updateCollection", collectionId, data),
-    deleteCollection: async (collectionId: number) =>
-        ipcRenderer.invoke("deleteCollection", collectionId),
-    setLastPageRead: (documentId: number, page: number) =>
-        ipcRenderer.invoke("setLastPageReadSave", documentId, page),
-    deleteDocument: (documentId: number) =>
-        ipcRenderer.invoke("deleteDocument", documentId),
-    createConversation: (message: IMessage) =>
-        ipcRenderer.invoke("createConversation", message),
-    getConversation: (conversationId: number) =>
-        ipcRenderer.invoke("getConversationMessages", conversationId),
-    getConversations: () => ipcRenderer.invoke("getConversations"),
-    getConfigs: () => ipcRenderer.invoke("getConfigs"),
-    updateConfig: (key: string, value: string) =>
-        ipcRenderer.invoke("updateConfig", key, value),
-    saveMessage: (conversationId: number, message: IMessage) =>
-        ipcRenderer.invoke("saveMessage", conversationId, message),
+    config: {
+        getAll: () => ipcRenderer.invoke("getConfigs"),
+        update: (key: string, value: string) =>
+            ipcRenderer.invoke("updateConfig", key, value),
+    },
+    summary: {
+        getAll: async () => ipcRenderer.invoke("getSummaries"),
+        get: async (id: number) => ipcRenderer.invoke("getSummaryById", id),
+        summarizePages: (
+            documentId: number,
+            pages: string[],
+            summaryTitle: string,
+        ) =>
+            ipcRenderer.invoke(
+                "summarizePages",
+                documentId,
+                pages,
+                summaryTitle,
+            ),
+        summaryzingProgress: (
+            callback: (progress: number) => void,
+            onEnd: () => void,
+        ) => {
+            ipcRenderer.on("summaryzingProgress", (event, progress) =>
+                callback(progress),
+            );
+            ipcRenderer.on("summaryzingComplete", onEnd);
+        },
+    },
     search: (query: string) => ipcRenderer.invoke("search", query),
+    openai: {
+        embeddingCost: (callback: (cost: number) => void) =>
+            ipcRenderer.on("embedding_cost", (event, cost) => callback(cost)),
+        embeddingProgress: (
+            callback: (progress: any) => void,
+            onEnd: () => void,
+        ) => {
+            ipcRenderer.on("embedding_progress", (event, progress) =>
+                callback(progress),
+            );
+            ipcRenderer.on("embedding_complete", onEnd);
+        },
+        chatWithCollection: (messages: IMessage[], collectionId: number) =>
+            ipcRenderer.invoke("chatWithCollection", messages, collectionId),
+        chatWithDocument: (messages: IMessage[], documentId: number) =>
+            ipcRenderer.invoke("chatWithDocument", messages, documentId),
+        onChatStream: (
+            callback: (chunk: any) => void,
+            streamFile: (result: RankedSearchResult) => void,
+            onEnd: () => void,
+        ) => {
+            ipcRenderer.on("chat-stream", (event, chunk) => callback(chunk));
+            ipcRenderer.on("chat-stream-files", (event, result) =>
+                streamFile(result),
+            );
+            ipcRenderer.on("chat-stream-end", onEnd);
+        },
+        onChatStatus: (callback: (chatStatus: IChatStatus) => void) => {
+            ipcRenderer.on("chat-status", (event, chatStatus) =>
+                callback(chatStatus),
+            );
+        },
+    },
 });
 
 contextBridge.exposeInMainWorld("actions", {
     close: () => ipcRenderer.invoke("close"),
     minimize: () => ipcRenderer.invoke("minimize"),
-});
-
-contextBridge.exposeInMainWorld("openai", {
-    setApiKey: (apiKey: string) => ipcRenderer.invoke("set-api-key", apiKey),
 });
 
 export type IpcHandler = typeof handler;

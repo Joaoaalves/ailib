@@ -67,7 +67,7 @@ export default function PDFViewer({ document, path, page }: PDFViewerProps) {
             }
         };
 
-        window.backend.setLastPageRead(document.id, currentPage);
+        window.api.document.setLastPageRead(document.id, currentPage);
 
         window.addEventListener("keydown", handleKeyDown);
         return () => {

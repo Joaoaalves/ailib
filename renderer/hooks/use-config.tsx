@@ -2,12 +2,12 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import { IConfig } from "shared/types/config";
 
 const getConfigs = async () => {
-    const configs = await window.backend.getConfigs();
+    const configs = await window.api.config.getAll();
     return configs;
 };
 
 const updateConfig = async ({ key, value }: IConfig) => {
-    const config = await window.backend.updateConfig(key, value);
+    const config = await window.api.config.update(key, value);
     return config;
 };
 

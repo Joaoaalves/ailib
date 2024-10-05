@@ -27,8 +27,8 @@ const DocumentSummaryProvider: React.FC<{ children: ReactNode }> = ({
             setProgress(data.progress);
         };
 
-        if (window.openai && window.openai.summaryzingProgress) {
-            window.openai.summaryzingProgress(handleProgress, () =>
+        if (window.api.openai && window.api.openai.summaryzingProgress) {
+            window.api.openai.summaryzingProgress(handleProgress, () =>
                 router.refresh(),
             );
         }

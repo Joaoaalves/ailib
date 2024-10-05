@@ -20,7 +20,7 @@ const FileUploader = () => {
     const processCountRef = useRef<HTMLInputElement>(null);
 
     const createDocument = async (): Promise<IDocument> => {
-        const document = await window.backend.createDocument(
+        const document = await window.api.document.create(
             bookNameRef.current?.value || "",
             pdfPathRef.current,
             collectionRef.current,
@@ -57,7 +57,7 @@ const FileUploader = () => {
             if (blob) {
                 const coverBuffer = await blob.arrayBuffer();
                 try {
-                    window.backend.saveCover(doc.id, coverBuffer);
+                    window.api.fileHandler.saveCover(doc.id, coverBuffer);
                 } catch (error) {
                     console.error("Erro ao salvar a capa do documento:", error);
                 }
@@ -69,7 +69,7 @@ const FileUploader = () => {
         documentId: number,
         totalPages: number,
     ) => {
-        window.backend.updateDocument(documentId, { totalPages });
+        window.api.document.update(documentId, { totalPages });
     };
 
     const processPDF = usePDFJS(async (pdfjs) => {
@@ -88,7 +88,7 @@ const FileUploader = () => {
             pageTextPromises.push(getPageText(pdf, pageNo));
         }
         const pages: string[] = await Promise.all(pageTextPromises);
-        window.backend.processPdf(
+        window.api.fileHandler.processPdf(
             pages,
             document.id,
             collectionRef.current,

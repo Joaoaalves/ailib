@@ -44,7 +44,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 
     const getConversation = async () => {
         let conv: IConversation =
-            await window.backend.getConversation(conversationId);
+            await window.api.conversation.get(conversationId);
 
         if (!conv) return router.push(`/chat/${collectionId}/${documentId}`);
 
@@ -82,7 +82,10 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 
     const onStreamEnd = () => {
         if (conversation) {
-            window.backend.saveMessage(conversation.id, messages.at(-1));
+            window.api.conversation.saveMessage(
+                conversation.id,
+                messages.at(-1),
+            );
         }
     };
 
@@ -123,14 +126,17 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
 
         setMessages((prevMessages) => {
             const newMessagesArr = [...prevMessages, newMessage];
-            window.backend.saveMessage(convId, newMessage);
+            window.api.conversation.saveMessage(convId, newMessage);
 
             if (!documentId) {
-                window.openai.chatWithCollection(newMessagesArr, collectionId);
+                window.api.openai.chatWithCollection(
+                    newMessagesArr,
+                    collectionId,
+                );
                 return newMessagesArr;
             }
 
-            window.openai.chatWithDocument(newMessagesArr, documentId);
+            window.api.openai.chatWithDocument(newMessagesArr, documentId);
             return newMessagesArr;
         });
     };

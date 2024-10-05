@@ -20,7 +20,7 @@ const SearchProvider: React.FC<SearchProviderProps> = ({ children }) => {
     const search = async (query: string) => {
         setIsSearching(true);
 
-        const result = await window.backend.search(query);
+        const result = await window.api.search(query);
         setSeachResult(result);
         setIsSearching(false);
     };

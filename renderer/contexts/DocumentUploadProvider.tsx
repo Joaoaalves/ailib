@@ -34,14 +34,14 @@ const DocumentUploadProvider: React.FC<{ children: ReactNode }> = ({
             if (!progress || prog.chunk > progress.chunk) setProgress(prog);
         };
 
-        if (window.openai && window.openai.embeddingProgress) {
-            window.openai.embeddingProgress(handleProgress, () =>
+        if (window.api.openai && window.api.openai.embeddingProgress) {
+            window.api.openai.embeddingProgress(handleProgress, () =>
                 router.refresh(),
             );
         }
 
-        if (window.openai && window.openai.embeddingCost) {
-            window.openai.embeddingCost((cost: number) =>
+        if (window.api.openai && window.api.openai.embeddingCost) {
+            window.api.openai.embeddingCost((cost: number) =>
                 setEmbeddingCost(cost),
             );
         }

@@ -14,9 +14,7 @@ export default function SummaryForm({ documentId }) {
     const { isSummaryzing, progress } = useSummaryDocument();
 
     const getDocument = async () => {
-        document.current = await window.backend.getDocument(
-            documentId as string,
-        );
+        document.current = await window.api.document.get(documentId as string);
     };
 
     useEffect(() => {
@@ -47,7 +45,7 @@ export default function SummaryForm({ documentId }) {
         }
         const pages: string[] = await Promise.all(pageTextPromises);
 
-        window.openai.summarizePages(
+        window.api.summary.summarizePages(
             document.current.id,
             pages,
             title.current.value,

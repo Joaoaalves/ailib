@@ -2,16 +2,16 @@ import { useQuery, useQueryClient, useMutation } from "react-query";
 import { IConversation, IMessage } from "shared/types/conversation";
 
 const getConversations = async () => {
-    const conversations = await window.backend.getConversations();
+    const conversations = await window.api.conversation.getAll();
     return conversations ?? [];
 };
 
 const deleteConversation = async (conversationId: number) => {
-    window.openai.deleteConversation(conversationId);
+    window.api.conversation.delete(conversationId);
 };
 
 const addConversation = async (message: IMessage) => {
-    return await window.backend.createConversation(message);
+    return await window.api.conversation.create(message);
 };
 
 export function useConversations() {
