@@ -14,7 +14,7 @@ export default function Page() {
     }>();
 
     const getSummary = async () => {
-        const summary = await window.summary.getById(summaryId as string);
+        const summary = await window.api.summary.get(summaryId as string);
         setSummary(summary);
     };
 
