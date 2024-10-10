@@ -27,12 +27,14 @@ export default function Page() {
     return (
         <Layout sidePanelLinks={<SummaryList documentId={documentId} />}>
             <div className="grid grid-cols-1 grid-rows-1 p-8 text-white bg-[#111111] m-4 rounded-lg relative">
-                <CopyClipboardButton
-                    text={summary.text}
-                    className="sticky top-8 ms-auto z-[9999]"
-                />
                 {summary && (
-                    <MarkdownRenderer>{summary?.text}</MarkdownRenderer>
+                    <>
+                        <CopyClipboardButton
+                            text={summary.text}
+                            className="sticky top-8 ms-auto z-[9999]"
+                        />
+                        <MarkdownRenderer>{summary?.text}</MarkdownRenderer>
+                    </>
                 )}
             </div>
         </Layout>
