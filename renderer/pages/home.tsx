@@ -8,7 +8,6 @@ import { useCollections } from "@/hooks/use-collections";
 
 export default function HomePage() {
     const { collections } = useCollections();
-
     return (
         <React.Fragment>
             <Head>

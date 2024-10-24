@@ -4,6 +4,18 @@
       "shared/*": [
         "./shared/*"
       ],
+      "@entities/*": [
+        "./main/domain/entities/*"
+      ],
+      "@repositories/*": [
+        "./main/infrastructure/persistance/repositories/*"
+      ],
+      "@services/*": [
+        "./main/application/services/*"
+      ],
+      "@models/*": [
+        "./main/infrastructure/persistance/models/*"
+      ]
     },
     "target": "es2020",
     "lib": [

@@ -16,8 +16,6 @@ import {
     chatWithCollection,
 } from "./lib/openai";
 
-import Document from "./db/document";
-import Collection from "./db/collection";
 import Conversation from "./db/conversation";
 
 import syncDatabase from "./db/sync";
@@ -29,7 +27,6 @@ import {
 } from "./lib/qdrant";
 
 import { RAGFusion } from "./lib/rag";
-import Summary from "./db/summary";
 import { associateDocumentToCollection } from "./lib/data";
 import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
@@ -37,7 +34,44 @@ import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 import TextChunk from "./db/textChunk";
 
+import { CreateCollectionService } from "./application/services/Collection/create-collection";
+import { FindAllCollectionsService } from "@services/Collection/find-all-collections";
+import { UpdateCollectionService } from "@services/Collection/update-collection";
+import { DeleteCollectionService } from "@services/Collection/delete-collection";
+import { FormatResponseService } from "@services/FormatResponse/format-response-json";
+
+import Summary from "@models/Summary";
+import Document from "@models/Document";
+
 const isProd = process.env.NODE_ENV === "production";
+// Create a new Collection
+ipcMain.handle("createCollection", async (event, collectionName) => {
+    const createCollectionService = new CreateCollectionService();
+    const collection =
+        await createCollectionService.createCollection(collectionName);
+    return FormatResponseService.formatToJson(collection);
+});
+
+// List all Collections
+ipcMain.handle("getCollections", async (event) => {
+    const findAllCollectionsService = new FindAllCollectionsService();
+    const collections = await findAllCollectionsService.getAllCollections();
+    return FormatResponseService.formatToJson(collections);
+});
+
+// Update Collection
+ipcMain.handle("updateCollection", async (event, collectionId, data) => {
+    const updateCollectionService = new UpdateCollectionService();
+    await updateCollectionService.updateCollection(collectionId, data);
+    return FormatResponseService.formatToJson(data);
+});
+
+// Delete Collection
+ipcMain.handle("deleteCollection", async (event, collectionId) => {
+    const deleteCollectionService = new DeleteCollectionService();
+    await deleteCollectionService.deleteCollection(collectionId);
+    return FormatResponseService.formatToJson({ collectionId });
+});
 
 ipcMain.handle("createConversation", async (event, message) => {
     const title = await createConversationTitle(message);
@@ -196,35 +230,6 @@ ipcMain.handle(
     },
 );
 
-ipcMain.handle("getCollections", async (event) => {
-    const collections = await Collection.findAll({ include: Document });
-    return JSON.parse(JSON.stringify(collections));
-});
-
-ipcMain.handle("createCollection", async (event, collectionName) => {
-    const collectionId = await Collection.create({ name: collectionName });
-    return collectionId;
-});
-
-ipcMain.handle("updateCollection", async (event, collectionId, data) => {
-    const collection = await Collection.findByPk(collectionId, {
-        include: Document,
-    });
-
-    collection.set(data);
-
-    await collection.save();
-
-    return JSON.parse(JSON.stringify(collection));
-});
-
-ipcMain.handle("deleteCollection", async (event, collectionId) => {
-    await Collection.destroy({
-        where: {
-            id: Number(collectionId),
-        },
-    });
-});
 ipcMain.handle("getDocument", async (event, documentId) => {
     const document = await Document.findByPk(Number(documentId));
     return JSON.parse(JSON.stringify(document));

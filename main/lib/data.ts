@@ -1,5 +1,5 @@
-import Document from "../db/document";
-import Collection from "../db/collection";
+import Document from "@models/Document";
+import Collection from "@models/Collection";
 
 import type { IDocument } from "shared/types/document";
 

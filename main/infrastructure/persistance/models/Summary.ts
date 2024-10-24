@@ -1,6 +1,6 @@
-import { ISummary } from "shared/types/summary";
+import { ISummary } from "@entities/Summary";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "./connection";
+import db from "../database";
 
 interface SummaryCreationAttributes extends Optional<ISummary, "id"> {}
 
@@ -13,7 +13,6 @@ interface SummaryInstance extends Model<ISummary, SummaryCreationAttributes> {
     chapter?: number;
     createAt: Date;
 }
-
 const Summary = db.define<SummaryInstance>(
     "Summary",
     {

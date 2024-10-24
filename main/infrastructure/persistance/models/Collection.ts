@@ -1,7 +1,7 @@
-import { ICollection } from "./../../shared/types/collection";
+import { ICollection } from "@entities/Collection";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "./connection";
-import Document from "./document";
+import db from "../database";
+import Document from "@models/Document";
 
 interface CollectionAttributes {
     id: number;
@@ -34,7 +34,6 @@ const Collection = db.define<CollectionInstance>(
         timestamps: false,
     },
 );
-
 Collection.hasMany(Document);
 
 export default Collection;

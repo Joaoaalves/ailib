@@ -1,7 +1,7 @@
+import { IDocument } from "@entities/Document";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "./connection";
-import { IDocument } from "shared/types/document";
-import Summary from "./summary";
+import db from "../database";
+import Summary from "@models/Summary";
 
 interface DocumentCreationAttributes extends Optional<IDocument, "id"> {}
 
@@ -13,7 +13,6 @@ interface DocumentInstance
     cover?: string;
     totalPages?: number;
     lastPageRead?: number;
-    addSummary: (summary: typeof Summary) => Promise<void>;
 }
 
 const Document = db.define<DocumentInstance>(
