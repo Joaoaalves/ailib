@@ -3,7 +3,6 @@ import { ICollection } from "shared/types/collection";
 
 const getCollections = async () => {
     const collections = await window.api.collection.getAll();
-    console.log(typeof collections);
     return collections;
 };
 

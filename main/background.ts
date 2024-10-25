@@ -1,3 +1,4 @@
+import { DeleteDocumentService } from "./application/services/Document/delete-document";
 import {
     app,
     ipcMain,
@@ -42,13 +43,22 @@ import { FormatResponseService } from "@services/FormatResponse/format-response-
 
 import Summary from "@models/Summary";
 import Document from "@models/Document";
+import { CreateDocumentRepository } from "@repositories/Document/create-document";
+import { CreateDocumentService } from "@services/Document/create-document";
+import { AddDocumentToCollectionRepository } from "@repositories/Collection/add-document-to-collection";
+import { UpdateDocumentRepository } from "@repositories/Document/update-document";
+import { UpdateDocumentService } from "@services/Document/update-document";
+import { FindDocumentByIdRepository } from "@repositories/Document/find-document-by-id";
+import { FindDocumentByIdService } from "@services/Document/find-document-by-id";
+import { DeleteDocumentRepository } from "@repositories/Document/delete-document";
 
 const isProd = process.env.NODE_ENV === "production";
 // Create a new Collection
-ipcMain.handle("createCollection", async (event, collectionName) => {
+ipcMain.handle("createCollection", async (event, collectionName: string) => {
     const createCollectionService = new CreateCollectionService();
-    const collection =
-        await createCollectionService.createCollection(collectionName);
+    const collection = await createCollectionService.createCollection({
+        name: collectionName,
+    });
     return FormatResponseService.formatToJson(collection);
 });
 
@@ -72,6 +82,103 @@ ipcMain.handle("deleteCollection", async (event, collectionId) => {
     await deleteCollectionService.deleteCollection(collectionId);
     return FormatResponseService.formatToJson({ collectionId });
 });
+
+// Create Document
+ipcMain.handle(
+    "createDocument",
+    async (
+        event: IpcMainEvent,
+        name: string,
+        path: string,
+        collectionId: number,
+    ) => {
+        const createDocumentRepository = new CreateDocumentRepository();
+        const createDocumentService = new CreateDocumentService(
+            createDocumentRepository,
+        );
+
+        const document = await createDocumentService.create({
+            name,
+            path,
+        });
+
+        if (document) {
+            const addDocumentToCollectionRepository =
+                new AddDocumentToCollectionRepository();
+            await addDocumentToCollectionRepository.addDocument(
+                collectionId,
+                document.id,
+            );
+
+            return FormatResponseService.formatToJson(document);
+        }
+
+        return FormatResponseService.formatToJson({
+            error: "Failed to create document.",
+        });
+    },
+);
+
+// Update Document
+ipcMain.handle(
+    "updateDocument",
+    async (
+        event: IpcMainEvent,
+        documentId: number,
+        updateFields: IDocument,
+    ) => {
+        const updateDocumentRepository = new UpdateDocumentRepository();
+        const updateDocumentService = new UpdateDocumentService(
+            updateDocumentRepository,
+        );
+
+        await updateDocumentService.update(documentId, updateFields);
+        return FormatResponseService.formatToJson(updateFields);
+    },
+);
+
+ipcMain.handle("getDocument", async (event, documentId) => {
+    const findDocumentByIdRepository = new FindDocumentByIdRepository();
+    const findDocumentByIdService = new FindDocumentByIdService(
+        findDocumentByIdRepository,
+    );
+
+    const doc = await findDocumentByIdService.getDocumentById(documentId);
+    return FormatResponseService.formatToJson(doc);
+});
+
+ipcMain.handle("deleteDocument", async (event, documentId) => {
+    const deleteDocumentRepository = new DeleteDocumentRepository();
+    const deleteDocumentService = new DeleteDocumentService(
+        deleteDocumentRepository,
+    );
+
+    return await deleteDocumentService.delete(documentId);
+});
+
+ipcMain.handle(
+    "saveCover",
+    async (event: IpcMainEvent, documentId: number, cover: ArrayBuffer) => {
+        const doc = await Document.findByPk(documentId);
+
+        if (doc) {
+            const buffer = Buffer.from(cover);
+
+            //save cover on /storage/covers/ with the document.name value
+            const coverPath = await saveCoverOnStorage(buffer, doc.name);
+
+            //save cover path to document on db
+            doc.cover = coverPath;
+
+            await doc.save();
+            return JSON.parse(JSON.stringify(doc));
+        }
+
+        return {
+            error: "Document not found!",
+        };
+    },
+);
 
 ipcMain.handle("createConversation", async (event, message) => {
     const title = await createConversationTitle(message);
@@ -121,76 +228,6 @@ ipcMain.handle("chatWithDocument", async (event, messages, documentId) => {
 });
 
 ipcMain.handle(
-    "createDocument",
-    async (
-        event: IpcMainEvent,
-        name: string,
-        path: string,
-        collectionId: number,
-    ) => {
-        const storagePdfPath = await savePdfToStorage(path, name);
-        const doc = await Document.create({
-            name,
-            path: storagePdfPath,
-        });
-        if (doc) {
-            await associateDocumentToCollection(collectionId, doc.id);
-
-            return JSON.parse(JSON.stringify(doc));
-        }
-
-        return {
-            error: "Document not found!",
-        };
-    },
-);
-
-ipcMain.handle(
-    "saveCover",
-    async (event: IpcMainEvent, documentId: number, cover: ArrayBuffer) => {
-        const doc = await Document.findByPk(documentId);
-
-        if (doc) {
-            const buffer = Buffer.from(cover);
-
-            //save cover on /storage/covers/ with the document.name value
-            const coverPath = await saveCoverOnStorage(buffer, doc.name);
-
-            //save cover path to document on db
-            doc.cover = coverPath;
-
-            await doc.save();
-            return JSON.parse(JSON.stringify(doc));
-        }
-
-        return {
-            error: "Document not found!",
-        };
-    },
-);
-
-ipcMain.handle(
-    "updateDocument",
-    async (
-        event: IpcMainEvent,
-        documentId: number,
-        updateFields: IDocument,
-    ) => {
-        const doc = await Document.findByPk(documentId);
-
-        if (doc) {
-            await doc.update(updateFields);
-            await doc.save();
-            return JSON.parse(JSON.stringify(doc));
-        }
-
-        return {
-            error: "Document not found!",
-        };
-    },
-);
-
-ipcMain.handle(
     "processPdf",
     async (
         event: IpcMainEvent,
@@ -229,21 +266,6 @@ ipcMain.handle(
         event.sender.send("embedding_complete");
     },
 );
-
-ipcMain.handle("getDocument", async (event, documentId) => {
-    const document = await Document.findByPk(Number(documentId));
-    return JSON.parse(JSON.stringify(document));
-});
-
-ipcMain.handle("deleteDocument", async (event, documentId) => {
-    await Document.destroy({
-        where: {
-            id: Number(documentId),
-        },
-    });
-
-    await deletePointsForDocumentId(documentId);
-});
 
 ipcMain.handle("deleteConversation", async (event, conversationId) => {
     const conversation = await Conversation.findByPk(conversationId, {

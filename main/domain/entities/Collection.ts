@@ -15,7 +15,7 @@ export interface IFindCollectionByIdRepository {
 }
 
 export interface ICreateCollectionRepository {
-    create(collection: ICollection): Promise<ICollection>;
+    create(collection: Partial<ICollection>): Promise<ICollection>;
 }
 
 export interface IDeleteCollectionRepository {

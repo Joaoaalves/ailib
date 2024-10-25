@@ -11,7 +11,7 @@ export interface IDocument {
 }
 
 export interface ICreateDocumentRepository {
-    create(document: IDocument): Promise<IDocument>;
+    create(document: Partial<IDocument>): Promise<IDocument>;
 }
 
 export interface IDeleteDocumentRepository {

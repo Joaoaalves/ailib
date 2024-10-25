@@ -5,13 +5,10 @@ export class AddDocumentToCollectionService {
     private addDocumentToCollectionRepository =
         new AddDocumentToCollectionRepository();
 
-    async addDocument(
-        collectionId: number,
-        document: IDocument,
-    ): Promise<void> {
+    async addDocument(collectionId: number, documentId: number): Promise<void> {
         return await this.addDocumentToCollectionRepository.addDocument(
             collectionId,
-            document,
+            documentId,
         );
     }
 }
