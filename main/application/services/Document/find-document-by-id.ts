@@ -1,13 +1,13 @@
-import { IDocument, IFindDocumentById } from "@entities/Document";
+import { IDocument, IFindDocumentByIdRepository } from "@entities/Document";
 
 export class FindDocumentByIdService {
-    private findDocumentByIdRepository: IFindDocumentById;
+    private findDocumentByIdRepository: IFindDocumentByIdRepository;
 
-    constructor(findDocumentByIdRepository: IFindDocumentById) {
+    constructor(findDocumentByIdRepository: IFindDocumentByIdRepository) {
         this.findDocumentByIdRepository = findDocumentByIdRepository;
     }
 
-    async getDocumentById(id: number): Promise<IDocument | null> {
+    async findById(id: number): Promise<IDocument | null> {
         return await this.findDocumentByIdRepository.findById(id);
     }
 }

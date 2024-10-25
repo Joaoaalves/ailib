@@ -1,4 +1,3 @@
-import { DeleteDocumentService } from "./application/services/Document/delete-document";
 import {
     app,
     ipcMain,
@@ -39,7 +38,15 @@ import { FindAllCollectionsService } from "@services/Collection/find-all-collect
 import { UpdateCollectionService } from "@services/Collection/update-collection";
 import { DeleteCollectionService } from "@services/Collection/delete-collection";
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
+import { AddSummaryToDocumentService } from "./application/services/Document/add-summary-to-document";
+import { DeleteDocumentService } from "./application/services/Document/delete-document";
+import { CreateSummaryService } from "@services/Summary/create-summary";
+import { FindAllSummarysService } from "@services/Summary/find-all-summarys";
+import { FindSummaryByIdService } from "@services/Summary/find-summary-by-id";
 
+import { FindAllSummarysRepository } from "@repositories/Summary/find-all-summarys";
+import { FindSummaryByIdRepository } from "@repositories/Summary/find-summary-by-id";
+import { CreateSummaryRepository } from "./infrastructure/persistance/repositories/Summary/create-summary";
 import { CreateDocumentRepository } from "@repositories/Document/create-document";
 import { AddDocumentToCollectionRepository } from "@repositories/Collection/add-document-to-collection";
 import { UpdateDocumentRepository } from "@repositories/Document/update-document";
@@ -50,7 +57,6 @@ import { DeleteCollectionRepository } from "./infrastructure/persistance/reposit
 import { FindAllCollectionsRepository } from "./infrastructure/persistance/repositories/Collection/find-all-collections";
 import { CreateCollectionRepository } from "@repositories/Collection/create-collection";
 
-import Summary from "@models/Summary";
 import Document from "@models/Document";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -162,7 +168,7 @@ ipcMain.handle("getDocument", async (event, documentId) => {
         findDocumentByIdRepository,
     );
 
-    const doc = await findDocumentByIdService.getDocumentById(documentId);
+    const doc = await findDocumentByIdService.findById(documentId);
     return FormatResponseService.formatToJson(doc);
 });
 
@@ -190,7 +196,7 @@ ipcMain.handle(
             doc.cover = coverPath;
 
             await doc.save();
-            return JSON.parse(JSON.stringify(doc));
+            return FormatResponseService.formatToJson(doc);
         }
 
         return {
@@ -202,7 +208,7 @@ ipcMain.handle(
 ipcMain.handle("createConversation", async (event, message) => {
     const title = await createConversationTitle(message);
     const conversation = await Conversation.create({ title });
-    return JSON.parse(JSON.stringify(conversation));
+    return FormatResponseService.formatToJson(conversation);
 });
 
 ipcMain.handle("getConversationMessages", async (event, conversationId) => {
@@ -210,12 +216,12 @@ ipcMain.handle("getConversationMessages", async (event, conversationId) => {
         include: Message,
         order: [["id", "ASC"]],
     });
-    return JSON.parse(JSON.stringify(conversation));
+    return FormatResponseService.formatToJson(conversation);
 });
 
 ipcMain.handle("getConversations", async (event) => {
     const conversations = await Conversation.findAll();
-    return JSON.parse(JSON.stringify(conversations));
+    return FormatResponseService.formatToJson(conversations);
 });
 
 ipcMain.handle("saveMessage", async (event, conversationId, message) => {
@@ -368,43 +374,57 @@ ipcMain.handle(
 
         writeStream.end();
 
-        const summary = await Summary.create({
+        const createSummaryService = new CreateSummaryService(
+            new CreateSummaryRepository(),
+        );
+
+        const summary = await createSummaryService.create({
             title: summaryTitle,
             path: outputPath,
             summaryType: "interval",
         });
 
-        const document = await Document.findByPk(documentId);
+        const addDocumentToSummaryService = new AddSummaryToDocumentService(
+            new AddDocumentToCollectionRepository(),
+        );
 
-        if (document) {
-            //@ts-expect-error
-            document.addSummary(summary);
-        }
+        await addDocumentToSummaryService.addSummary(documentId, summary.id);
 
         event.sender.send("summaryzingComplete");
-        return JSON.parse(JSON.stringify(summary));
+        return FormatResponseService.formatToJson(summary);
     },
 );
 
 ipcMain.handle("getSummaries", async (event) => {
-    return JSON.parse(JSON.stringify(await Summary.findAll()));
+    const findAllSummarysService = new FindAllSummarysService(
+        new FindAllSummarysRepository(),
+    );
+
+    return FormatResponseService.formatToJson(
+        await findAllSummarysService.findAll(),
+    );
 });
 
-ipcMain.handle("getSummaryById", async (event, key) => {
+ipcMain.handle("getSummaryById", async (event, id) => {
     try {
-        const summary = await Summary.findByPk(key);
+        const findSummaryByIdService = new FindSummaryByIdService(
+            new FindSummaryByIdRepository(),
+        );
+        const summary = await findSummaryByIdService.findById(id);
 
         if (summary) {
             const data = readFileSync(summary.path, "utf-8");
-            summary.dataValues.text = data;
-            return JSON.parse(JSON.stringify(summary));
+            summary.text = data;
+            return FormatResponseService.formatToJson(summary);
         }
 
-        return JSON.parse(JSON.stringify({ error: "Summary Not Found!" }));
+        return FormatResponseService.formatToJson({
+            error: "Summary Not Found!",
+        });
     } catch (error) {
-        return JSON.parse(
-            JSON.stringify({ error: "Error looking for Summary File." }),
-        );
+        return FormatResponseService.formatToJson({
+            error: "Error looking for Summary File.",
+        });
     }
 });
 
@@ -415,7 +435,7 @@ ipcMain.handle("updateConfig", async (event, id, value) => {
         if (config) {
             config.value = value;
             await config.save();
-            return JSON.parse(JSON.stringify(config));
+            return FormatResponseService.formatToJson(config);
         }
     } catch (error) {
         return {
@@ -428,7 +448,7 @@ ipcMain.handle("getConfigs", async () => {
     try {
         const configs = await Config.findAll();
 
-        return JSON.parse(JSON.stringify(configs));
+        return FormatResponseService.formatToJson(configs);
     } catch (error) {
         return {
             error: "Error geting Configs",

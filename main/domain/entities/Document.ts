@@ -22,6 +22,10 @@ export interface IUpdateDocumentRepository {
     update(id: number, document: Partial<IDocument>): Promise<void>;
 }
 
-export interface IFindDocumentById {
+export interface IFindDocumentByIdRepository {
     findById(id: number): Promise<IDocument | null>;
+}
+
+export interface IAddSummaryToDocumentRepository {
+    addDocument(documentId: number, summaryId: number): Promise<void>;
 }
