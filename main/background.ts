@@ -22,40 +22,45 @@ import Conversation from "./db/conversation";
 import syncDatabase from "./db/sync";
 import { processPDF } from "./lib/document";
 import Message from "./db/message";
-import {
-    deletePointsForDocumentId,
-    ensureCollectionsExists,
-} from "./lib/qdrant";
+import { ensureCollectionsExists } from "./lib/qdrant";
 
 import { RAGFusion } from "./lib/rag";
-import { associateDocumentToCollection } from "./lib/data";
 import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
 import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 import TextChunk from "./db/textChunk";
 
+import { CreateDocumentService } from "@services/Document/create-document";
+import { UpdateDocumentService } from "@services/Document/update-document";
+import { FindDocumentByIdService } from "@services/Document/find-document-by-id";
 import { CreateCollectionService } from "./application/services/Collection/create-collection";
 import { FindAllCollectionsService } from "@services/Collection/find-all-collections";
 import { UpdateCollectionService } from "@services/Collection/update-collection";
 import { DeleteCollectionService } from "@services/Collection/delete-collection";
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
 
-import Summary from "@models/Summary";
-import Document from "@models/Document";
 import { CreateDocumentRepository } from "@repositories/Document/create-document";
-import { CreateDocumentService } from "@services/Document/create-document";
 import { AddDocumentToCollectionRepository } from "@repositories/Collection/add-document-to-collection";
 import { UpdateDocumentRepository } from "@repositories/Document/update-document";
-import { UpdateDocumentService } from "@services/Document/update-document";
 import { FindDocumentByIdRepository } from "@repositories/Document/find-document-by-id";
-import { FindDocumentByIdService } from "@services/Document/find-document-by-id";
 import { DeleteDocumentRepository } from "@repositories/Document/delete-document";
+import { UpdateCollectionRepository } from "@repositories/Collection/update-collection";
+import { DeleteCollectionRepository } from "./infrastructure/persistance/repositories/Collection/delete-collection";
+import { FindAllCollectionsRepository } from "./infrastructure/persistance/repositories/Collection/find-all-collections";
+import { CreateCollectionRepository } from "@repositories/Collection/create-collection";
+
+import Summary from "@models/Summary";
+import Document from "@models/Document";
 
 const isProd = process.env.NODE_ENV === "production";
 // Create a new Collection
 ipcMain.handle("createCollection", async (event, collectionName: string) => {
-    const createCollectionService = new CreateCollectionService();
+    const createCollectionRepository = new CreateCollectionRepository();
+    const createCollectionService = new CreateCollectionService(
+        createCollectionRepository,
+    );
+
     const collection = await createCollectionService.createCollection({
         name: collectionName,
     });
@@ -64,21 +69,33 @@ ipcMain.handle("createCollection", async (event, collectionName: string) => {
 
 // List all Collections
 ipcMain.handle("getCollections", async (event) => {
-    const findAllCollectionsService = new FindAllCollectionsService();
+    const findAllCollectionsRepository = new FindAllCollectionsRepository();
+    const findAllCollectionsService = new FindAllCollectionsService(
+        findAllCollectionsRepository,
+    );
+
     const collections = await findAllCollectionsService.getAllCollections();
     return FormatResponseService.formatToJson(collections);
 });
 
 // Update Collection
 ipcMain.handle("updateCollection", async (event, collectionId, data) => {
-    const updateCollectionService = new UpdateCollectionService();
+    const updateCollectionRepository = new UpdateCollectionRepository();
+    const updateCollectionService = new UpdateCollectionService(
+        updateCollectionRepository,
+    );
+
     await updateCollectionService.updateCollection(collectionId, data);
     return FormatResponseService.formatToJson(data);
 });
 
 // Delete Collection
 ipcMain.handle("deleteCollection", async (event, collectionId) => {
-    const deleteCollectionService = new DeleteCollectionService();
+    const deleteCollectionRepository = new DeleteCollectionRepository();
+    const deleteCollectionService = new DeleteCollectionService(
+        deleteCollectionRepository,
+    );
+
     await deleteCollectionService.deleteCollection(collectionId);
     return FormatResponseService.formatToJson({ collectionId });
 });
