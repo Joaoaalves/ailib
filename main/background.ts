@@ -109,6 +109,8 @@ ipcMain.handle(
         path: string,
         collectionId: number,
     ) => {
+        const storagePdfPath = await savePdfToStorage(path, name);
+
         const createDocumentRepository = new CreateDocumentRepository();
         const createDocumentService = new CreateDocumentService(
             createDocumentRepository,
@@ -116,7 +118,7 @@ ipcMain.handle(
 
         const document = await createDocumentService.create({
             name,
-            path,
+            path: storagePdfPath,
         });
 
         if (document) {
