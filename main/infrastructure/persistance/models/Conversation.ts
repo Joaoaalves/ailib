@@ -1,7 +1,7 @@
-import { IConversation } from "./../../shared/types/conversation";
+import { IConversation } from "@entities/Conversation";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "./connection";
-import Message from "./message";
+import db from "../database";
+import Message from "./Message";
 
 interface ConversationCreationAttributes
     extends Optional<IConversation, "id"> {}
@@ -10,7 +10,7 @@ interface ConversationInstance
     extends Model<IConversation, ConversationCreationAttributes> {
     id: number;
     title: string;
-    addMessage: (message: typeof Message) => Promise<void>;
+    addMessage: (message: Model) => Promise<void>;
 }
 
 const Conversation = db.define<ConversationInstance>(

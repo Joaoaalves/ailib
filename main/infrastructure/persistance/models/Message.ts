@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "./connection";
+import db from "../database";
 
 const Message = db.define("Message", {
     id: {

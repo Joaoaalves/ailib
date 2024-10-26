@@ -16,11 +16,8 @@ import {
     chatWithCollection,
 } from "./lib/openai";
 
-import Conversation from "./db/conversation";
-
 import syncDatabase from "./db/sync";
 import { processPDF } from "./lib/document";
-import Message from "./db/message";
 import { ensureCollectionsExists } from "./lib/qdrant";
 
 import { RAGFusion } from "./lib/rag";
@@ -43,6 +40,12 @@ import { DeleteDocumentService } from "./application/services/Document/delete-do
 import { CreateSummaryService } from "@services/Summary/create-summary";
 import { FindAllSummarysService } from "@services/Summary/find-all-summarys";
 import { FindSummaryByIdService } from "@services/Summary/find-summary-by-id";
+import { CreateConversationService } from "@services/Conversations/create-conversation";
+import { DeleteConversationService } from "@services/Conversations/delete-conversation";
+import { AddMessageToConversationService } from "@services/Conversations/add-message-to-conversation";
+import { FindConversationByIdService } from "./application/services/Conversations/find-conversation-by-id";
+import { FindAllConversationsService } from "./application/services/Conversations/find-all-conversations";
+import { GetConversationMessagesService } from "./application/services/Conversations/get-conversation-messages";
 
 import { FindAllSummarysRepository } from "@repositories/Summary/find-all-summarys";
 import { FindSummaryByIdRepository } from "@repositories/Summary/find-summary-by-id";
@@ -56,6 +59,12 @@ import { UpdateCollectionRepository } from "@repositories/Collection/update-coll
 import { DeleteCollectionRepository } from "./infrastructure/persistance/repositories/Collection/delete-collection";
 import { FindAllCollectionsRepository } from "./infrastructure/persistance/repositories/Collection/find-all-collections";
 import { CreateCollectionRepository } from "@repositories/Collection/create-collection";
+import { CreateConversationRepository } from "@repositories/Conversation/create-conversation";
+import { GetConversationMessagesRepository } from "@repositories/Conversation/get-conversation-messages";
+import { FindAllConversationsRepository } from "@repositories/Conversation/find-all-conversations";
+import { FindConversationByIdRepository } from "@repositories/Conversation/find-conversation-by-id";
+import { AddMessageToConversationRepository } from "@repositories/Conversation/add-message-to-conversation";
+import { DeleteConversationRepository } from "@repositories/Conversation/delete-conversation";
 
 import Document from "@models/Document";
 
@@ -162,6 +171,7 @@ ipcMain.handle(
     },
 );
 
+// Get Document
 ipcMain.handle("getDocument", async (event, documentId) => {
     const findDocumentByIdRepository = new FindDocumentByIdRepository();
     const findDocumentByIdService = new FindDocumentByIdService(
@@ -172,6 +182,7 @@ ipcMain.handle("getDocument", async (event, documentId) => {
     return FormatResponseService.formatToJson(doc);
 });
 
+// Delete Document
 ipcMain.handle("deleteDocument", async (event, documentId) => {
     const deleteDocumentRepository = new DeleteDocumentRepository();
     const deleteDocumentService = new DeleteDocumentService(
@@ -205,36 +216,68 @@ ipcMain.handle(
     },
 );
 
+// Create Conversation
 ipcMain.handle("createConversation", async (event, message) => {
     const title = await createConversationTitle(message);
-    const conversation = await Conversation.create({ title });
+
+    const createConversationService = new CreateConversationService(
+        new CreateConversationRepository(),
+    );
+    const conversation = createConversationService.create({ title });
+
     return FormatResponseService.formatToJson(conversation);
 });
 
+// Get Conversation with Messages
 ipcMain.handle("getConversationMessages", async (event, conversationId) => {
-    const conversation = await Conversation.findByPk(conversationId, {
-        include: Message,
-        order: [["id", "ASC"]],
-    });
+    const getConversationMessagesService = new GetConversationMessagesService(
+        new GetConversationMessagesRepository(),
+    );
+    const conversation =
+        await getConversationMessagesService.getMessages(conversationId);
+
     return FormatResponseService.formatToJson(conversation);
 });
 
+// Get All Conversations
 ipcMain.handle("getConversations", async (event) => {
-    const conversations = await Conversation.findAll();
+    const findAllConversationsService = new FindAllConversationsService(
+        new FindAllConversationsRepository(),
+    );
+
+    const conversations = await findAllConversationsService.findAll();
     return FormatResponseService.formatToJson(conversations);
 });
 
+// Save Message to Conversation
 ipcMain.handle("saveMessage", async (event, conversationId, message) => {
     try {
-        const conversation = await Conversation.findByPk(conversationId);
+        const findConversationByIdService = new FindConversationByIdService(
+            new FindConversationByIdRepository(),
+        );
+
+        const conversation =
+            await findConversationByIdService.findById(conversationId);
 
         if (conversation) {
-            const createdMessage = await Message.create({ ...message });
+            const createConversationService = new CreateConversationService(
+                new CreateConversationRepository(),
+            );
 
-            // @ts-expect-error
-            await conversation.addMessage(createdMessage);
+            const createdMessage =
+                await createConversationService.create(message);
 
-            return createdMessage;
+            const addMessageToConversationService =
+                new AddMessageToConversationService(
+                    new AddMessageToConversationRepository(),
+                );
+
+            await addMessageToConversationService.addMessage(
+                conversationId,
+                createdMessage.id,
+            );
+
+            return FormatResponseService.formatToJson(createdMessage);
         } else {
             throw new Error("Conversation not found");
         }
@@ -293,19 +336,11 @@ ipcMain.handle(
 );
 
 ipcMain.handle("deleteConversation", async (event, conversationId) => {
-    const conversation = await Conversation.findByPk(conversationId, {
-        include: Message,
-    });
-    await Message.destroy({
-        where: {
-            id: {
-                // @ts-expect-error
-                includes: conversation.Messages.map((message) => message.id),
-            },
-        },
-    });
+    const deleteConversationService = new DeleteConversationService(
+        new DeleteConversationRepository(),
+    );
 
-    await conversation.destroy();
+    await deleteConversationService.delete(conversationId);
 });
 
 ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
