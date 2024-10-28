@@ -10,22 +10,10 @@ export interface IDocument {
     summaries?: ISummary[];
 }
 
-export interface ICreateDocumentRepository {
+export interface IDocumentRepository {
     create(document: Partial<IDocument>): Promise<IDocument>;
-}
-
-export interface IDeleteDocumentRepository {
     delete(id: number): Promise<void>;
-}
-
-export interface IUpdateDocumentRepository {
     update(id: number, document: Partial<IDocument>): Promise<void>;
-}
-
-export interface IFindDocumentByIdRepository {
     findById(id: number): Promise<IDocument | null>;
-}
-
-export interface IAddSummaryToDocumentRepository {
     addDocument(documentId: number, summaryId: number): Promise<void>;
 }

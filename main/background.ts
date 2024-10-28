@@ -27,13 +27,9 @@ import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 import TextChunk from "./db/textChunk";
 
-import { CreateDocumentService } from "@services/Document/create-document";
-import { UpdateDocumentService } from "@services/Document/update-document";
-import { FindDocumentByIdService } from "@services/Document/find-document-by-id";
 import { CollectionService } from "@services/Collection";
+import { DocumentService } from "@services/Document";
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
-import { AddSummaryToDocumentService } from "./application/services/Document/add-summary-to-document";
-import { DeleteDocumentService } from "./application/services/Document/delete-document";
 import { CreateSummaryService } from "@services/Summary/create-summary";
 import { FindAllSummarysService } from "@services/Summary/find-all-summarys";
 import { FindSummaryByIdService } from "@services/Summary/find-summary-by-id";
@@ -45,13 +41,10 @@ import { FindAllConversationsService } from "./application/services/Conversation
 import { GetConversationMessagesService } from "./application/services/Conversations/get-conversation-messages";
 
 import { CollectionRepository } from "@repositories/Collection";
+import { DocumentRepository } from "@repositories/Document";
 import { FindAllSummarysRepository } from "@repositories/Summary/find-all-summarys";
 import { FindSummaryByIdRepository } from "@repositories/Summary/find-summary-by-id";
 import { CreateSummaryRepository } from "./infrastructure/persistance/repositories/Summary/create-summary";
-import { CreateDocumentRepository } from "@repositories/Document/create-document";
-import { UpdateDocumentRepository } from "@repositories/Document/update-document";
-import { FindDocumentByIdRepository } from "@repositories/Document/find-document-by-id";
-import { DeleteDocumentRepository } from "@repositories/Document/delete-document";
 import { CreateConversationRepository } from "@repositories/Conversation/create-conversation";
 import { GetConversationMessagesRepository } from "@repositories/Conversation/get-conversation-messages";
 import { FindAllConversationsRepository } from "@repositories/Conversation/find-all-conversations";
@@ -60,7 +53,6 @@ import { AddMessageToConversationRepository } from "@repositories/Conversation/a
 import { DeleteConversationRepository } from "@repositories/Conversation/delete-conversation";
 
 import Document from "@models/Document";
-import { AddSummaryToDocumentRepository } from "@repositories/Document/add-summary-to-document";
 
 const isProd = process.env.NODE_ENV === "production";
 // Create a new Collection
@@ -107,13 +99,9 @@ ipcMain.handle(
         collectionId: number,
     ) => {
         const storagePdfPath = await savePdfToStorage(path, name);
+        const documentService = new DocumentService(new DocumentRepository());
 
-        const createDocumentRepository = new CreateDocumentRepository();
-        const createDocumentService = new CreateDocumentService(
-            createDocumentRepository,
-        );
-
-        const document = await createDocumentService.create({
+        const document = await documentService.create({
             name,
             path: storagePdfPath,
         });
@@ -141,35 +129,26 @@ ipcMain.handle(
         documentId: number,
         updateFields: IDocument,
     ) => {
-        const updateDocumentRepository = new UpdateDocumentRepository();
-        const updateDocumentService = new UpdateDocumentService(
-            updateDocumentRepository,
-        );
+        const documentService = new DocumentService(new DocumentRepository());
 
-        await updateDocumentService.update(documentId, updateFields);
+        await documentService.update(documentId, updateFields);
         return FormatResponseService.formatToJson(updateFields);
     },
 );
 
 // Get Document
 ipcMain.handle("getDocument", async (event, documentId) => {
-    const findDocumentByIdRepository = new FindDocumentByIdRepository();
-    const findDocumentByIdService = new FindDocumentByIdService(
-        findDocumentByIdRepository,
-    );
+    const documentService = new DocumentService(new DocumentRepository());
 
-    const doc = await findDocumentByIdService.findById(documentId);
+    const doc = await documentService.findById(documentId);
     return FormatResponseService.formatToJson(doc);
 });
 
 // Delete Document
 ipcMain.handle("deleteDocument", async (event, documentId) => {
-    const deleteDocumentRepository = new DeleteDocumentRepository();
-    const deleteDocumentService = new DeleteDocumentService(
-        deleteDocumentRepository,
-    );
+    const documentService = new DocumentService(new DocumentRepository());
 
-    return await deleteDocumentService.delete(documentId);
+    return await documentService.delete(documentId);
 });
 
 ipcMain.handle(
@@ -399,11 +378,9 @@ ipcMain.handle(
             summaryType: "interval",
         });
 
-        const addDocumentToSummaryService = new AddSummaryToDocumentService(
-            new AddSummaryToDocumentRepository(),
-        );
+        const documentService = new DocumentService(new DocumentRepository());
 
-        await addDocumentToSummaryService.addSummary(documentId, summary.id);
+        await documentService.addSummary(documentId, summary.id);
 
         event.sender.send("summaryzingComplete");
         return FormatResponseService.formatToJson(summary);
