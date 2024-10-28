@@ -6,26 +6,11 @@ export interface ICollection {
     documents?: IDocument[];
 }
 
-export interface IFindAllCollectionsRepository {
-    findAll(): Promise<ICollection[]>;
-}
-
-export interface IFindCollectionByIdRepository {
-    findById(id: number): Promise<ICollection | null>;
-}
-
-export interface ICreateCollectionRepository {
+export interface ICollectionRepository {
     create(collection: Partial<ICollection>): Promise<ICollection>;
-}
-
-export interface IDeleteCollectionRepository {
-    delete(id: number): Promise<void>;
-}
-
-export interface IUpdateCollectionRepository {
+    findAll(): Promise<ICollection[]>;
+    findById(id: number): Promise<ICollection | null>;
     update(id: number, collection: Partial<ICollection>): Promise<void>;
-}
-
-export interface IAddDocumentToCollection {
+    delete(id: number): Promise<void>;
     addDocument(collectionId: number, document): Promise<void>;
 }

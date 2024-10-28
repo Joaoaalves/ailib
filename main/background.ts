@@ -30,10 +30,7 @@ import TextChunk from "./db/textChunk";
 import { CreateDocumentService } from "@services/Document/create-document";
 import { UpdateDocumentService } from "@services/Document/update-document";
 import { FindDocumentByIdService } from "@services/Document/find-document-by-id";
-import { CreateCollectionService } from "./application/services/Collection/create-collection";
-import { FindAllCollectionsService } from "@services/Collection/find-all-collections";
-import { UpdateCollectionService } from "@services/Collection/update-collection";
-import { DeleteCollectionService } from "@services/Collection/delete-collection";
+import { CollectionService } from "@services/Collection";
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
 import { AddSummaryToDocumentService } from "./application/services/Document/add-summary-to-document";
 import { DeleteDocumentService } from "./application/services/Document/delete-document";
@@ -47,18 +44,14 @@ import { FindConversationByIdService } from "./application/services/Conversation
 import { FindAllConversationsService } from "./application/services/Conversations/find-all-conversations";
 import { GetConversationMessagesService } from "./application/services/Conversations/get-conversation-messages";
 
+import { CollectionRepository } from "@repositories/Collection";
 import { FindAllSummarysRepository } from "@repositories/Summary/find-all-summarys";
 import { FindSummaryByIdRepository } from "@repositories/Summary/find-summary-by-id";
 import { CreateSummaryRepository } from "./infrastructure/persistance/repositories/Summary/create-summary";
 import { CreateDocumentRepository } from "@repositories/Document/create-document";
-import { AddDocumentToCollectionRepository } from "@repositories/Collection/add-document-to-collection";
 import { UpdateDocumentRepository } from "@repositories/Document/update-document";
 import { FindDocumentByIdRepository } from "@repositories/Document/find-document-by-id";
 import { DeleteDocumentRepository } from "@repositories/Document/delete-document";
-import { UpdateCollectionRepository } from "@repositories/Collection/update-collection";
-import { DeleteCollectionRepository } from "./infrastructure/persistance/repositories/Collection/delete-collection";
-import { FindAllCollectionsRepository } from "./infrastructure/persistance/repositories/Collection/find-all-collections";
-import { CreateCollectionRepository } from "@repositories/Collection/create-collection";
 import { CreateConversationRepository } from "@repositories/Conversation/create-conversation";
 import { GetConversationMessagesRepository } from "@repositories/Conversation/get-conversation-messages";
 import { FindAllConversationsRepository } from "@repositories/Conversation/find-all-conversations";
@@ -67,16 +60,14 @@ import { AddMessageToConversationRepository } from "@repositories/Conversation/a
 import { DeleteConversationRepository } from "@repositories/Conversation/delete-conversation";
 
 import Document from "@models/Document";
+import { AddSummaryToDocumentRepository } from "@repositories/Document/add-summary-to-document";
 
 const isProd = process.env.NODE_ENV === "production";
 // Create a new Collection
 ipcMain.handle("createCollection", async (event, collectionName: string) => {
-    const createCollectionRepository = new CreateCollectionRepository();
-    const createCollectionService = new CreateCollectionService(
-        createCollectionRepository,
-    );
+    const collectionService = new CollectionService(new CollectionRepository());
 
-    const collection = await createCollectionService.createCollection({
+    const collection = await collectionService.createCollection({
         name: collectionName,
     });
     return FormatResponseService.formatToJson(collection);
@@ -84,34 +75,25 @@ ipcMain.handle("createCollection", async (event, collectionName: string) => {
 
 // List all Collections
 ipcMain.handle("getCollections", async (event) => {
-    const findAllCollectionsRepository = new FindAllCollectionsRepository();
-    const findAllCollectionsService = new FindAllCollectionsService(
-        findAllCollectionsRepository,
-    );
+    const collectionService = new CollectionService(new CollectionRepository());
 
-    const collections = await findAllCollectionsService.getAllCollections();
+    const collections = await collectionService.getAllCollections();
     return FormatResponseService.formatToJson(collections);
 });
 
 // Update Collection
 ipcMain.handle("updateCollection", async (event, collectionId, data) => {
-    const updateCollectionRepository = new UpdateCollectionRepository();
-    const updateCollectionService = new UpdateCollectionService(
-        updateCollectionRepository,
-    );
+    const collectionService = new CollectionService(new CollectionRepository());
 
-    await updateCollectionService.updateCollection(collectionId, data);
+    await collectionService.updateCollection(collectionId, data);
     return FormatResponseService.formatToJson(data);
 });
 
 // Delete Collection
 ipcMain.handle("deleteCollection", async (event, collectionId) => {
-    const deleteCollectionRepository = new DeleteCollectionRepository();
-    const deleteCollectionService = new DeleteCollectionService(
-        deleteCollectionRepository,
-    );
+    const collectionService = new CollectionService(new CollectionRepository());
 
-    await deleteCollectionService.deleteCollection(collectionId);
+    await collectionService.deleteCollection(collectionId);
     return FormatResponseService.formatToJson({ collectionId });
 });
 
@@ -137,12 +119,10 @@ ipcMain.handle(
         });
 
         if (document) {
-            const addDocumentToCollectionRepository =
-                new AddDocumentToCollectionRepository();
-            await addDocumentToCollectionRepository.addDocument(
-                collectionId,
-                document.id,
+            const collectionService = new CollectionService(
+                new CollectionRepository(),
             );
+            await collectionService.addDocument(collectionId, document.id);
 
             return FormatResponseService.formatToJson(document);
         }
@@ -420,7 +400,7 @@ ipcMain.handle(
         });
 
         const addDocumentToSummaryService = new AddSummaryToDocumentService(
-            new AddDocumentToCollectionRepository(),
+            new AddSummaryToDocumentRepository(),
         );
 
         await addDocumentToSummaryService.addSummary(documentId, summary.id);
