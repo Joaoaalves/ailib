@@ -25,7 +25,6 @@ import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
 import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
-import TextChunk from "./db/textChunk";
 
 import { CollectionService } from "@services/Collection";
 import { DocumentService } from "@services/Document";
@@ -33,7 +32,7 @@ import { SummaryService } from "@services/Summary";
 import { ConversationService } from "@services/Conversation";
 import { TextChunkService } from "@services/TextChunk";
 
-import { FormatResponseService } from "@services/FormatResponse/format-response-json";
+import { FormatResponseService } from "@services/FormatResponse";
 import { CollectionRepository } from "@repositories/Collection";
 import { DocumentRepository } from "@repositories/Document";
 import { SummaryRepository } from "@repositories/Summary";
