@@ -1,4 +1,3 @@
-import { IChatStatus } from "./../../shared/types/conversation";
 import { OpenAI } from "openai";
 import { Op } from "sequelize";
 import { upsertEmbedding } from "./qdrant";
@@ -8,33 +7,34 @@ import { encoding_for_model, Tiktoken, TiktokenModel } from "tiktoken";
 import { Prompts } from "../helpers/systemPrompts";
 import { RAGFusion } from "./rag";
 import { Metadata, RankedSearchResult } from "shared/types/qdrant";
-import Config from "../db/config";
-import TextChunk from "../db/textChunk";
+
+import Setting from "../infrastructure/persistance/models/Setting";
+import TextChunk from "../infrastructure/persistance/models/TextChunk";
 
 async function OpenAIClient() {
-    const apiKey = await Config.findByPk("openaiAPIKey");
+    const apiKey = await Setting.findByPk("openaiAPIKey");
     return new OpenAI({ apiKey: apiKey.value });
 }
 
 export const Models = {
     chat: async () => {
-        const model = await Config.findByPk("conversationModel");
+        const model = await Setting.findByPk("conversationModel");
         return model.value;
     },
     embeddings: async () => {
-        const model = await Config.findByPk("embeddingModel");
+        const model = await Setting.findByPk("embeddingModel");
         return model.value;
     },
     hyde: async () => {
-        const model = await Config.findByPk("hydeModel");
+        const model = await Setting.findByPk("hydeModel");
         return model.value;
     },
     sqr: async () => {
-        const model = await Config.findByPk("selfQueryRetrievalModel");
+        const model = await Setting.findByPk("selfQueryRetrievalModel");
         return model.value;
     },
     summary: async () => {
-        const model = await Config.findByPk("summaryModel");
+        const model = await Setting.findByPk("summaryModel");
         return model.value;
     },
 };
@@ -345,7 +345,7 @@ export function countTokens(text: string, model: TiktokenModel): number {
 }
 
 async function isHyDEEnabled() {
-    const hydeEnabled = await Config.findByPk("hydeEnabled");
+    const hydeEnabled = await Setting.findByPk("hydeEnabled");
     return hydeEnabled.value == "true";
 }
 
@@ -368,7 +368,7 @@ export async function createHypotheticalDocument(query: string) {
 }
 
 async function isSQREnabled() {
-    const sqrEnabled = await Config.findByPk("selfQueryRetrievalEnabled");
+    const sqrEnabled = await Setting.findByPk("selfQueryRetrievalEnabled");
     return sqrEnabled.value == "true";
 }
 

@@ -23,7 +23,6 @@ import { ensureCollectionsExists } from "./lib/qdrant";
 import { RAGFusion } from "./lib/rag";
 import { saveCoverOnStorage, savePdfToStorage } from "./lib/file";
 import { IDocument } from "shared/types/document";
-import Config from "./db/config";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 
 import { CollectionService } from "@services/Collection";
@@ -31,6 +30,7 @@ import { DocumentService } from "@services/Document";
 import { SummaryService } from "@services/Summary";
 import { ConversationService } from "@services/Conversation";
 import { TextChunkService } from "@services/TextChunk";
+import { SettingService } from "@services/Setting";
 
 import { FormatResponseService } from "@services/FormatResponse";
 import { CollectionRepository } from "@repositories/Collection";
@@ -38,6 +38,7 @@ import { DocumentRepository } from "@repositories/Document";
 import { SummaryRepository } from "@repositories/Summary";
 import { ConversationRepository } from "@repositories/Conversation";
 import { TextChunkRepository } from "@repositories/TextChunk";
+import { SettingRepository } from "@repositories/Setting";
 
 import Document from "@models/Document";
 
@@ -396,13 +397,10 @@ ipcMain.handle("getSummaryById", async (event, id) => {
 
 ipcMain.handle("updateConfig", async (event, id, value) => {
     try {
-        const config = await Config.findByPk(id);
+        const settingService = new SettingService(new SettingRepository());
 
-        if (config) {
-            config.value = value;
-            await config.save();
-            return FormatResponseService.formatToJson(config);
-        }
+        const setting = await settingService.update(id, value);
+        return FormatResponseService.formatToJson(setting);
     } catch (error) {
         return {
             error: "Error updating Config",
@@ -412,9 +410,11 @@ ipcMain.handle("updateConfig", async (event, id, value) => {
 
 ipcMain.handle("getConfigs", async () => {
     try {
-        const configs = await Config.findAll();
+        const settingService = new SettingService(new SettingRepository());
 
-        return FormatResponseService.formatToJson(configs);
+        const settings = await settingService.findAll();
+
+        return FormatResponseService.formatToJson(settings);
     } catch (error) {
         return {
             error: "Error geting Configs",
