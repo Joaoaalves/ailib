@@ -30,24 +30,13 @@ import TextChunk from "./db/textChunk";
 import { CollectionService } from "@services/Collection";
 import { DocumentService } from "@services/Document";
 import { SummaryService } from "@services/Summary";
+import { ConversationService } from "@services/Conversation";
 
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
-import { CreateConversationService } from "@services/Conversations/create-conversation";
-import { DeleteConversationService } from "@services/Conversations/delete-conversation";
-import { AddMessageToConversationService } from "@services/Conversations/add-message-to-conversation";
-import { FindConversationByIdService } from "./application/services/Conversations/find-conversation-by-id";
-import { FindAllConversationsService } from "./application/services/Conversations/find-all-conversations";
-import { GetConversationMessagesService } from "./application/services/Conversations/get-conversation-messages";
-
 import { CollectionRepository } from "@repositories/Collection";
 import { DocumentRepository } from "@repositories/Document";
 import { SummaryRepository } from "@repositories/Summary";
-import { CreateConversationRepository } from "@repositories/Conversation/create-conversation";
-import { GetConversationMessagesRepository } from "@repositories/Conversation/get-conversation-messages";
-import { FindAllConversationsRepository } from "@repositories/Conversation/find-all-conversations";
-import { FindConversationByIdRepository } from "@repositories/Conversation/find-conversation-by-id";
-import { AddMessageToConversationRepository } from "@repositories/Conversation/add-message-to-conversation";
-import { DeleteConversationRepository } from "@repositories/Conversation/delete-conversation";
+import { ConversationRepository } from "@repositories/Conversation";
 
 import Document from "@models/Document";
 
@@ -175,60 +164,48 @@ ipcMain.handle(
 // Create Conversation
 ipcMain.handle("createConversation", async (event, message) => {
     const title = await createConversationTitle(message);
-
-    const createConversationService = new CreateConversationService(
-        new CreateConversationRepository(),
+    const conversationService = new ConversationService(
+        new ConversationRepository(),
     );
-    const conversation = createConversationService.create({ title });
+
+    const conversation = conversationService.create({ title });
 
     return FormatResponseService.formatToJson(conversation);
 });
 
 // Get Conversation with Messages
 ipcMain.handle("getConversationMessages", async (event, conversationId) => {
-    const getConversationMessagesService = new GetConversationMessagesService(
-        new GetConversationMessagesRepository(),
+    const conversationService = new ConversationService(
+        new ConversationRepository(),
     );
-    const conversation =
-        await getConversationMessagesService.getMessages(conversationId);
+    const conversation = await conversationService.getMessages(conversationId);
 
     return FormatResponseService.formatToJson(conversation);
 });
 
 // Get All Conversations
 ipcMain.handle("getConversations", async (event) => {
-    const findAllConversationsService = new FindAllConversationsService(
-        new FindAllConversationsRepository(),
+    const conversationService = new ConversationService(
+        new ConversationRepository(),
     );
 
-    const conversations = await findAllConversationsService.findAll();
+    const conversations = await conversationService.findAll();
     return FormatResponseService.formatToJson(conversations);
 });
 
 // Save Message to Conversation
 ipcMain.handle("saveMessage", async (event, conversationId, message) => {
     try {
-        const findConversationByIdService = new FindConversationByIdService(
-            new FindConversationByIdRepository(),
+        const conversationService = new ConversationService(
+            new ConversationRepository(),
         );
 
-        const conversation =
-            await findConversationByIdService.findById(conversationId);
+        const conversation = await conversationService.findById(conversationId);
 
         if (conversation) {
-            const createConversationService = new CreateConversationService(
-                new CreateConversationRepository(),
-            );
+            const createdMessage = await conversationService.create(message);
 
-            const createdMessage =
-                await createConversationService.create(message);
-
-            const addMessageToConversationService =
-                new AddMessageToConversationService(
-                    new AddMessageToConversationRepository(),
-                );
-
-            await addMessageToConversationService.addMessage(
+            await conversationService.addMessage(
                 conversationId,
                 createdMessage.id,
             );
@@ -292,11 +269,11 @@ ipcMain.handle(
 );
 
 ipcMain.handle("deleteConversation", async (event, conversationId) => {
-    const deleteConversationService = new DeleteConversationService(
-        new DeleteConversationRepository(),
+    const conversationService = new ConversationService(
+        new ConversationRepository(),
     );
 
-    await deleteConversationService.delete(conversationId);
+    await conversationService.delete(conversationId);
 });
 
 ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
