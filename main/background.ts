@@ -29,10 +29,9 @@ import TextChunk from "./db/textChunk";
 
 import { CollectionService } from "@services/Collection";
 import { DocumentService } from "@services/Document";
+import { SummaryService } from "@services/Summary";
+
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
-import { CreateSummaryService } from "@services/Summary/create-summary";
-import { FindAllSummarysService } from "@services/Summary/find-all-summarys";
-import { FindSummaryByIdService } from "@services/Summary/find-summary-by-id";
 import { CreateConversationService } from "@services/Conversations/create-conversation";
 import { DeleteConversationService } from "@services/Conversations/delete-conversation";
 import { AddMessageToConversationService } from "@services/Conversations/add-message-to-conversation";
@@ -42,9 +41,7 @@ import { GetConversationMessagesService } from "./application/services/Conversat
 
 import { CollectionRepository } from "@repositories/Collection";
 import { DocumentRepository } from "@repositories/Document";
-import { FindAllSummarysRepository } from "@repositories/Summary/find-all-summarys";
-import { FindSummaryByIdRepository } from "@repositories/Summary/find-summary-by-id";
-import { CreateSummaryRepository } from "./infrastructure/persistance/repositories/Summary/create-summary";
+import { SummaryRepository } from "@repositories/Summary";
 import { CreateConversationRepository } from "@repositories/Conversation/create-conversation";
 import { GetConversationMessagesRepository } from "@repositories/Conversation/get-conversation-messages";
 import { FindAllConversationsRepository } from "@repositories/Conversation/find-all-conversations";
@@ -368,11 +365,9 @@ ipcMain.handle(
 
         writeStream.end();
 
-        const createSummaryService = new CreateSummaryService(
-            new CreateSummaryRepository(),
-        );
+        const summaryService = new SummaryService(new SummaryRepository());
 
-        const summary = await createSummaryService.create({
+        const summary = await summaryService.create({
             title: summaryTitle,
             path: outputPath,
             summaryType: "interval",
@@ -388,21 +383,15 @@ ipcMain.handle(
 );
 
 ipcMain.handle("getSummaries", async (event) => {
-    const findAllSummarysService = new FindAllSummarysService(
-        new FindAllSummarysRepository(),
-    );
+    const summaryService = new SummaryService(new SummaryRepository());
 
-    return FormatResponseService.formatToJson(
-        await findAllSummarysService.findAll(),
-    );
+    return FormatResponseService.formatToJson(await summaryService.findAll());
 });
 
 ipcMain.handle("getSummaryById", async (event, id) => {
     try {
-        const findSummaryByIdService = new FindSummaryByIdService(
-            new FindSummaryByIdRepository(),
-        );
-        const summary = await findSummaryByIdService.findById(id);
+        const summaryService = new SummaryService(new SummaryRepository());
+        const summary = await summaryService.findById(id);
 
         if (summary) {
             const data = readFileSync(summary.path, "utf-8");

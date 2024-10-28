@@ -9,14 +9,8 @@ export interface ISummary {
     createdAt: Date;
 }
 
-export interface IFindAllSummarysRepository {
+export interface ISummaryRepository {
     findAll(): Promise<ISummary[]>;
-}
-
-export interface IFindSummaryByIdRepository {
     findById(id: number): Promise<ISummary | null>;
-}
-
-export interface ICreateSummaryRepository {
     create(summary: Partial<ISummary>): Promise<ISummary>;
 }
