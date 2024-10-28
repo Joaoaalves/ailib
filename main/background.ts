@@ -31,12 +31,14 @@ import { CollectionService } from "@services/Collection";
 import { DocumentService } from "@services/Document";
 import { SummaryService } from "@services/Summary";
 import { ConversationService } from "@services/Conversation";
+import { TextChunkService } from "@services/TextChunk";
 
 import { FormatResponseService } from "@services/FormatResponse/format-response-json";
 import { CollectionRepository } from "@repositories/Collection";
 import { DocumentRepository } from "@repositories/Document";
 import { SummaryRepository } from "@repositories/Summary";
 import { ConversationRepository } from "@repositories/Conversation";
+import { TextChunkRepository } from "@repositories/TextChunk";
 
 import Document from "@models/Document";
 
@@ -286,19 +288,26 @@ ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
 });
 
 ipcMain.handle("search", async (event, query) => {
+    const documentService = new DocumentService(new DocumentRepository());
+
+    const textChunkService = new TextChunkService(new TextChunkRepository());
+
     const relevantQueries = await getMoreQueries(query);
     const queries = [query, ...relevantQueries];
 
     const RAGResult = await RAGFusion(queries);
-    const document = await Document.findByPk(RAGResult[0].documentId);
-    const textChunk = await TextChunk.findByPk(RAGResult[0].chunkId);
-    return JSON.parse(
-        JSON.stringify({
-            content: textChunk.text,
-            page: RAGResult[0].page,
-            document,
-        }),
+
+    const document = await documentService.findById(
+        parseInt(RAGResult[0].documentId),
     );
+
+    const textChunk = await textChunkService.findById(RAGResult[0].chunkId);
+
+    return FormatResponseService.formatToJson({
+        content: textChunk.text,
+        page: RAGResult[0].page,
+        document,
+    });
 });
 
 ipcMain.handle(
