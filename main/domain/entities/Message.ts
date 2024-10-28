@@ -4,10 +4,7 @@ export interface IMessage {
     role: "user" | "assistant" | "system";
 }
 
-export interface ICreateMessageRepository {
+export interface IMessageRepository {
     create(message: Partial<IMessage>): Promise<IMessage>;
-}
-
-export interface IDeleteMessageRepository {
     delete(messageId: number): Promise<void>;
 }
