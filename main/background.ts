@@ -11,7 +11,7 @@ import "./interfaces/ipc/WindowActionIpcHandler";
 import { app, BrowserWindow, protocol, globalShortcut } from "electron";
 import path from "path";
 
-import syncDatabase from "./db/sync";
+import syncDatabase from "./infrastructure/database/sync";
 import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
 
 const isProd = process.env.NODE_ENV === "production";
