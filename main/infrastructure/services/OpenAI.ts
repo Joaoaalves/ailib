@@ -1,6 +1,6 @@
-import { IMessage } from "@domain/entities/Message";
+import IMessage from "@domain/entities/Message";
 
-import { ISettingRepository } from "@domain/entities/Setting";
+import ISettingRepository from "@domain/repositories/SettingRepository";
 
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 

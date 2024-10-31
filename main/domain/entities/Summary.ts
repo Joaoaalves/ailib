@@ -1,6 +1,4 @@
-import { IRepository } from "./Repository";
-
-export interface ISummary {
+export default interface ISummary {
     id?: number;
     title: string;
     text?: string;
@@ -10,5 +8,3 @@ export interface ISummary {
     chapter?: number;
     createdAt: Date;
 }
-
-export interface ISummaryRepository extends IRepository<ISummary> {}

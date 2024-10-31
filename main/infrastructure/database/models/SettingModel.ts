@@ -1,4 +1,4 @@
-import { ISetting } from "@domain/entities/Setting";
+import ISetting from "@domain/entities/Setting";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
 

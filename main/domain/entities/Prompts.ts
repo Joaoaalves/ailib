@@ -1,6 +1,6 @@
-import { IMessage } from "./Message";
+import IMessage  from "./Message";
 
-export interface IPrompts {
+export default interface IPrompts {
     defaultChatInstruction: IMessage;
     titleCreationInstruction: IMessage;
     queryCreationInstruction: IMessage;

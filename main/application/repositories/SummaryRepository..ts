@@ -1,4 +1,5 @@
-import { ISummary, ISummaryRepository } from "@domain/entities/Summary";
+import ISummary from "@domain/entities/Summary";
+import ISummaryRepository from "@domain/repositories/SummaryRepository";
 import Summary from "@infra/database/models/SummaryModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 

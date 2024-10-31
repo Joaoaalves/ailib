@@ -1,8 +1,4 @@
-import { IRepository } from "./Repository";
-
-export interface ITextChunk {
+export default interface ITextChunk {
     id: number;
     text: string;
 }
-
-export interface ITextChunkRepository extends IRepository<ITextChunk> {}

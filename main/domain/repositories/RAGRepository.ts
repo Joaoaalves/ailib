@@ -1,4 +1,4 @@
-export interface IRAGRepository {
+export default interface IRAGRepository {
     summarizePages(
         pages: string[],
         lastSummary: string,

@@ -1,4 +1,4 @@
-import { ICollection } from "@domain/entities/Collection";
+import ICollection from "@domain/entities/Collection";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
 import Document from "./DocumentModel";

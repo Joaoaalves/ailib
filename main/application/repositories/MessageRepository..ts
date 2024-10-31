@@ -1,4 +1,5 @@
-import { IMessage, IMessageRepository } from "@domain/entities/Message";
+import IMessage from "@domain/entities/Message";
+import IMessageRepository from "@domain/repositories/MessageRepository";
 import Message from "@infra/database/models/MessageModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 

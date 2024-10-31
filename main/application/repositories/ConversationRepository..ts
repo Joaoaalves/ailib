@@ -1,7 +1,5 @@
-import {
-    IConversation,
-    IConversationRepository,
-} from "@domain/entities/Conversation";
+import IConversation from "@domain/entities/Conversation";
+import IConversationRepository from "@domain/repositories/ConversationRepository";
 import Conversation from "@infra/database/models/ConversationModel";
 import Message from "@infra/database/models/MessageModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";

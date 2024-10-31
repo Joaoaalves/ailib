@@ -1,7 +1,5 @@
-import {
-    ICollection,
-    ICollectionRepository,
-} from "@domain/entities/Collection";
+import ICollection from "@domain/entities/Collection";
+import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import Collection from "@infra/database/models/CollectionModel";
 import Document from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";

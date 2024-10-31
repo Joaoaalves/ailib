@@ -1,6 +1,4 @@
-import { IRepository } from "./Repository";
-
-export interface ISetting {
+export default interface ISetting {
     key: string;
     value: string;
     description: string;
@@ -8,5 +6,3 @@ export interface ISetting {
     type: string;
     allowedValues?: string[];
 }
-
-export interface ISettingRepository extends IRepository<ISetting> {}

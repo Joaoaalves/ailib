@@ -1,4 +1,4 @@
-import { ITextChunk } from "@domain/entities/TextChunk";
+import ITextChunk from "@domain/entities/TextChunk";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
 

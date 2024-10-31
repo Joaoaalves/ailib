@@ -1,4 +1,4 @@
-import { IDocument } from "@domain/entities/Document";
+import IDocument from "@domain/entities/Document";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
 import Summary from "./SummaryModel";

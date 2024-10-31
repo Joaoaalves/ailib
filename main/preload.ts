@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
-import { ICollection } from "@domain/entities/Collection";
+import ICollection from "@domain/entities/Collection";
 import { IChatStatus, IMessage } from "shared/types/conversation";
-import { IDocument } from "@domain/entities/Document";
+import IDocument from "@domain/entities/Document";
 import { RankedSearchResult } from "shared/types/qdrant";
 
 const handler = {

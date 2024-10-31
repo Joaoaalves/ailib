@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { IMessage } from "@domain/entities/Message";
+import IMessage from "@domain/entities/Message";
 import { staticPrompts } from "@prompts/staticPrompts";
 import { Op } from "sequelize";
 

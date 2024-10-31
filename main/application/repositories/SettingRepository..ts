@@ -1,4 +1,5 @@
-import { ISetting, ISettingRepository } from "@domain/entities/Setting";
+import ISetting from "@domain/entities/Setting";
+import ISettingRepository from "@domain/repositories/SettingRepository";
 import Setting from "@infra/database/models/SettingModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 

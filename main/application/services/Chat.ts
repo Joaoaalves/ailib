@@ -1,4 +1,4 @@
-import { IMessage } from "@domain/entities/Message";
+import IMessage from "@domain/entities/Message";
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { staticPrompts } from "@prompts/staticPrompts";
 

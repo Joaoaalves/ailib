@@ -1,4 +1,4 @@
-import { IConversation } from "@domain/entities/Conversation";
+import IConversation from "@domain/entities/Conversation";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
 import Message from "./MessageModel";

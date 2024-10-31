@@ -1,4 +1,4 @@
-export interface IRepository<T> {
+export default interface IRepository<T> {
     create(data: Partial<T>): Promise<T>;
     findById(id: number | string): Promise<T | null>;
     findAll?(): Promise<T[]>;

@@ -1,6 +1,6 @@
 import { StorageService } from "../../infrastructure/services/Storage";
 import { ipcMain, IpcMainEvent } from "electron";
-import { IDocument } from "@domain/entities/Document";
+import IDocument from "@domain/entities/Document";
 
 import { DocumentRepository } from "@application/repositories/DocumentRepository.";
 import { SettingRepository } from "@application/repositories/SettingRepository.";

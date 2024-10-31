@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { ChatCompletionChunk } from "openai/resources";
 import { Stream } from "openai/streaming";
 
-import { IMessage } from "@domain/entities/Message";
+import IMessage from "@domain/entities/Message";
 
 import { SettingRepository } from "@application/repositories/SettingRepository.";
 

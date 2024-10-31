@@ -1,5 +1,5 @@
-import { ITextChunkRepository, ITextChunk } from "@domain/entities/TextChunk";
-
+import ITextChunk from "@domain/entities/TextChunk";
+import ITextChunkRepository from "@domain/repositories/TextChunkRepository";
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { EventEmitterService } from "@infra/events/EventEmmiterService";
 import { EventsChannel } from "@infra/events/EventsChannel";
