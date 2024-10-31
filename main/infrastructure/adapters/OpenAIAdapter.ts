@@ -4,7 +4,7 @@ import { Stream } from "openai/streaming";
 
 import { IMessage } from "@domain/entities/Message";
 
-import { SettingRepository } from "@application/repositories/Setting";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
 
 export interface IOpenAIService {
     getEmbeddings(text: string, model: string): Promise<number[]>;

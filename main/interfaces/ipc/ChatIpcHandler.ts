@@ -3,8 +3,8 @@ import { IMessage } from "@domain/entities/Message";
 import { staticPrompts } from "@prompts/staticPrompts";
 import { Op } from "sequelize";
 
-import { SettingRepository } from "@application/repositories/Setting";
-import { TextChunkRepository } from "@application/repositories/TextChunk";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
+import { TextChunkRepository } from "@application/repositories/TextChunkRepository.";
 
 import { QDrantService } from "../../infrastructure/services/QDrant";
 import { RAGService } from "../../infrastructure/services/RAG";

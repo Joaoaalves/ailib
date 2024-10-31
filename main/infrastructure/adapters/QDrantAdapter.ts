@@ -1,7 +1,7 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { v4 as uuid } from "uuid";
 
-import { SettingRepository } from "@application/repositories/Setting";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
 
 export type Metadata = {
     collectionId: number;

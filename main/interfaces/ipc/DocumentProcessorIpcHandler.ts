@@ -1,8 +1,8 @@
 import { ipcMain, IpcMainEvent } from "electron";
 
-import { TextChunkRepository } from "@application/repositories/TextChunk";
-import { SettingRepository } from "@application/repositories/Setting";
-import { DocumentRepository } from "@application/repositories/Document";
+import { TextChunkRepository } from "@application/repositories/TextChunkRepository.";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
+import { DocumentRepository } from "@application/repositories/DocumentRepository.";
 
 import { OpenAIService } from "@infra/services/OpenAI";
 import { QDrantService } from "@infra/services/QDrant";

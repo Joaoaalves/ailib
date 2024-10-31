@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 
-import { SettingRepository } from "@application/repositories/Setting";
-import { ConversationRepository } from "@application/repositories/Conversation";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
+import { ConversationRepository } from "@application/repositories/ConversationRepository.";
 
 import { ChatService } from "@application/services/Chat";
 import { OpenAIService } from "@infra/services/OpenAI";

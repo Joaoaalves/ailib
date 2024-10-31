@@ -3,8 +3,8 @@ import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 
 import { SummaryRepository } from "@application/repositories/Summary";
-import { DocumentRepository } from "@application/repositories/Document";
-import { SettingRepository } from "@application/repositories/Setting";
+import { DocumentRepository } from "@application/repositories/DocumentRepository.";
+import { SettingRepository } from "@application/repositories/SettingRepository.";
 
 import { OpenAIService } from "@infra/services/OpenAI";
 import { SummaryzerService } from "@infra/services/Summaryzer";
