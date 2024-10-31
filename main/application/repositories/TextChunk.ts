@@ -1,5 +1,5 @@
 import { ITextChunk, ITextChunkRepository } from "@domain/entities/TextChunk";
-import TextChunk from "@domain/models/TextChunk";
+import TextChunk from "@infra/database/models/TextChunk";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class TextChunkRepository implements ITextChunkRepository {

@@ -2,8 +2,8 @@ import {
     ICollection,
     ICollectionRepository,
 } from "@domain/entities/Collection";
-import Collection from "@domain/models/Collection";
-import Document from "@domain/models/Document";
+import Collection from "@infra/database/models/Collection";
+import Document from "@infra/database/models/Document";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class CollectionRepository implements ICollectionRepository {

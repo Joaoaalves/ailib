@@ -1,5 +1,5 @@
 import { ISummary, ISummaryRepository } from "@domain/entities/Summary";
-import Summary from "@domain/models/Summary";
+import Summary from "@infra/database/models/Summary";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class SummaryRepository implements ISummaryRepository {

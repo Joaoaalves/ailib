@@ -1,5 +1,5 @@
 import { ISetting, ISettingRepository } from "@domain/entities/Setting";
-import Setting from "@domain/models/Setting";
+import Setting from "@infra/database/models/Setting";
 
 const defaultConfigs: ISetting[] = [
     {
