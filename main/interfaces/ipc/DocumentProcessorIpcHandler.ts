@@ -8,8 +8,8 @@ import { OpenAIService } from "@infra/services/OpenAI";
 import { QDrantService } from "@infra/services/QDrant";
 import { EventEmitterService } from "@infra/events/EventEmmiterService";
 
-import { OpenAIAdapter } from "@infra/adapters/OpenAI";
-import { QDrantAdapter } from "@infra/adapters/QDrant";
+import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
+import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import { FileProcesserService } from "@infra/services/FileProcesser";
 
 const documentRepository = new DocumentRepository();

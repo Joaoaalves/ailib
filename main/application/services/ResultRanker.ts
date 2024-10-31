@@ -1,4 +1,4 @@
-import { IResult } from "@infra/adapters/QDrant";
+import { IResult } from "@infra/adapters/QDrantAdapter";
 
 export interface RankedSearchResult extends IResult {
     occurrences: number;

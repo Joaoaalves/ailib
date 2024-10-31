@@ -7,7 +7,7 @@ import { ChatService } from "@application/services/Chat";
 import { OpenAIService } from "@infra/services/OpenAI";
 import { FormatResponseService } from "@application/services/FormatResponse";
 
-import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAI";
+import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 
 const settingRepository = new SettingRepository();
 const conversationRepository = new ConversationRepository();

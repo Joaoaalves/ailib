@@ -2,7 +2,7 @@ import { staticPrompts } from "@prompts/staticPrompts";
 
 import { IMessage } from "@domain/entities/Message";
 
-import { IOpenAIService } from "@infra/adapters/OpenAI";
+import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 
 export interface ISummaryzerService {
     summarizePages(

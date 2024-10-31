@@ -9,7 +9,7 @@ import { CollectionRepository } from "@application/repositories/Collection";
 import { FormatResponseService } from "@application/services/FormatResponse";
 import { QDrantService } from "@infra/services/QDrant";
 
-import { QDrantAdapter } from "../../infrastructure/adapters/QDrant";
+import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
 const documentRepository = new DocumentRepository();
 const collectionRepository = new CollectionRepository();

@@ -7,8 +7,8 @@ import {
     ResultRanker,
 } from "@application/services/ResultRanker";
 
-import { IOpenAIService } from "@infra/adapters/OpenAI";
-import { IQDrantService } from "@infra/adapters/QDrant";
+import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
+import { IQDrantService } from "@infra/adapters/QDrantAdapter";
 
 export interface IRAGService {
     createHypotheticalDocument(query: string, model: string): Promise<string>;

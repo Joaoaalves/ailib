@@ -4,13 +4,13 @@ import { DocumentRepository } from "@application/repositories/Document";
 import { SettingRepository } from "@application/repositories/Setting";
 import { TextChunkRepository } from "@application/repositories/TextChunk";
 
-import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAI";
+import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { OpenAIService } from "../../infrastructure/services/OpenAI";
 import { RAGService } from "../../infrastructure/services/RAG";
 import { FormatResponseService } from "@application/services/FormatResponse";
 import { QDrantService } from "../../infrastructure/services/QDrant";
 
-import { QDrantAdapter } from "../../infrastructure/adapters/QDrant";
+import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
 const documentRepository = new DocumentRepository();
 const textChunkRepository = new TextChunkRepository();

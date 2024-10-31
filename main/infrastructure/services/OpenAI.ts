@@ -2,7 +2,7 @@ import { IMessage } from "@domain/entities/Message";
 
 import { ISettingRepository } from "@domain/entities/Setting";
 
-import { IOpenAIService } from "@infra/adapters/OpenAI";
+import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 
 export class OpenAIService {
     constructor(

@@ -10,7 +10,7 @@ import { OpenAIService } from "@infra/services/OpenAI";
 import { SummaryzerService } from "@infra/services/Summaryzer";
 import { FormatResponseService } from "@application/services/FormatResponse";
 
-import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAI";
+import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 
 const summaryRepository = new SummaryRepository();
 const documentRepository = new DocumentRepository();

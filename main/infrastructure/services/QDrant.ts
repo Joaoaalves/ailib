@@ -1,4 +1,4 @@
-import { IQDrantService, Metadata } from "@infra/adapters/QDrant";
+import { IQDrantService, Metadata } from "@infra/adapters/QDrantAdapter";
 
 export class QDrantService implements IQDrantService {
     constructor(private qdrantAdapter: IQDrantService) {}

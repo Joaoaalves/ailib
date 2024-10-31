@@ -1,10 +1,10 @@
 import { ITextChunkRepository, ITextChunk } from "@domain/entities/TextChunk";
 
-import { IOpenAIService } from "@infra/adapters/OpenAI";
+import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { EventEmitterService } from "@infra/events/EventEmmiterService";
 import { EventsChannel } from "@infra/events/EventsChannel";
 
-import { IQDrantService, Metadata } from "../adapters/QDrant";
+import { IQDrantService, Metadata } from "../adapters/QDrantAdapter";
 import { IpcMainEvent } from "electron";
 
 export interface IFileProcesserService {

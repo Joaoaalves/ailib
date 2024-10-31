@@ -10,8 +10,8 @@ import { QDrantService } from "../../infrastructure/services/QDrant";
 import { RAGService } from "../../infrastructure/services/RAG";
 import { OpenAIService } from "../../infrastructure/services/OpenAI";
 
-import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAI";
-import { QDrantAdapter } from "../../infrastructure/adapters/QDrant";
+import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
+import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
 const settingRepository = new SettingRepository();
 const textChunkRepository = new TextChunkRepository();
