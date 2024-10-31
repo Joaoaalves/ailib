@@ -2,9 +2,9 @@ import { StorageService } from "../../infrastructure/services/Storage";
 import { ipcMain, IpcMainEvent } from "electron";
 import IDocument from "@domain/entities/Document";
 
-import { DocumentRepository } from "@application/repositories/DocumentRepository.";
-import { SettingRepository } from "@application/repositories/SettingRepository.";
-import { CollectionRepository } from "@application/repositories/CollectionRepository";
+import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
+import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { CollectionRepository } from "@infra/repositories/CollectionRepository";
 
 import { FormatResponseService } from "../services/FormatResponse";
 import { QDrantService } from "@infra/services/QDrant";

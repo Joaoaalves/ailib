@@ -2,9 +2,9 @@ import { ipcMain, IpcMainEvent } from "electron";
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 
-import { SummaryRepository } from "@application/repositories/SummaryRepository.";
-import { DocumentRepository } from "@application/repositories/DocumentRepository.";
-import { SettingRepository } from "@application/repositories/SettingRepository.";
+import { SummaryRepository } from "@infra/repositories/SummaryRepository.";
+import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
+import { SettingRepository } from "@infra/repositories/SettingRepository.";
 
 import { OpenAIService } from "@infra/services/OpenAI";
 import { SummaryzerService } from "@infra/services/Summaryzer";

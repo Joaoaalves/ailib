@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 
-import { CollectionRepository } from "@application/repositories/CollectionRepository";
+import { CollectionRepository } from "@infra/repositories/CollectionRepository";
 
 import { FormatResponseService } from "../services/FormatResponse";
 

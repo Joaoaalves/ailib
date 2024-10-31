@@ -1,8 +1,8 @@
 import { ipcMain } from "electron";
 
-import { DocumentRepository } from "@application/repositories/DocumentRepository.";
-import { SettingRepository } from "@application/repositories/SettingRepository.";
-import { TextChunkRepository } from "@application/repositories/TextChunkRepository.";
+import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
+import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { TextChunkRepository } from "@infra/repositories/TextChunkRepository.";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { OpenAIService } from "../../infrastructure/services/OpenAI";
