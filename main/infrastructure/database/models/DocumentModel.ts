@@ -1,7 +1,7 @@
 import { IDocument } from "@domain/entities/Document";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
-import Summary from "./Summary";
+import Summary from "./SummaryModel";
 
 interface DocumentCreationAttributes extends Optional<IDocument, "id"> {}
 

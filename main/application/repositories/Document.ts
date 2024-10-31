@@ -1,6 +1,6 @@
 import { IDocument, IDocumentRepository } from "@domain/entities/Document";
-import Summary from "@infra/database/models/Summary";
-import Document from "@infra/database/models/Document";
+import Summary from "@infra/database/models/SummaryModel";
+import Document from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class DocumentRepository implements IDocumentRepository {
