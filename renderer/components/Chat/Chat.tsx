@@ -1,5 +1,5 @@
 import { CiSettings } from "react-icons/ci";
-import Message from "./Message";
+import MessageModel from "./Message";
 import { ReactNode, useEffect, useState } from "react";
 import { useChat } from "@/contexts/ChatContext";
 import { ScrollArea } from "../ui/ScrollArea";

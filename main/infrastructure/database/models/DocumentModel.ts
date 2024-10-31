@@ -1,7 +1,7 @@
 import IDocument from "@domain/entities/Document";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
-import Summary from "./SummaryModel";
+import SummaryModel from "./SummaryModel";
 
 interface DocumentCreationAttributes extends Optional<IDocument, "id"> {}
 
@@ -15,7 +15,7 @@ interface DocumentInstance
     lastPageRead?: number;
 }
 
-const Document = db.define<DocumentInstance>(
+const DocumentModel = db.define<DocumentInstance>(
     "Document",
     {
         id: {
@@ -50,6 +50,6 @@ const Document = db.define<DocumentInstance>(
     },
 );
 
-Document.hasMany(Summary, { as: "summaries", foreignKey: "documentId" });
+DocumentModel.hasMany(SummaryModel, { as: "summaries", foreignKey: "DocumentModelId" });
 
-export default Document;
+export default DocumentModel;

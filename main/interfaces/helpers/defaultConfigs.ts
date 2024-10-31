@@ -1,5 +1,5 @@
 import ISetting from "@domain/entities/Setting";
-import Setting from "@infra/database/models/SettingModel";
+import SettingModel from "@infra/database/models/SettingModel";
 
 const defaultConfigs: ISetting[] = [
     {
@@ -79,7 +79,7 @@ const defaultConfigs: ISetting[] = [
 
 export default async function createDefaultConfigsIfNotExists() {
     try {
-        await Setting.bulkCreate(defaultConfigs, {
+        await SettingModel.bulkCreate(defaultConfigs, {
             ignoreDuplicates: true,
         });
     } catch (error) {

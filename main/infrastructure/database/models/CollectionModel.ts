@@ -1,7 +1,7 @@
 import ICollection from "@domain/entities/Collection";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
-import Document from "./DocumentModel";
+import DocumentModel from "./DocumentModel";
 
 interface CollectionAttributes {
     id: number;
@@ -17,7 +17,7 @@ interface CollectionInstance
     addDocument: (document: typeof Document) => Promise<void>;
 }
 
-const Collection = db.define<CollectionInstance>(
+const CollectionModel = db.define<CollectionInstance>(
     "Collection",
     {
         id: {
@@ -34,6 +34,6 @@ const Collection = db.define<CollectionInstance>(
         timestamps: false,
     },
 );
-Collection.hasMany(Document);
+CollectionModel.hasMany(DocumentModel);
 
-export default Collection;
+export default CollectionModel;

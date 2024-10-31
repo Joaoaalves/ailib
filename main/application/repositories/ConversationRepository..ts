@@ -1,37 +1,37 @@
 import IConversation from "@domain/entities/Conversation";
 import IConversationRepository from "@domain/repositories/ConversationRepository";
-import Conversation from "@infra/database/models/ConversationModel";
-import Message from "@infra/database/models/MessageModel";
+import ConversationModel from "@infra/database/models/ConversationModel";
+import MessageModel from "@infra/database/models/MessageModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class ConversationRepository implements IConversationRepository {
     async create(conversation: Partial<IConversation>): Promise<IConversation> {
-        const cnvs = await Conversation.create(conversation);
+        const cnvs = await ConversationModel.create(conversation);
         return mapToEntity<IConversation>(cnvs);
     }
 
     async findAll(): Promise<IConversation[]> {
-        const conversations = await Conversation.findAll();
+        const conversations = await ConversationModel.findAll();
         return conversations.map((conversation) =>
             mapToEntity<IConversation>(conversation),
         );
     }
 
     async findById(conversationId: number): Promise<IConversation> {
-        const conversation = await Conversation.findByPk(conversationId);
+        const conversation = await ConversationModel.findByPk(conversationId);
         return mapToEntity<IConversation>(conversation);
     }
 
     async delete(conversationId: number): Promise<void> {
-        const conversation = await Conversation.findByPk(conversationId, {
-            include: Message,
+        const conversation = await ConversationModel.findByPk(conversationId, {
+            include: MessageModel,
         });
 
         // @ts-expect-error
         const messages = conversation.dataValues.Messages;
 
         if (messages?.length) {
-            await Message.destroy({
+            await MessageModel.destroy({
                 where: {
                     id: {
                         includes: messages.map((message) => message.id),
@@ -44,15 +44,15 @@ export class ConversationRepository implements IConversationRepository {
     }
 
     async addMessage(conversationId: number, messageId: number): Promise<void> {
-        const conversation = await Conversation.findByPk(conversationId);
-        const message = await Message.findByPk(messageId);
+        const conversation = await ConversationModel.findByPk(conversationId);
+        const message = await MessageModel.findByPk(messageId);
 
         await conversation.addMessage(message);
     }
 
     async getMessages(conversationId: number): Promise<IConversation> {
-        const conversation = await Conversation.findByPk(conversationId, {
-            include: Message,
+        const conversation = await ConversationModel.findByPk(conversationId, {
+            include: MessageModel,
             order: [["id", "ASC"]],
         });
 

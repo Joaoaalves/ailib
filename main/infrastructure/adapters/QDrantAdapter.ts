@@ -58,7 +58,7 @@ export class QDrantAdapter implements IQDrantService {
             const smallCollection = await this.client.collectionExists(
                 this.smallCollectionName,
             );
-            if (!smallCollection.exists) {
+            if (!smallCollectionModel.exists) {
                 await this.client.createCollection(this.smallCollectionName, {
                     vectors: {
                         size: 1536,
@@ -70,7 +70,7 @@ export class QDrantAdapter implements IQDrantService {
             const largeCollection = await this.client.collectionExists(
                 this.largeCollectionName,
             );
-            if (!largeCollection.exists) {
+            if (!largeCollectionModel.exists) {
                 await this.client.createCollection(this.largeCollectionName, {
                     vectors: {
                         size: 3072,

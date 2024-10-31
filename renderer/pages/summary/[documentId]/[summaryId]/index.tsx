@@ -1,6 +1,6 @@
 "use client";
 import Layout from "@/components/Layout";
-import SummaryList from "@/components/Summary/SummaryList";
+import SummaryModelList from "@/components/Summary/SummaryList";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ISummary } from "shared/types/summary";

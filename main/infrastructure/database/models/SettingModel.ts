@@ -13,7 +13,7 @@ interface SettingInstance extends Model<SettingCreationAttributes, ISetting> {
     allowedValues?: string[];
 }
 
-const Setting = db.define<SettingInstance>("Setting", {
+const SettingModel = db.define<SettingInstance>("Setting", {
     key: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -42,4 +42,4 @@ const Setting = db.define<SettingInstance>("Setting", {
     },
 });
 
-export default Setting;
+export default SettingModel;

@@ -10,7 +10,7 @@ interface TextChunkInstance
     text: string;
 }
 
-const TextChunk = db.define<TextChunkInstance>("TextChunk", {
+const TextChunkModel = db.define<TextChunkInstance>("TextChunk", {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -22,4 +22,4 @@ const TextChunk = db.define<TextChunkInstance>("TextChunk", {
     },
 });
 
-export default TextChunk;
+export default TextChunkModel;

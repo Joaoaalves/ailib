@@ -49,7 +49,7 @@ export function useCollections() {
                 (oldData: ICollection[] | undefined) => {
                     if (!oldData) return [];
                     return oldData.map((collection) =>
-                        collection.id === updatedCollection.id
+                        collection.id === updatedCollectionModel.id
                             ? updatedCollection
                             : collection,
                     );

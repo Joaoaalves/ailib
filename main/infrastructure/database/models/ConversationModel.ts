@@ -1,7 +1,7 @@
 import IConversation from "@domain/entities/Conversation";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database";
-import Message from "./MessageModel";
+import MessageModel from "./MessageModel";
 
 interface ConversationCreationAttributes
     extends Optional<IConversation, "id"> {}
@@ -13,7 +13,7 @@ interface ConversationInstance
     addMessage: (message: Model) => Promise<void>;
 }
 
-const Conversation = db.define<ConversationInstance>(
+const ConversationModel = db.define<ConversationInstance>(
     "Conversation",
     {
         id: {
@@ -31,6 +31,6 @@ const Conversation = db.define<ConversationInstance>(
     },
 );
 
-Conversation.hasMany(Message);
+ConversationModel.hasMany(MessageModel);
 
-export default Conversation;
+export default ConversationModel;

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import Layout from "@/components/Layout";
 import { ICollection } from "shared/types/collection";
-import Collection from "@/components/Collection/Collection";
+import CollectionModel from "@/components/Collection/Collection";
 import { useCollections } from "@/hooks/use-collections";
 
 export default function HomePage() {

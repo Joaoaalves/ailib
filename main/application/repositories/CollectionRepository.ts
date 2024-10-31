@@ -1,22 +1,22 @@
 import ICollection from "@domain/entities/Collection";
 import ICollectionRepository from "@domain/repositories/CollectionRepository";
-import Collection from "@infra/database/models/CollectionModel";
-import Document from "@infra/database/models/DocumentModel";
+import CollectionModel from "@infra/database/models/CollectionModel";
+import DocumentModel from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class CollectionRepository implements ICollectionRepository {
     async create(collection: Partial<ICollection>): Promise<ICollection> {
-        const col = await Collection.create(collection);
+        const col = await CollectionModel.create(collection);
         return mapToEntity<ICollection>(col);
     }
 
     async findById(id: number): Promise<ICollection | null> {
-        const collection = await Collection.findByPk(id);
+        const collection = await CollectionModel.findByPk(id);
         return collection ? mapToEntity<ICollection>(collection) : null;
     }
 
     async findAll(): Promise<ICollection[]> {
-        const collections = await Collection.findAll({ include: Document });
+        const collections = await CollectionModel.findAll({ include: DocumentModel });
 
         return collections.map((collection) =>
             mapToEntity<ICollection>(collection),
@@ -24,16 +24,16 @@ export class CollectionRepository implements ICollectionRepository {
     }
 
     async update(id: number, collection: Partial<ICollection>): Promise<void> {
-        await Collection.update(collection, { where: { id } });
+        await CollectionModel.update(collection, { where: { id } });
     }
 
     async delete(id: number): Promise<void> {
-        await Collection.destroy({ where: { id } });
+        await CollectionModel.destroy({ where: { id } });
     }
 
     async addDocument(collectionId: number, documentId: number): Promise<void> {
-        const collection = await Collection.findByPk(collectionId);
-        const document = await Document.findByPk(documentId);
+        const collection = await CollectionModel.findByPk(collectionId);
+        const document = await DocumentModel.findByPk(documentId);
 
         // @ts-expect-error
         await collection.addDocument(document);

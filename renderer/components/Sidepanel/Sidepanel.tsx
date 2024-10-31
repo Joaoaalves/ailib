@@ -6,7 +6,7 @@ import Nav from "./Nav";
 
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import Settings from "../Settings/Settings";
+import SettingModels from "../Settings/Settings";
 
 interface SidepanelProps {
     children?: ReactNode;

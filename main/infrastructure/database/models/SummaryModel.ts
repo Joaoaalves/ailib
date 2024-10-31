@@ -14,7 +14,7 @@ interface SummaryInstance extends Model<ISummary, SummaryCreationAttributes> {
     createAt: Date;
 }
 
-const Summary = db.define<SummaryInstance>(
+const SummaryModel = db.define<SummaryInstance>(
     "Summary",
     {
         id: {
@@ -52,4 +52,4 @@ const Summary = db.define<SummaryInstance>(
     },
 );
 
-export default Summary;
+export default SummaryModel;

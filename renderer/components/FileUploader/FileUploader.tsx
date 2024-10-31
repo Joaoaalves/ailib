@@ -3,7 +3,7 @@
 import { useDropzone, Accept } from "react-dropzone";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { ICollection } from "shared/types/collection";
-import CollectionPicker from "./CollectionPicker";
+import CollectionModelPicker from "./CollectionPicker";
 import Input from "../ui/Input";
 import { usePDFJS } from "@/hooks/use-pdfjs";
 import { IDocument } from "shared/types/document";

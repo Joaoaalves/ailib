@@ -61,7 +61,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
             if (prevMessages.length === 0) return prevMessages;
             const updatedMessages = [...prevMessages];
             const lastMessage = updatedMessages[updatedMessages.length - 1];
-            if (lastMessage.role === "user") {
+            if (lastMessageModel.role === "user") {
                 const newMessage: IMessage = {
                     role: "assistant",
                     content: content,
@@ -70,10 +70,10 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
                 };
                 return [...updatedMessages, newMessage];
             }
-            if (lastMessage.role === "assistant") {
-                if (!lastMessage.content.endsWith(content)) {
-                    lastMessage.content += content;
-                    lastMessage.updatedAt = new Date();
+            if (lastMessageModel.role === "assistant") {
+                if (!lastMessageModel.content.endsWith(content)) {
+                    lastMessageModel.content += content;
+                    lastMessageModel.updatedAt = new Date();
                 }
             }
             return updatedMessages;
@@ -108,7 +108,7 @@ const ChatProvider: React.FC<ChatProviderProps> = ({
                     });
                 },
             );
-            return newConversation.id;
+            return newConversationModel.id;
         }
 
         return conversation?.id;

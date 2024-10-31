@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import db from "@infra/database";
 
-const Message = db.define("Message", {
+const MessageModel = db.define("Message", {
     id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
@@ -17,4 +17,4 @@ const Message = db.define("Message", {
     },
 });
 
-export default Message;
+export default MessageModel;

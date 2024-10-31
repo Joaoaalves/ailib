@@ -1,4 +1,4 @@
-import CollectionCard from "@/components/Collection/CollectionCard";
+import CollectionModelCard from "@/components/Collection/CollectionCard";
 import CreateCollection from "@/components/Collection/CreateCollection";
 import Layout from "@/components/Layout";
 import { useCollections } from "@/hooks/use-collections";

@@ -1,22 +1,22 @@
 import IDocument from "@domain/entities/Document";
 import IDocumentRepository from "@domain/repositories/DocumentRepository";
-import Summary from "@infra/database/models/SummaryModel";
-import Document from "@infra/database/models/DocumentModel";
+import SummaryModel from "@infra/database/models/SummaryModel";
+import DocumentModel from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
 export class DocumentRepository implements IDocumentRepository {
     async create(document: Partial<IDocument>): Promise<IDocument> {
-        const doc = await Document.create(document);
+        const doc = await DocumentModel.create(document);
         return mapToEntity<IDocument>(doc);
     }
 
     async findById(id: number): Promise<IDocument | null> {
-        const doc = await Document.findByPk(id);
+        const doc = await DocumentModel.findByPk(id);
         return mapToEntity<IDocument>(doc);
     }
 
     async update(id: number, document: Partial<IDocument>): Promise<void> {
-        const doc = await Document.findByPk(id);
+        const doc = await DocumentModel.findByPk(id);
 
         if (doc) {
             await doc.update(document);
@@ -25,7 +25,7 @@ export class DocumentRepository implements IDocumentRepository {
     }
 
     async delete(id: number): Promise<void> {
-        await Document.destroy({
+        await DocumentModel.destroy({
             where: {
                 id: Number(id),
             },
@@ -33,10 +33,10 @@ export class DocumentRepository implements IDocumentRepository {
     }
 
     async addSummary(documentId: number, summaryId: number): Promise<void> {
-        const document = await Document.findByPk(documentId);
-        const summary = await Summary.findByPk(summaryId);
+        const document = await DocumentModel.findByPk(documentId);
+        const summary = await SummaryModel.findByPk(summaryId);
 
         // @ts-expect-error
-        await document.addSumary(summary);
+        await DocumentModel.addSumary(summary);
     }
 }
