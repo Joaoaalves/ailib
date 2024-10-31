@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 
 import { SettingRepository } from "@application/repositories/SettingRepository.";
 
-import { FormatResponseService } from "@application/services/FormatResponse";
+import { FormatResponseService } from "../services/FormatResponse";
 
 const settingService = new SettingRepository();
 

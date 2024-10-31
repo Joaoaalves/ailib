@@ -7,7 +7,7 @@ import { TextChunkRepository } from "@application/repositories/TextChunkReposito
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { OpenAIService } from "../../infrastructure/services/OpenAI";
 import { RAGService } from "../../infrastructure/services/RAG";
-import { FormatResponseService } from "@application/services/FormatResponse";
+import { FormatResponseService } from "../services/FormatResponse";
 import { QDrantService } from "../../infrastructure/services/QDrant";
 
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";

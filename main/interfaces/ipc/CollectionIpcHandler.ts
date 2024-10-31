@@ -2,7 +2,7 @@ import { ipcMain } from "electron";
 
 import { CollectionRepository } from "@application/repositories/CollectionRepository";
 
-import { FormatResponseService } from "@application/services/FormatResponse";
+import { FormatResponseService } from "../services/FormatResponse";
 
 // Create a new Collection
 const collectionRepository = new CollectionRepository();

@@ -6,7 +6,7 @@ import { DocumentRepository } from "@application/repositories/DocumentRepository
 import { SettingRepository } from "@application/repositories/SettingRepository.";
 import { CollectionRepository } from "@application/repositories/CollectionRepository";
 
-import { FormatResponseService } from "@application/services/FormatResponse";
+import { FormatResponseService } from "../services/FormatResponse";
 import { QDrantService } from "@infra/services/QDrant";
 
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";

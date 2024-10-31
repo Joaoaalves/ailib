@@ -3,9 +3,9 @@ import { ipcMain } from "electron";
 import { SettingRepository } from "@application/repositories/SettingRepository.";
 import { ConversationRepository } from "@application/repositories/ConversationRepository.";
 
-import { ChatService } from "@application/services/Chat";
+import { ChatService } from "@infra/services/Chat";
 import { OpenAIService } from "@infra/services/OpenAI";
-import { FormatResponseService } from "@application/services/FormatResponse";
+import { FormatResponseService } from "../services/FormatResponse";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 
