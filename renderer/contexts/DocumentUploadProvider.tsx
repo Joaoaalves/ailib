@@ -6,16 +6,10 @@ import React, {
     useContext,
 } from "react";
 import { useRouter } from "next/navigation";
-interface IProgress {
-    chunk: number;
-    total: number;
-    embedding: string;
-}
 
 interface IProgressContext {
-    progressPercentage: number;
+    progress: number;
     isEmbedding: boolean;
-    embeddingCost: number;
 }
 
 const ProgressContext = createContext<IProgressContext | undefined>(undefined);
@@ -24,37 +18,24 @@ const DocumentUploadProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
     const router = useRouter();
-    const [progress, setProgress] = useState<IProgress | null>(null);
+    const [progress, setProgress] = useState<number>(null);
     const [isEmbedding, setIsEmbedding] = useState<boolean>(false);
-    const [embeddingCost, setEmbeddingCost] = useState<number>();
 
     useEffect(() => {
-        const handleProgress = (prog: IProgress) => {
+        const handleProgress = (prog: number) => {
+            console.log(prog);
             setIsEmbedding(true);
-            if (!progress || prog.chunk > progress.chunk) setProgress(prog);
+            if (!progress || prog > progress) setProgress(prog);
         };
 
-        if (window.api.openai && window.api.openai.embeddingProgress) {
+        if (window.api?.openai && window.api?.openai.embeddingProgress) {
             window.api.openai.embeddingProgress(handleProgress, () =>
                 router.refresh(),
             );
         }
-
-        if (window.api.openai && window.api.openai.embeddingCost) {
-            window.api.openai.embeddingCost((cost: number) =>
-                setEmbeddingCost(cost),
-            );
-        }
     }, []);
-
-    const progressPercentage = progress
-        ? (progress.chunk * 100) / progress.total
-        : 0;
-
     return (
-        <ProgressContext.Provider
-            value={{ progressPercentage, isEmbedding, embeddingCost }}
-        >
+        <ProgressContext.Provider value={{ progress, isEmbedding }}>
             {children}
         </ProgressContext.Provider>
     );

@@ -1,3 +1,5 @@
+import { IRepository } from "./Repository";
+
 export interface ISummary {
     id?: number;
     title: string;
@@ -9,8 +11,4 @@ export interface ISummary {
     createdAt: Date;
 }
 
-export interface ISummaryRepository {
-    findAll(): Promise<ISummary[]>;
-    findById(id: number): Promise<ISummary | null>;
-    create(summary: Partial<ISummary>): Promise<ISummary>;
-}
+export interface ISummaryRepository extends IRepository<ISummary> {}

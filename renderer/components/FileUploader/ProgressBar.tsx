@@ -8,7 +8,7 @@ interface IProgress {
 }
 
 function ProgressBar() {
-    const { progressPercentage, isEmbedding } = useUploadDocument();
+    const { progress, isEmbedding } = useUploadDocument();
 
     if (!isEmbedding) return <></>;
 
@@ -17,7 +17,7 @@ function ProgressBar() {
             <div
                 className="h-2 bg-primary rounded-r-full"
                 style={{
-                    width: `${progressPercentage}%`,
+                    width: `${progress}%`,
                 }}
             ></div>
         </div>

@@ -1,4 +1,5 @@
-import { IDocument } from "@entities/Document";
+import { IRepository } from "@domain/entities/Repository";
+import { IDocument } from "@domain/entities/Document";
 
 export interface ICollection {
     id: number;
@@ -6,11 +7,6 @@ export interface ICollection {
     documents?: IDocument[];
 }
 
-export interface ICollectionRepository {
-    create(collection: Partial<ICollection>): Promise<ICollection>;
-    findAll(): Promise<ICollection[]>;
-    findById(id: number): Promise<ICollection | null>;
-    update(id: number, collection: Partial<ICollection>): Promise<void>;
-    delete(id: number): Promise<void>;
+export interface ICollectionRepository extends IRepository<ICollection> {
     addDocument(collectionId: number, document): Promise<void>;
 }

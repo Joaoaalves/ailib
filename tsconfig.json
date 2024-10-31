@@ -4,17 +4,17 @@
       "shared/*": [
         "./shared/*"
       ],
-      "@entities/*": [
-        "./main/domain/entities/*"
+      "@domain/*": [
+        "./main/domain/*"
       ],
-      "@repositories/*": [
-        "./main/infrastructure/persistance/repositories/*"
+      "@infra/*": [
+        "./main/infrastructure/*"
       ],
-      "@services/*": [
-        "./main/application/services/*"
+      "@application/*": [
+        "./main/application/*"
       ],
-      "@models/*": [
-        "./main/infrastructure/persistance/models/*"
+      "@prompts/*": [
+        "./main/domain/prompts/*"
       ]
     },
     "target": "es2020",

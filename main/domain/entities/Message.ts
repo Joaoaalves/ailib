@@ -1,10 +1,9 @@
+import { IRepository } from "./Repository";
+
 export interface IMessage {
-    id: number;
+    id?: number;
     content: string;
     role: "user" | "assistant" | "system";
 }
 
-export interface IMessageRepository {
-    create(message: Partial<IMessage>): Promise<IMessage>;
-    delete(messageId: number): Promise<void>;
-}
+export interface IMessageRepository extends IRepository<IMessage> {}

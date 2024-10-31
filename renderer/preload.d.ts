@@ -75,7 +75,7 @@ declare global {
                     pages: string[],
                     summaryTitle: string,
                 ) => void;
-                summaryzingProgress: (
+                summary_progress: (
                     callback: (data) => void,
                     onEnd: () => void,
                 ) => void;
@@ -85,9 +85,8 @@ declare global {
                 update: (key: string, value: string) => Promise<IConfig>;
             };
             openai: {
-                embeddingCost: (callback: (cost: number) => void) => void;
                 embeddingProgress: (
-                    callback: (progress: IProgress) => void,
+                    callback: (progress: number) => void,
                     onEnd: () => void,
                 ) => void;
                 chatWithCollection: (

@@ -1,12 +1,12 @@
 import { useQuery, useQueryClient, useMutation } from "react-query";
 import { IConfig } from "shared/types/config";
 
-const getConfigs = async () => {
+const getSettings = async () => {
     const configs = await window.api.config.getAll();
     return configs;
 };
 
-const updateConfig = async ({ key, value }: IConfig) => {
+const updateSetting = async ({ key, value }: IConfig) => {
     const config = await window.api.config.update(key, value);
     return config;
 };
@@ -14,9 +14,9 @@ const updateConfig = async ({ key, value }: IConfig) => {
 export function useConfigs() {
     const queryClient = useQueryClient();
 
-    const query = useQuery("configs", getConfigs);
+    const query = useQuery("configs", getSettings);
 
-    const updateMutation = useMutation(updateConfig, {
+    const updateMutation = useMutation(updateSetting, {
         onSuccess: (updatedConfig) => {
             queryClient.setQueryData("configs", (oldData: IConfig[]) =>
                 oldData.map((config) =>
@@ -28,6 +28,6 @@ export function useConfigs() {
 
     return {
         configs: query.data,
-        updateConfig: updateMutation.mutate,
+        updateSetting: updateMutation.mutate,
     };
 }

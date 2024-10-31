@@ -1,7 +1,7 @@
-import { IConfig } from "shared/types/config";
-import Config from "../db/config";
+import { ISetting, ISettingRepository } from "@domain/entities/Setting";
+import Setting from "@domain/models/Setting";
 
-const defaultConfigs: IConfig[] = [
+const defaultConfigs: ISetting[] = [
     {
         key: "openaiAPIKey",
         description:
@@ -79,10 +79,9 @@ const defaultConfigs: IConfig[] = [
 
 export default async function createDefaultConfigsIfNotExists() {
     try {
-        await Config.bulkCreate(defaultConfigs, {
+        await Setting.bulkCreate(defaultConfigs, {
             ignoreDuplicates: true,
         });
-        console.log("Configurações padrão verificadas/criadas.");
     } catch (error) {
         console.error("Erro ao criar configurações padrão:", error);
     }

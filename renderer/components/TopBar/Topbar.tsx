@@ -18,14 +18,13 @@ interface TopBarProps {
 import { useUploadDocument } from "@/contexts/DocumentUploadProvider";
 
 export default function TopBar({ children }: TopBarProps) {
-    const { isEmbedding, progressPercentage, embeddingCost } =
-        useUploadDocument();
+    const { isEmbedding, progress } = useUploadDocument();
     const [open, setOpen] = useState<boolean>(false);
 
     useEffect(() => {
         if (isEmbedding == open && !isEmbedding) return;
 
-        if (progressPercentage == 100) return setOpen(false);
+        if (progress == 100) return setOpen(false);
 
         setOpen(!isEmbedding);
     }, [isEmbedding]);

@@ -23,7 +23,7 @@ import {
 import { GoQuestion } from "react-icons/go";
 
 export default function SettingsForm({ setOpen }) {
-    const { configs, updateConfig } = useConfigs();
+    const { configs, updateSetting } = useConfigs();
     const [formValues, setFormValues] = useState<Object>({});
 
     const handleInputChange = (key: string, value: string) => {
@@ -39,7 +39,7 @@ export default function SettingsForm({ setOpen }) {
         await Promise.all(
             configs.map(async (config) => {
                 if (formValues[config.key] !== undefined) {
-                    updateConfig({
+                    updateSetting({
                         key: config.key,
                         value: formValues[config.key],
                     });

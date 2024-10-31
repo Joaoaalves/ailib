@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
-import { ICollection } from "shared/types/collection";
+import { ICollection } from "@domain/entities/Collection";
 import { IChatStatus, IMessage } from "shared/types/conversation";
-import { IDocument } from "shared/types/document";
+import { IDocument } from "@domain/entities/Document";
 import { RankedSearchResult } from "shared/types/qdrant";
 
 const handler = {
@@ -74,9 +74,9 @@ contextBridge.exposeInMainWorld("api", {
             ipcRenderer.invoke("saveCover", documentId, cover),
     },
     config: {
-        getAll: () => ipcRenderer.invoke("getConfigs"),
+        getAll: () => ipcRenderer.invoke("getSettings"),
         update: (key: string, value: string) =>
-            ipcRenderer.invoke("updateConfig", key, value),
+            ipcRenderer.invoke("updateSetting", key, value),
     },
     summary: {
         getAll: async () => ipcRenderer.invoke("getSummaries"),
@@ -92,28 +92,26 @@ contextBridge.exposeInMainWorld("api", {
                 pages,
                 summaryTitle,
             ),
-        summaryzingProgress: (
+        summary_progress: (
             callback: (progress: number) => void,
             onEnd: () => void,
         ) => {
-            ipcRenderer.on("summaryzingProgress", (event, progress) =>
+            ipcRenderer.on("summary-progress", (event, progress) =>
                 callback(progress),
             );
-            ipcRenderer.on("summaryzingComplete", onEnd);
+            ipcRenderer.on("summary-complete", onEnd);
         },
     },
     search: (query: string) => ipcRenderer.invoke("search", query),
     openai: {
-        embeddingCost: (callback: (cost: number) => void) =>
-            ipcRenderer.on("embedding_cost", (event, cost) => callback(cost)),
         embeddingProgress: (
             callback: (progress: any) => void,
             onEnd: () => void,
         ) => {
-            ipcRenderer.on("embedding_progress", (event, progress) =>
+            ipcRenderer.on("embedding-progress", (event, progress) =>
                 callback(progress),
             );
-            ipcRenderer.on("embedding_complete", onEnd);
+            ipcRenderer.on("embedding-complete", onEnd);
         },
         chatWithCollection: (messages: IMessage[], collectionId: number) =>
             ipcRenderer.invoke("chatWithCollection", messages, collectionId),
@@ -131,7 +129,7 @@ contextBridge.exposeInMainWorld("api", {
             ipcRenderer.on("chat-stream-end", onEnd);
         },
         onChatStatus: (callback: (chatStatus: IChatStatus) => void) => {
-            ipcRenderer.on("chat-status", (event, chatStatus) =>
+            ipcRenderer.on("chat-stream", (event, chatStatus) =>
                 callback(chatStatus),
             );
         },

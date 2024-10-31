@@ -15,7 +15,6 @@ export default function Document() {
             const document = await window.api.document.get(
                 documentId as string,
             );
-            console.log(document);
             setDocument(document);
         } catch (error) {
             console.error(error);

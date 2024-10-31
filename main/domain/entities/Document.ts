@@ -1,4 +1,5 @@
-import { ISummary } from "@entities/Summary";
+import { ISummary } from "@domain/entities/Summary";
+import { IRepository } from "./Repository";
 
 export interface IDocument {
     id?: number;
@@ -10,10 +11,6 @@ export interface IDocument {
     summaries?: ISummary[];
 }
 
-export interface IDocumentRepository {
-    create(document: Partial<IDocument>): Promise<IDocument>;
-    delete(id: number): Promise<void>;
-    update(id: number, document: Partial<IDocument>): Promise<void>;
-    findById(id: number): Promise<IDocument | null>;
-    addDocument(documentId: number, summaryId: number): Promise<void>;
+export interface IDocumentRepository extends IRepository<IDocument> {
+    addSummary(documentId: number, summaryId: number): Promise<void>;
 }

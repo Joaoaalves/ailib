@@ -1,3 +1,5 @@
+import { IRepository } from "./Repository";
+
 export interface ISetting {
     key: string;
     value: string;
@@ -7,9 +9,4 @@ export interface ISetting {
     allowedValues?: string[];
 }
 
-export interface ISettingRepository {
-    create(setting: Partial<ISetting>): Promise<ISetting>;
-    findById(settingId: number): Promise<ISetting>;
-    findAll(): Promise<ISetting[]>;
-    update(settingId: number, value: string): Promise<ISetting>;
-}
+export interface ISettingRepository extends IRepository<ISetting> {}
