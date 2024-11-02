@@ -4,7 +4,7 @@ import SummaryModel from "@infra/database/models/SummaryModel";
 import DocumentModel from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class DocumentRepository implements IDocumentRepository {
+export class DocumentRepositorySequelize implements IDocumentRepository {
     async create(document: Partial<IDocument>): Promise<IDocument> {
         const doc = await DocumentModel.create(document);
         return mapToEntity<IDocument>(doc);

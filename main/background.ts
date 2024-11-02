@@ -1,18 +1,18 @@
-import "./interfaces/ipc/ChatIpcHandler";
-import "./interfaces/ipc/CollectionIpcHandler";
-import "./interfaces/ipc/ConversationIpcHandler";
-import "./interfaces/ipc/DocumentIpcHandler";
-import "./interfaces/ipc/DocumentProcessorIpcHandler";
-import "./interfaces/ipc/RAGIpcHandler";
-import "./interfaces/ipc/SettingIpcHandler";
-import "./interfaces/ipc/SummaryIpcHandler";
-import "./interfaces/ipc/WindowActionIpcHandler";
+import "./interface/ipc/ChatIpcHandler";
+import "./interface/ipc/CollectionIpcHandler";
+import "./interface/ipc/ConversationIpcHandler";
+import "./interface/ipc/DocumentIpcHandler";
+import "./interface/ipc/DocumentProcessorIpcHandler";
+import "./interface/ipc/RAGIpcHandler";
+import "./interface/ipc/SettingIpcHandler";
+import "./interface/ipc/SummaryIpcHandler";
+import "./interface/ipc/WindowActionIpcHandler";
 
 import { app, BrowserWindow, protocol, globalShortcut } from "electron";
 import path from "path";
 
 import syncDatabase from "./infrastructure/database/sync";
-import createDefaultConfigsIfNotExists from "./helpers/defaultConfigs";
+import createDefaultConfigsIfNotExists from "./interface/helpers/defaultConfigs";
 
 const isProd = process.env.NODE_ENV === "production";
 

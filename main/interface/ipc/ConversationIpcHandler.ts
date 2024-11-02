@@ -1,16 +1,16 @@
 import { ipcMain } from "electron";
 
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
-import { ConversationRepository } from "@infra/repositories/ConversationRepository.";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { ConversationRepositorySequelize } from "@infra/database/adapters/ConversationRepository";
 
-import { ChatService } from "@infra/services/Chat";
-import { OpenAIService } from "@infra/services/OpenAI";
-import { FormatResponseService } from "../services/FormatResponse";
+import { ChatService } from "@infra/services/ChatService";
+import { OpenAIService } from "@infra/services/OpenAIService";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 
-const settingRepository = new SettingRepository();
-const conversationRepository = new ConversationRepository();
+const settingRepository = new SettingRepositorySequelize();
+const conversationRepository = new ConversationRepositorySequelize();
 
 const openAIService = new OpenAIService(
     new OpenAIAdapter(settingRepository),
@@ -49,7 +49,7 @@ ipcMain.handle("getConversations", async (event) => {
 
 // Delete Conversation
 ipcMain.handle("deleteConversation", async (event, conversationId) => {
-    const conversationRepository = new ConversationRepository();
+    const conversationRepository = new ConversationRepositorySequelize();
 
     await conversationRepository.delete(conversationId);
 });

@@ -1,9 +1,9 @@
-import ITextChunkRepository from '@domain/repositories/TextChunkRepository';
+import ITextChunkRepository from "@domain/repositories/TextChunkRepository";
 import ITextChunk from "@domain/entities/TextChunk";
 import TextChunkModel from "@infra/database/models/TextChunkModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class TextChunkRepository implements ITextChunkRepository {
+export class TextChunkRepositorySequelize implements ITextChunkRepository {
     async create(textChunk: Partial<ITextChunk>): Promise<ITextChunk> {
         const chunk = await TextChunkModel.create(textChunk);
         return mapToEntity<ITextChunk>(chunk);

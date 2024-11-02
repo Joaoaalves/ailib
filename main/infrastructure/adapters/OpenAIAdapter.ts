@@ -4,7 +4,7 @@ import { Stream } from "openai/streaming";
 
 import IMessage from "@domain/entities/Message";
 
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 
 export interface IOpenAIService {
     getEmbeddings(text: string, model: string): Promise<number[]>;
@@ -17,7 +17,7 @@ export interface IOpenAIService {
 
 export class OpenAIAdapter implements IOpenAIService {
     private client: OpenAI;
-    constructor(private settingRepository: SettingRepository) {}
+    constructor(private settingRepository: SettingRepositorySequelize) {}
 
     async startClient(): Promise<void> {
         const apiKey = await this.settingRepository.findById("openaiAPIKey");

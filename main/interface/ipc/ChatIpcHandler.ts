@@ -3,18 +3,18 @@ import IMessage from "@domain/entities/Message";
 import { staticPrompts } from "@prompts/staticPrompts";
 import { Op } from "sequelize";
 
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
-import { TextChunkRepository } from "@infra/repositories/TextChunkRepository.";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
 
-import { QDrantService } from "../../infrastructure/services/QDrant";
-import { RAGService } from "../../infrastructure/services/RAG";
-import { OpenAIService } from "../../infrastructure/services/OpenAI";
+import { QDrantService } from "../../infrastructure/services/QDrantService";
+import { RAGService } from "../../infrastructure/services/RAGService";
+import { OpenAIService } from "../../infrastructure/services/OpenAIService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
-const settingRepository = new SettingRepository();
-const textChunkRepository = new TextChunkRepository();
+const settingRepository = new SettingRepositorySequelize();
+const textChunkRepository = new TextChunkRepositorySequelize();
 
 const openAIService = new OpenAIService(
     new OpenAIAdapter(settingRepository),

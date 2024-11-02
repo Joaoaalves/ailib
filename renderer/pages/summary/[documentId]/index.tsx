@@ -1,7 +1,7 @@
 "use client";
 import Layout from "@/components/Layout";
-import SummaryModelForm from "@/components/Summary/SummaryForm";
-import SummaryModelList from "@/components/Summary/SummaryList";
+import SummaryForm from "@/components/Summary/SummaryForm";
+import SummaryList from "@/components/Summary/SummaryList";
 import { DocumentSummaryProvider } from "@/contexts/SummaryProvider";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";

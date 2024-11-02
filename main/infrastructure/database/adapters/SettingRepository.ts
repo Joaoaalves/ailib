@@ -3,7 +3,7 @@ import ISettingRepository from "@domain/repositories/SettingRepository";
 import SettingModel from "@infra/database/models/SettingModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class SettingRepository implements ISettingRepository {
+export class SettingRepositorySequelize implements ISettingRepository {
     async create(setting: Partial<ISetting>) {
         const stt = await SettingModel.create(setting);
         return mapToEntity<ISetting>(stt);

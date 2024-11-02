@@ -1,6 +1,6 @@
 import IConversation from "@domain/entities/Conversation";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 import MessageModel from "./MessageModel";
 
 interface ConversationCreationAttributes

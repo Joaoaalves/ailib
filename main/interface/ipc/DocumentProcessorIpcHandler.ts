@@ -1,20 +1,20 @@
 import { ipcMain, IpcMainEvent } from "electron";
 
-import { TextChunkRepository } from "@infra/repositories/TextChunkRepository.";
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
-import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
+import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
 
-import { OpenAIService } from "@infra/services/OpenAI";
-import { QDrantService } from "@infra/services/QDrant";
+import { OpenAIService } from "@infra/services/OpenAIService";
+import { QDrantService } from "@infra/services/QDrantService";
 import { EventEmitterService } from "@infra/events/EventEmmiterService";
 
 import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import { FileProcesserService } from "@infra/services/FileProcesser";
 
-const documentRepository = new DocumentRepository();
-const settingRepository = new SettingRepository();
-const textChunkRepository = new TextChunkRepository();
+const documentRepository = new DocumentRepositorySequelize();
+const settingRepository = new SettingRepositorySequelize();
+const textChunkRepository = new TextChunkRepositorySequelize();
 
 const openAiService = new OpenAIService(
     new OpenAIAdapter(settingRepository),

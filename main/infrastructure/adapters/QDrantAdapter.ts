@@ -1,7 +1,7 @@
 import { QdrantClient } from "@qdrant/js-client-rest";
 import { v4 as uuid } from "uuid";
 
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 
 export type Metadata = {
     collectionId: number;
@@ -39,7 +39,7 @@ export class QDrantAdapter implements IQDrantService {
     private largeCollectionName = "AILib-Large";
     private smallCollectionName = "AILib-Small";
 
-    constructor(private settingRepository: SettingRepository) {}
+    constructor(private settingRepository: SettingRepositorySequelize) {}
 
     private async setQdrantCollection(): Promise<void> {
         const embeddingModel =
@@ -58,7 +58,7 @@ export class QDrantAdapter implements IQDrantService {
             const smallCollection = await this.client.collectionExists(
                 this.smallCollectionName,
             );
-            if (!smallCollectionModel.exists) {
+            if (!smallCollection.exists) {
                 await this.client.createCollection(this.smallCollectionName, {
                     vectors: {
                         size: 1536,
@@ -70,7 +70,7 @@ export class QDrantAdapter implements IQDrantService {
             const largeCollection = await this.client.collectionExists(
                 this.largeCollectionName,
             );
-            if (!largeCollectionModel.exists) {
+            if (!largeCollection.exists) {
                 await this.client.createCollection(this.largeCollectionName, {
                     vectors: {
                         size: 3072,

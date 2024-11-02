@@ -4,7 +4,7 @@ import CollectionModel from "@infra/database/models/CollectionModel";
 import DocumentModel from "@infra/database/models/DocumentModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class CollectionRepository implements ICollectionRepository {
+export class CollectionRepositorySequelize implements ICollectionRepository {
     async create(collection: Partial<ICollection>): Promise<ICollection> {
         const col = await CollectionModel.create(collection);
         return mapToEntity<ICollection>(col);
@@ -16,7 +16,9 @@ export class CollectionRepository implements ICollectionRepository {
     }
 
     async findAll(): Promise<ICollection[]> {
-        const collections = await CollectionModel.findAll({ include: DocumentModel });
+        const collections = await CollectionModel.findAll({
+            include: DocumentModel,
+        });
 
         return collections.map((collection) =>
             mapToEntity<ICollection>(collection),

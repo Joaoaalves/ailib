@@ -1,4 +1,4 @@
-import IMessage  from "./Message";
+import IMessage from "./Message";
 
 export default interface IPrompts {
     defaultChatInstruction: IMessage;

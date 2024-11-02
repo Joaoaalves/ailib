@@ -1,4 +1,4 @@
-import IPrompts  from "@domain/entities/Prompts";
+import IPrompts from "@domain/entities/Prompts";
 
 export const staticPrompts: IPrompts = {
     defaultChatInstruction: {

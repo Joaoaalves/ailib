@@ -1,20 +1,20 @@
 import { ipcMain } from "electron";
 
-import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
-import { TextChunkRepository } from "@infra/repositories/TextChunkRepository.";
+import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
-import { OpenAIService } from "../../infrastructure/services/OpenAI";
-import { RAGService } from "../../infrastructure/services/RAG";
-import { FormatResponseService } from "../services/FormatResponse";
-import { QDrantService } from "../../infrastructure/services/QDrant";
+import { OpenAIService } from "../../infrastructure/services/OpenAIService";
+import { RAGService } from "../../infrastructure/services/RAGService";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
+import { QDrantService } from "../../infrastructure/services/QDrantService";
 
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
-const documentRepository = new DocumentRepository();
-const textChunkRepository = new TextChunkRepository();
-const settingRepository = new SettingRepository();
+const documentRepository = new DocumentRepositorySequelize();
+const textChunkRepository = new TextChunkRepositorySequelize();
+const settingRepository = new SettingRepositorySequelize();
 
 const openAIService = new OpenAIService(
     new OpenAIAdapter(settingRepository),

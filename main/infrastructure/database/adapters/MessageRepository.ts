@@ -3,7 +3,7 @@ import IMessageRepository from "@domain/repositories/MessageRepository";
 import MessageModel from "@infra/database/models/MessageModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class MessageRepository implements IMessageRepository {
+export class MessageRepositorySequelize implements IMessageRepository {
     async create(message: Partial<IMessage>): Promise<IMessage> {
         const msg = await MessageModel.create(message);
         if (msg) return mapToEntity<IMessage>(msg);

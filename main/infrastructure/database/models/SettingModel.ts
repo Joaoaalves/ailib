@@ -1,6 +1,6 @@
 import ISetting from "@domain/entities/Setting";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 
 interface SettingCreationAttributes extends Optional<ISetting, "key"> {}
 

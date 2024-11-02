@@ -1,11 +1,11 @@
 import { ipcMain } from "electron";
 
-import { CollectionRepository } from "@infra/repositories/CollectionRepository";
+import { CollectionRepositorySequelize } from "@infra/database/adapters/CollectionRepository";
 
-import { FormatResponseService } from "../services/FormatResponse";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
 // Create a new Collection
-const collectionRepository = new CollectionRepository();
+const collectionRepository = new CollectionRepositorySequelize();
 
 ipcMain.handle("createCollection", async (event, collectionName: string) => {
     const collection = await collectionRepository.create({

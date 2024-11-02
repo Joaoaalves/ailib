@@ -1,6 +1,6 @@
 import ITextChunk from "@domain/entities/TextChunk";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 
 interface TextChunkCreationAttributes extends Optional<ITextChunk, "id"> {}
 

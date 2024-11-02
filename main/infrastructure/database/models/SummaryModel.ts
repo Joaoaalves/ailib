@@ -1,6 +1,6 @@
 import ISummary from "@domain/entities/Summary";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 
 interface SummaryCreationAttributes extends Optional<ISummary, "id"> {}
 

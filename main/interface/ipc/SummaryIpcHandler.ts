@@ -2,19 +2,19 @@ import { ipcMain, IpcMainEvent } from "electron";
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 
-import { SummaryRepository } from "@infra/repositories/SummaryRepository.";
-import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { SummaryRepositorySequelize } from "@infra/database/adapters/SummaryRepository";
+import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 
-import { OpenAIService } from "@infra/services/OpenAI";
-import { SummaryzerService } from "@infra/services/Summaryzer";
-import { FormatResponseService } from "../services/FormatResponse";
+import { OpenAIService } from "@infra/services/OpenAIService";
+import { SummaryzerService } from "@infra/services/SummaryzerService";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 
-const summaryRepository = new SummaryRepository();
-const documentRepository = new DocumentRepository();
-const settingRepository = new SettingRepository();
+const summaryRepository = new SummaryRepositorySequelize();
+const documentRepository = new DocumentRepositorySequelize();
+const settingRepository = new SettingRepositorySequelize();
 
 const openAIService = new OpenAIService(
     new OpenAIAdapter(settingRepository),
@@ -65,7 +65,7 @@ ipcMain.handle(
 
         writeStream.end();
 
-        const summaryRepository = new SummaryRepository();
+        const summaryRepository = new SummaryRepositorySequelize();
 
         const summary = await summaryRepository.create({
             title: summaryTitle,
@@ -88,7 +88,7 @@ ipcMain.handle("getSummaries", async (event) => {
 
 ipcMain.handle("getSummaryById", async (event, id) => {
     try {
-        const summaryRepository = new SummaryRepository();
+        const summaryRepository = new SummaryRepositorySequelize();
         const summary = await summaryRepository.findById(id);
 
         if (summary) {

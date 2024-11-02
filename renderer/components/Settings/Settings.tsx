@@ -7,7 +7,7 @@ import {
     DialogTrigger,
 } from "../ui/Dialog";
 import { CiSettings } from "react-icons/ci";
-import SettingModelsForm from "./SettingsForm";
+import SettingsForm from "./SettingsForm";
 
 export default function Settings({}) {
     const [open, setOpen] = useState<boolean>();

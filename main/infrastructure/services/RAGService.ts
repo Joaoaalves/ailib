@@ -5,7 +5,7 @@ import IMessage from "@domain/entities/Message";
 import {
     IResultRanker,
     ResultRanker,
-} from "@application/services/ResultRanker";
+} from "@infra/services/ResultRankerService";
 
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { IQDrantService } from "@infra/adapters/QDrantAdapter";

@@ -1,6 +1,6 @@
 import ICollection from "@domain/entities/Collection";
 import { DataTypes, Model, Optional } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 import DocumentModel from "./DocumentModel";
 
 interface CollectionAttributes {

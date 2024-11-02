@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import db from "@infra/database";
+import db from "@infra/database/database";
 
 const MessageModel = db.define("Message", {
     id: {

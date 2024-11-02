@@ -4,7 +4,9 @@ import ConversationModel from "@infra/database/models/ConversationModel";
 import MessageModel from "@infra/database/models/MessageModel";
 import { mapToEntity } from "@infra/utils/mapToEntity";
 
-export class ConversationRepository implements IConversationRepository {
+export class ConversationRepositorySequelize
+    implements IConversationRepository
+{
     async create(conversation: Partial<IConversation>): Promise<IConversation> {
         const cnvs = await ConversationModel.create(conversation);
         return mapToEntity<IConversation>(cnvs);

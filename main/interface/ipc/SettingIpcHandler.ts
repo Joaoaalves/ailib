@@ -1,10 +1,10 @@
 import { ipcMain } from "electron";
 
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 
-import { FormatResponseService } from "../services/FormatResponse";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
-const settingService = new SettingRepository();
+const settingService = new SettingRepositorySequelize();
 
 ipcMain.handle("updateSetting", async (event, id, value) => {
     try {

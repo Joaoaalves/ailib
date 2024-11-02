@@ -1,19 +1,19 @@
-import { StorageService } from "../../infrastructure/services/Storage";
+import { StorageService } from "../../infrastructure/services/StorageService";
 import { ipcMain, IpcMainEvent } from "electron";
 import IDocument from "@domain/entities/Document";
 
-import { DocumentRepository } from "@infra/repositories/DocumentRepository.";
-import { SettingRepository } from "@infra/repositories/SettingRepository.";
-import { CollectionRepository } from "@infra/repositories/CollectionRepository";
+import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
+import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { CollectionRepositorySequelize } from "@infra/database/adapters/CollectionRepository";
 
-import { FormatResponseService } from "../services/FormatResponse";
-import { QDrantService } from "@infra/services/QDrant";
+import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
+import { QDrantService } from "@infra/services/QDrantService";
 
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
-const documentRepository = new DocumentRepository();
-const collectionRepository = new CollectionRepository();
-const settingRepository = new SettingRepository();
+const documentRepository = new DocumentRepositorySequelize();
+const collectionRepository = new CollectionRepositorySequelize();
+const settingRepository = new SettingRepositorySequelize();
 
 const storageService = new StorageService();
 

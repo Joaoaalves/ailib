@@ -1,6 +1,6 @@
 import { IDocument } from "shared/types/document";
 import { ICollection } from "shared/types/collection";
-import DocumentModel from "@/components/Document/Document";
+import Document from "@/components/Document/Document";
 import { IoChatbubbleOutline } from "react-icons/io5";
 import { useRouter } from "next/navigation";
 

@@ -1,4 +1,4 @@
-import db from "./connection";
+import db from "./database";
 
 export default async function syncDatabase() {
     try {
