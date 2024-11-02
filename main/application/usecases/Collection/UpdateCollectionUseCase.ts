@@ -1,13 +1,4 @@
-import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import ICollection from "@domain/entities/Collection";
+import BaseUpdateUseCase from "../interfaces/BaseUpdateUseCase";
 
-export class UpdateCollectionUseCase {
-    constructor(private collectionRepository: ICollectionRepository) {}
-
-    async execute(
-        collectionId: number,
-        collectionData: Partial<ICollection>,
-    ): Promise<void> {
-        await this.collectionRepository.update(collectionId, collectionData);
-    }
-}
+export default class UpdateCollectionUseCase extends BaseUpdateUseCase<ICollection> {}

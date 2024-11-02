@@ -1,3 +1,4 @@
+import GetDocumentUseCase from "@application/usecases/Document/GetDocumentUseCase";
 import { ipcMain } from "electron";
 
 import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
@@ -25,6 +26,8 @@ const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
 const ragService = new RAGService(openAIService, qdrantService);
 
+const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
+
 ipcMain.handle("search", async (event, query) => {
     const embeddingModel = await settingRepository.findById("embeddingModel");
     const sqrModel = await settingRepository.findById(
@@ -45,7 +48,7 @@ ipcMain.handle("search", async (event, query) => {
 
     const RAGResult = await ragService.RAGFusion(embeddedQueries);
 
-    const document = await documentRepository.findById(
+    const document = await getDocumentUseCase.execute(
         parseInt(RAGResult[0].documentId),
     );
 

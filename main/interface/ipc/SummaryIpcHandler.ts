@@ -11,6 +11,7 @@ import { SummaryzerService } from "@infra/services/SummaryzerService";
 import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
+import AddSummaryToDocumentUseCase from "@application/usecases/Document/AddSumaryToDocumentUseCase";
 
 const summaryRepository = new SummaryRepositorySequelize();
 const documentRepository = new DocumentRepositorySequelize();
@@ -22,6 +23,10 @@ const openAIService = new OpenAIService(
 );
 
 const summaryzerService = new SummaryzerService(openAIService);
+
+const addSummaryToDocumentUseCase = new AddSummaryToDocumentUseCase(
+    documentRepository,
+);
 
 ipcMain.handle(
     "summarizePages",
@@ -65,15 +70,13 @@ ipcMain.handle(
 
         writeStream.end();
 
-        const summaryRepository = new SummaryRepositorySequelize();
-
         const summary = await summaryRepository.create({
             title: summaryTitle,
             path: outputPath,
             summaryType: "interval",
         });
 
-        await documentRepository.addSummary(documentId, summary.id);
+        await addSummaryToDocumentUseCase.execute(documentId, summary.id);
 
         event.sender.send("summary-complete");
         return FormatResponseService.formatToJson(summary);

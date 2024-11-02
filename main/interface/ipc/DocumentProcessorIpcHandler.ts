@@ -1,12 +1,13 @@
 import { ipcMain, IpcMainEvent } from "electron";
 
+import GetDocumentUseCase from "@application/usecases/Document/GetDocumentUseCase";
+
 import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
 
 import { OpenAIService } from "@infra/services/OpenAIService";
 import { QDrantService } from "@infra/services/QDrantService";
-import { EventEmitterService } from "@infra/events/EventEmmiterService";
 
 import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
@@ -16,14 +17,14 @@ const documentRepository = new DocumentRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
 
+const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
+
 const openAiService = new OpenAIService(
     new OpenAIAdapter(settingRepository),
     settingRepository,
 );
 
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
-
-const eventEmitterService = EventEmitterService.getInstance();
 
 ipcMain.handle(
     "processPdf",
@@ -43,7 +44,7 @@ ipcMain.handle(
 
         const embeddingModel =
             await settingRepository.findById("embeddingModel");
-        const document = await documentRepository.findById(documentId);
+        const document = await getDocumentUseCase.execute(documentId);
 
         if (!document) {
             return { error: "Document not found!" };

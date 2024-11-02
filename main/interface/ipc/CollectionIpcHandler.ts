@@ -1,8 +1,8 @@
 import { ipcMain } from "electron";
-import { CreateCollectionUseCase } from "@application/usecases/Collection/CreateCollectionUseCase";
-import { UpdateCollectionUseCase } from "@application/usecases/Collection/UpdateCollectionUseCase";
-import { DeleteCollectionUseCase } from "@application/usecases/Collection/DeleteCollectionUseCase";
-import { ListCollectionsUseCase } from "@application/usecases/Collection/ListCollectionsUseCase";
+import CreateCollectionUseCase from "@application/usecases/Collection/CreateCollectionUseCase";
+import UpdateCollectionUseCase from "@application/usecases/Collection/UpdateCollectionUseCase";
+import DeleteCollectionUseCase from "@application/usecases/Collection/DeleteCollectionUseCase";
+import ListCollectionsUseCase from "@application/usecases/Collection/ListCollectionsUseCase";
 
 import { CollectionRepositorySequelize } from "@infra/database/adapters/CollectionRepository";
 

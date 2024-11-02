@@ -1,10 +1,4 @@
-import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import ICollection from "@domain/entities/Collection";
+import BaseGetUseCase from "../interfaces/BaseGetUseCase";
 
-export class GetCollectionUseCase {
-    constructor(private collectionRepository: ICollectionRepository) {}
-
-    async execute(collectionId: number): Promise<ICollection> {
-        return await this.collectionRepository.findById(collectionId);
-    }
-}
+export default class GetCollectionUseCase extends BaseGetUseCase<ICollection> {}

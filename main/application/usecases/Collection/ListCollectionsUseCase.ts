@@ -1,10 +1,4 @@
-import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import ICollection from "@domain/entities/Collection";
+import BaseListUseCase from "../interfaces/BaseListUseCase";
 
-export class ListCollectionsUseCase {
-    constructor(private collectionRepository: ICollectionRepository) {}
-
-    async execute(): Promise<ICollection[]> {
-        return await this.collectionRepository.findAll();
-    }
-}
+export default class ListCollectionsUseCase extends BaseListUseCase<ICollection> {}

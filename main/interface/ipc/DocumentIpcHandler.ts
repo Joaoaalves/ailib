@@ -2,6 +2,12 @@ import { StorageService } from "../../infrastructure/services/StorageService";
 import { ipcMain, IpcMainEvent } from "electron";
 import IDocument from "@domain/entities/Document";
 
+import AddDocumentToCollectionUseCase from "@application/usecases/Collection/AddDocumentToCollectionUseCase";
+import CreateDocumentUseCase from "@application/usecases/Document/CreateDocumentUseCase";
+import GetDocumentUseCase from "@application/usecases/Document/GetDocumentUseCase";
+import UpdateDocumentUseCase from "@application/usecases/Document/UpdateDocumentUseCase";
+import DeleteDocumentUseCase from "@application/usecases/Document/DeleteDocumentUseCase";
+
 import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 import { CollectionRepositorySequelize } from "@infra/database/adapters/CollectionRepository";
@@ -18,6 +24,16 @@ const settingRepository = new SettingRepositorySequelize();
 const storageService = new StorageService();
 
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
+
+const addDocumentToCollectionUseCase = new AddDocumentToCollectionUseCase(
+    collectionRepository,
+);
+
+const createDocumentUseCase = new CreateDocumentUseCase(documentRepository);
+const updateDocumentUseCase = new UpdateDocumentUseCase(documentRepository);
+const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
+const deleteDocumentUseCase = new DeleteDocumentUseCase(documentRepository);
+
 // Create Document
 ipcMain.handle(
     "createDocument",
@@ -32,13 +48,16 @@ ipcMain.handle(
             name,
         );
 
-        const document = await documentRepository.create({
+        const document = await createDocumentUseCase.execute({
             name,
             path: storagePdfPath,
         });
 
         if (document) {
-            await collectionRepository.addDocument(collectionId, document.id);
+            await addDocumentToCollectionUseCase.execute(
+                collectionId,
+                document.id,
+            );
 
             return FormatResponseService.formatToJson(document);
         }
@@ -57,28 +76,28 @@ ipcMain.handle(
         documentId: number,
         updateFields: IDocument,
     ) => {
-        await documentRepository.update(documentId, updateFields);
+        await updateDocumentUseCase.execute(documentId, updateFields);
         return FormatResponseService.formatToJson(updateFields);
     },
 );
 
 // Get Document
 ipcMain.handle("getDocument", async (event, documentId) => {
-    const doc = await documentRepository.findById(documentId);
+    const doc = await getDocumentUseCase.execute(documentId);
 
     return FormatResponseService.formatToJson(doc);
 });
 
 // Delete Document
 ipcMain.handle("deleteDocument", async (event, documentId) => {
-    await documentRepository.delete(documentId);
+    await deleteDocumentUseCase.execute(documentId);
     await qdrantService.deletePointsForDocumentId(documentId);
 });
 
 ipcMain.handle(
     "saveCover",
     async (event: IpcMainEvent, documentId: number, cover: ArrayBuffer) => {
-        const doc = await documentRepository.findById(documentId);
+        const doc = await getDocumentUseCase.execute(documentId);
 
         if (doc) {
             const buffer = Buffer.from(cover);
@@ -90,7 +109,7 @@ ipcMain.handle(
 
             doc.cover = coverPath;
 
-            await documentRepository.update(documentId, doc);
+            await updateDocumentUseCase.execute(documentId, doc);
 
             return FormatResponseService.formatToJson(doc);
         }
@@ -103,10 +122,10 @@ ipcMain.handle(
 
 // Set Last Page Read
 ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
-    const document = await documentRepository.findById(documentId);
+    const document = await getDocumentUseCase.execute(documentId);
 
     if (document) {
         document.lastPageRead = page;
-        await documentRepository.update(documentId, document);
+        await updateDocumentUseCase.execute(documentId, document);
     }
 });

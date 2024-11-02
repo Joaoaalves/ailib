@@ -1,9 +1,4 @@
-import ICollectionRepository from "@domain/repositories/CollectionRepository";
+import BaseDeleteUseCase from "../interfaces/BaseDeleteUseCase";
+import ICollection from "@domain/entities/Collection";
 
-export class DeleteCollectionUseCase {
-    constructor(private collectionRepository: ICollectionRepository) {}
-
-    async execute(collectionId: number): Promise<void> {
-        await this.collectionRepository.delete(collectionId);
-    }
-}
+export default class DeleteCollectionUseCase extends BaseDeleteUseCase<ICollection> {}

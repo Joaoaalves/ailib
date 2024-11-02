@@ -1,6 +1,6 @@
 import ICollectionRepository from "@domain/repositories/CollectionRepository";
 
-export class AddDocumentToCollectionUseCase {
+export default class AddDocumentToCollectionUseCase {
     constructor(private collectionRepository: ICollectionRepository) {}
 
     async execute(collectionId: number, documentId: number): Promise<void> {
