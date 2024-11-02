@@ -2,6 +2,10 @@ import { ipcMain, IpcMainEvent } from "electron";
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
 import path from "path";
 
+import AddSummaryToDocumentUseCase from "@application/usecases/Document/AddSumaryToDocumentUseCase";
+import CreateSummaryUseCase from "@application/usecases/Summary/CreateSummaryUseCase";
+import ListSummarysUseCase from "@application/usecases/Summary/ListSummarysUseCase";
+
 import { SummaryRepositorySequelize } from "@infra/database/adapters/SummaryRepository";
 import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
@@ -11,7 +15,7 @@ import { SummaryzerService } from "@infra/services/SummaryzerService";
 import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
-import AddSummaryToDocumentUseCase from "@application/usecases/Document/AddSumaryToDocumentUseCase";
+import GetSummaryUseCase from "@application/usecases/Summary/GetSummaryUseCase";
 
 const summaryRepository = new SummaryRepositorySequelize();
 const documentRepository = new DocumentRepositorySequelize();
@@ -27,6 +31,9 @@ const summaryzerService = new SummaryzerService(openAIService);
 const addSummaryToDocumentUseCase = new AddSummaryToDocumentUseCase(
     documentRepository,
 );
+const createSummaryUseCase = new CreateSummaryUseCase(summaryRepository);
+const listSummarysUseCase = new ListSummarysUseCase(summaryRepository);
+const getSummaryUseCase = new GetSummaryUseCase(summaryRepository);
 
 ipcMain.handle(
     "summarizePages",
@@ -70,7 +77,7 @@ ipcMain.handle(
 
         writeStream.end();
 
-        const summary = await summaryRepository.create({
+        const summary = await createSummaryUseCase.execute({
             title: summaryTitle,
             path: outputPath,
             summaryType: "interval",
@@ -85,14 +92,14 @@ ipcMain.handle(
 
 ipcMain.handle("getSummaries", async (event) => {
     return FormatResponseService.formatToJson(
-        await summaryRepository.findAll(),
+        await listSummarysUseCase.execute(),
     );
 });
 
 ipcMain.handle("getSummaryById", async (event, id) => {
     try {
         const summaryRepository = new SummaryRepositorySequelize();
-        const summary = await summaryRepository.findById(id);
+        const summary = await getSummaryUseCase.execute(id);
 
         if (summary) {
             const data = readFileSync(summary.path, "utf-8");
