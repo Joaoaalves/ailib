@@ -12,18 +12,14 @@ import { OpenAIService } from "../../infrastructure/services/OpenAIService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
+import GetSettingUseCase from "@application/usecases/Setting/GetSettingUseCase";
 
 const settingRepository = new SettingRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
 
-const openAIService = new OpenAIService(
-    new OpenAIAdapter(settingRepository),
-    settingRepository,
-);
-
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
-const ragService = new RAGService(openAIService, qdrantService);
+const getSettingUseCase = new GetSettingUseCase(settingRepository);
 
 const documentFilter = (documentId: string) => {
     return {
@@ -66,72 +62,30 @@ async function streamChatStatus(
     });
 }
 
-async function isSQREnabled(): Promise<boolean> {
-    const sqrSetting = await settingRepository.findById(
-        "selfQueryRetrievalEnabled",
-    );
-
-    return sqrSetting.value == "true";
-}
-
-async function isHyDEEnabled(): Promise<boolean> {
-    const hydeSetting = await settingRepository.findById("hydeEnabled");
-
-    return hydeSetting.value == "true";
-}
-
 async function chat(
     event: IpcMainInvokeEvent,
     messages: IMessage[],
     filter: object,
 ) {
-    const sqrModel = await settingRepository.findById(
-        "selfQueryRetrievalModel",
+    const openaiApiKey = (await getSettingUseCase.execute("openaiAPIKey"))
+        .value;
+
+    const openAIService = new OpenAIService(
+        new OpenAIAdapter(openaiApiKey),
+        settingRepository,
     );
-    const hydeModel = await settingRepository.findById("hydeModel");
-    const embeddingModel = await settingRepository.findById("embeddingModel");
-    const conversationModel =
-        await settingRepository.findById("conversationModel");
+
+    const ragService = new RAGService(
+        openAIService,
+        qdrantService,
+        settingRepository,
+    );
+
+    streamChatStatus(event, "Searching for information over your library.");
 
     const userQuery = messages.at(-1).content;
-    let queries = [userQuery];
 
-    if (await isSQREnabled()) {
-        await streamChatStatus(event, "Doing Self Query Retrieval");
-
-        const relevantQueries = await ragService.generateQueries(
-            userQuery,
-            sqrModel.value,
-        );
-        queries.push(...relevantQueries.split(";"));
-    }
-
-    if (await isHyDEEnabled()) {
-        await streamChatStatus(event, "Doing Hypotethical Document Embeddings");
-
-        const hypotethicalDocuments = await Promise.all(
-            queries.map(async (query) => {
-                return ragService.createHypotheticalDocument(
-                    query,
-                    hydeModel.value,
-                );
-            }),
-        );
-
-        queries = hypotethicalDocuments;
-    }
-
-    const embeddedQueries = await Promise.all(
-        queries.map(async (query) => {
-            return ragService.embeddQuery(query, embeddingModel.value);
-        }),
-    );
-
-    const systemMessage = staticPrompts.defaultChatInstruction;
-
-    streamChatStatus(event, "Doing RAG Fusion");
-
-    ragService.RAGFusion(embeddedQueries, filter).then(async (result) => {
+    ragService.execute(userQuery, filter).then(async (result) => {
         streamChatStatus(event, "Sending best results to AI");
 
         const chunkIds = result.map((result) => result.chunkId);
@@ -153,11 +107,13 @@ async function chat(
             "\n---\nMensagem original do usuário:\n---\n" +
             lastMessage.content;
 
+        const systemMessage = staticPrompts.defaultChatInstruction;
+
         messages = [systemMessage, ...messages, lastMessage];
 
         const completionStream = await openAIService.chatStream(
             messages,
-            conversationModel.value,
+            (await settingRepository.findById("conversationModel")).value,
         );
 
         for await (const chunk of completionStream) {

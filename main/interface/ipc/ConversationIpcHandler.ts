@@ -19,12 +19,6 @@ import AddMessageToConversationUseCase from "@application/usecases/Message/AddMe
 const settingRepository = new SettingRepositorySequelize();
 const conversationRepository = new ConversationRepositorySequelize();
 
-const openAIService = new OpenAIService(
-    new OpenAIAdapter(settingRepository),
-    settingRepository,
-);
-
-const chatService = new ChatService(openAIService);
 const createConversationUseCase = new CreateConversationUseCase(
     conversationRepository,
 );
@@ -46,12 +40,17 @@ const addMessageToConversationUseCase = new AddMessageToConversationUseCase(
 
 // Create Conversation
 ipcMain.handle("createConversation", async (event, message) => {
-    const conversationModel =
-        await settingRepository.findById("conversationModel");
-    const title = await chatService.createChatTitle(
-        message,
-        conversationModel.value,
+    const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
+        .value;
+
+    const openAIService = new OpenAIService(
+        new OpenAIAdapter(openAiApiKey),
+        settingRepository,
     );
+
+    const chatService = new ChatService(openAIService, settingRepository);
+
+    const title = await chatService.createChatTitle(message);
 
     const conversation = createConversationUseCase.execute({ title });
 

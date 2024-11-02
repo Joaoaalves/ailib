@@ -4,8 +4,6 @@ import { Stream } from "openai/streaming";
 
 import IMessage from "@domain/entities/Message";
 
-import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
-
 export interface IOpenAIService {
     getEmbeddings(text: string, model: string): Promise<number[]>;
     chat(messages: IMessage[], model: string): Promise<string>;
@@ -17,11 +15,10 @@ export interface IOpenAIService {
 
 export class OpenAIAdapter implements IOpenAIService {
     private client: OpenAI;
-    constructor(private settingRepository: SettingRepositorySequelize) {}
+    constructor(private apiKey: string) {}
 
     async startClient(): Promise<void> {
-        const apiKey = await this.settingRepository.findById("openaiAPIKey");
-        this.client = new OpenAI({ apiKey: apiKey.value });
+        this.client = new OpenAI({ apiKey: this.apiKey });
     }
 
     async getEmbeddings(text: string, model: string): Promise<number[]> {

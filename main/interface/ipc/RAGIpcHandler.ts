@@ -17,26 +17,28 @@ const documentRepository = new DocumentRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
 
-const openAIService = new OpenAIService(
-    new OpenAIAdapter(settingRepository),
-    settingRepository,
-);
-
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
-
-const ragService = new RAGService(openAIService, qdrantService);
 
 const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
 
 ipcMain.handle("search", async (event, query) => {
+    const openAiApiKey = (await settingRepository.findById("openaiApiKey"))
+        .value;
+
+    const openAIService = new OpenAIService(
+        new OpenAIAdapter(openAiApiKey),
+        settingRepository,
+    );
+
+    const ragService = new RAGService(
+        openAIService,
+        qdrantService,
+        settingRepository,
+    );
+
     const embeddingModel = await settingRepository.findById("embeddingModel");
-    const sqrModel = await settingRepository.findById(
-        "selfQueryRetrievalModel",
-    );
-    const relevantQueries = await ragService.generateQueries(
-        query,
-        sqrModel.value,
-    );
+
+    const relevantQueries = await ragService.generateQueries(query);
 
     const queries = [query, ...relevantQueries];
 

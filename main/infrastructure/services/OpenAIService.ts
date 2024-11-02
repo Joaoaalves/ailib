@@ -24,14 +24,10 @@ export class OpenAIService {
     async chatStream(messages: IMessage[], model: string) {
         if (await this.checkAPIKey())
             return await this.openAIAdapter.chatStream(messages, model);
-
-        throw new Error("OpenAI API Key is not set.");
     }
 
     async chat(messages: IMessage[], model: string) {
         if (await this.checkAPIKey())
             return await this.openAIAdapter.chat(messages, model);
-
-        throw new Error("OpenAI API Key is not set.");
     }
 }

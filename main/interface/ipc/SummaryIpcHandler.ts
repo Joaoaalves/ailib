@@ -21,13 +21,6 @@ const summaryRepository = new SummaryRepositorySequelize();
 const documentRepository = new DocumentRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
 
-const openAIService = new OpenAIService(
-    new OpenAIAdapter(settingRepository),
-    settingRepository,
-);
-
-const summaryzerService = new SummaryzerService(openAIService);
-
 const addSummaryToDocumentUseCase = new AddSummaryToDocumentUseCase(
     documentRepository,
 );
@@ -43,6 +36,15 @@ ipcMain.handle(
         pages: string[],
         summaryTitle: string,
     ) => {
+        const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
+            .value;
+        const openAIService = new OpenAIService(
+            new OpenAIAdapter(openAiApiKey),
+            settingRepository,
+        );
+
+        const summaryzerService = new SummaryzerService(openAIService);
+
         const summaryModel = await settingRepository.findById("summaryModel");
         var lastSummary: string;
 

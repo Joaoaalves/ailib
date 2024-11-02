@@ -9,6 +9,7 @@ import {
 
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { IQDrantService } from "@infra/adapters/QDrantAdapter";
+import ISettingRepository from "@domain/repositories/SettingRepository";
 
 export interface IRAGService {
     createHypotheticalDocument(query: string, model: string): Promise<string>;
@@ -17,9 +18,11 @@ export interface IRAGService {
 
 export class RAGService implements IRAGService {
     private resultRankerService: IResultRanker = new ResultRanker();
+
     constructor(
         private openAIService: IOpenAIService,
         private qdrantService: IQDrantService,
+        private settingRepository: ISettingRepository,
     ) {}
 
     private createMessage(
@@ -32,27 +35,84 @@ export class RAGService implements IRAGService {
         };
     }
 
-    async createHypotheticalDocument(
-        query: string,
-        model: string,
-    ): Promise<string> {
+    private async isSQREnabled(): Promise<boolean> {
+        const sqrSetting = await this.settingRepository.findById(
+            "selfQueryRetrievalEnabled",
+        );
+
+        return sqrSetting.value == "true";
+    }
+
+    private async isHyDEEnabled(): Promise<boolean> {
+        const hydeSetting =
+            await this.settingRepository.findById("hydeEnabled");
+
+        return hydeSetting.value == "true";
+    }
+
+    private async getSQRModel(): Promise<string> {
+        return (
+            await this.settingRepository.findById("selfQueryRetrievalModel")
+        ).value;
+    }
+
+    private async getHyDEModel(): Promise<string> {
+        return (await this.settingRepository.findById("hydeModel")).value;
+    }
+
+    private async getEmbeddingModel(): Promise<string> {
+        return (await this.settingRepository.findById("embeddingModel")).value;
+    }
+
+    async execute(userQuery: string, filter: object) {
+        let queries = [userQuery];
+
+        this.generateQueries(userQuery).then((relevantQueries) => {
+            if (relevantQueries) {
+                queries.push(...relevantQueries.split(";"));
+            }
+        });
+
+        const hypotethicalDocuments = await Promise.all(
+            queries.map(async (query) =>
+                this.createHypotheticalDocument(query),
+            ),
+        );
+
+        if (hypotethicalDocuments) queries = hypotethicalDocuments;
+
+        const embeddedQueries = await Promise.all(
+            queries.map(async (query) => this.embeddQuery(query)),
+        );
+
+        return this.RAGFusion(embeddedQueries, filter);
+    }
+
+    async createHypotheticalDocument(query: string): Promise<string> {
+        if (!this.isHyDEEnabled()) return;
+
+        const hydeModel = await this.getHyDEModel();
+
         return await this.openAIService.chat(
             [staticPrompts.createHyDEInstruction, this.createMessage(query)],
-            model,
+            hydeModel,
         );
     }
 
-    async generateQueries(query: string, model: string): Promise<string> {
+    async generateQueries(query: string): Promise<string> {
+        if (!this.isSQREnabled()) return;
+
+        const sqrModel = await this.getSQRModel();
+
         return await this.openAIService.chat(
             [staticPrompts.queryCreationInstruction, this.createMessage(query)],
-            model,
+            sqrModel,
         );
     }
 
-    async embeddQuery(
-        query: string,
-        embeddingModel: string,
-    ): Promise<number[]> {
+    async embeddQuery(query: string): Promise<number[]> {
+        const embeddingModel = await this.getEmbeddingModel();
+
         return this.openAIService.getEmbeddings(query, embeddingModel);
     }
 

@@ -19,11 +19,6 @@ const textChunkRepository = new TextChunkRepositorySequelize();
 
 const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
 
-const openAiService = new OpenAIService(
-    new OpenAIAdapter(settingRepository),
-    settingRepository,
-);
-
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
 ipcMain.handle(
@@ -35,6 +30,14 @@ ipcMain.handle(
         collectionId: number,
         processCount: number,
     ) => {
+        const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
+            .value;
+
+        const openAiService = new OpenAIService(
+            new OpenAIAdapter(openAiApiKey),
+            settingRepository,
+        );
+
         const fileProcesserService = new FileProcesserService(
             openAiService,
             qdrantService,
