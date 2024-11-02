@@ -98,7 +98,6 @@ ipcMain.handle("getSummaries", async (event) => {
 
 ipcMain.handle("getSummaryById", async (event, id) => {
     try {
-        const summaryRepository = new SummaryRepositorySequelize();
         const summary = await getSummaryUseCase.execute(id);
 
         if (summary) {
