@@ -2,7 +2,7 @@ import ICollection from "@domain/entities/Collection";
 import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import CollectionModel from "@infra/database/models/CollectionModel";
 import DocumentModel from "@infra/database/models/DocumentModel";
-import { mapToEntity } from "@infra/utils/mapToEntity";
+import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class CollectionRepositorySequelize implements ICollectionRepository {
     async create(collection: Partial<ICollection>): Promise<ICollection> {

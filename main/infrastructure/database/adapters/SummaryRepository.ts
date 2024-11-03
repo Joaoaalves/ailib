@@ -1,7 +1,7 @@
 import ISummary from "@domain/entities/Summary";
 import ISummaryRepository from "@domain/repositories/SummaryRepository";
 import SummaryModel from "@infra/database/models/SummaryModel";
-import { mapToEntity } from "@infra/utils/mapToEntity";
+import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class SummaryRepositorySequelize implements ISummaryRepository {
     async create(summary: Partial<ISummary>): Promise<ISummary> {

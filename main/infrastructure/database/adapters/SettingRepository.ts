@@ -1,7 +1,7 @@
 import ISetting from "@domain/entities/Setting";
 import ISettingRepository from "@domain/repositories/SettingRepository";
 import SettingModel from "@infra/database/models/SettingModel";
-import { mapToEntity } from "@infra/utils/mapToEntity";
+import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class SettingRepositorySequelize implements ISettingRepository {
     async create(setting: Partial<ISetting>) {

@@ -6,6 +6,7 @@ import { EventsChannel } from "@infra/events/EventsChannel";
 
 import { IQDrantService, Metadata } from "../adapters/QDrantAdapter";
 import { IpcMainEvent } from "electron";
+import BaseCreateUseCase from "@application/interfaces/BaseCreateUseCase";
 
 export interface IFileProcesserService {
     processChunks(
@@ -22,7 +23,7 @@ export class FileProcesserService implements IFileProcesserService {
     constructor(
         private openAIService: IOpenAIService,
         private qdrantService: IQDrantService,
-        private textChunkRepository: ITextChunkRepository,
+        private createTextChunkUseCase: BaseCreateUseCase<ITextChunk>,
         mainEvent: IpcMainEvent["sender"],
     ) {
         this.eventEmitter.setSender(mainEvent);
@@ -38,7 +39,7 @@ export class FileProcesserService implements IFileProcesserService {
             for (let index = 0; index < chunks.length; index++) {
                 const chunk = chunks[index];
 
-                const textChunk = await this.textChunkRepository.create({
+                const textChunk = await this.createTextChunkUseCase.execute({
                     text: chunk,
                 });
 

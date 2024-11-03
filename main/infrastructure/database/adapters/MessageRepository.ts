@@ -1,7 +1,7 @@
 import IMessage from "@domain/entities/Message";
 import IMessageRepository from "@domain/repositories/MessageRepository";
 import MessageModel from "@infra/database/models/MessageModel";
-import { mapToEntity } from "@infra/utils/mapToEntity";
+import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class MessageRepositorySequelize implements IMessageRepository {
     async create(message: Partial<IMessage>): Promise<IMessage> {

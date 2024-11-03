@@ -2,7 +2,7 @@ import IConversation from "@domain/entities/Conversation";
 import IConversationRepository from "@domain/repositories/ConversationRepository";
 import ConversationModel from "@infra/database/models/ConversationModel";
 import MessageModel from "@infra/database/models/MessageModel";
-import { mapToEntity } from "@infra/utils/mapToEntity";
+import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class ConversationRepositorySequelize
     implements IConversationRepository

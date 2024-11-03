@@ -12,6 +12,7 @@ import { FormatResponseService } from "../../infrastructure/services/FormatRespo
 import { QDrantService } from "../../infrastructure/services/QDrantService";
 
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
+import GetTextChunkUseCase from "@application/usecases/TextChunk/GetTextChunkUseCase";
 
 const documentRepository = new DocumentRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
@@ -20,6 +21,8 @@ const settingRepository = new SettingRepositorySequelize();
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
 const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
+
+const getTextChunkUseCase = new GetTextChunkUseCase(textChunkRepository);
 
 ipcMain.handle("search", async (event, query) => {
     const openAiApiKey = (await settingRepository.findById("openaiApiKey"))
@@ -54,7 +57,7 @@ ipcMain.handle("search", async (event, query) => {
         parseInt(RAGResult[0].documentId),
     );
 
-    const textChunk = await textChunkRepository.findById(RAGResult[0].chunkId);
+    const textChunk = await getTextChunkUseCase.execute(RAGResult[0].chunkId);
 
     return FormatResponseService.formatToJson({
         content: textChunk.text,

@@ -10,7 +10,8 @@ export class ChatService {
     ) {}
 
     async getConversationModel(): Promise<string> {
-        return (await this.settingRepository.findById("openaiAPIKey")).value;
+        return (await this.settingRepository.findById("conversationModel"))
+            .value;
     }
 
     async createChatTitle(message: IMessage): Promise<string> {

@@ -51,9 +51,7 @@ ipcMain.handle("createConversation", async (event, message) => {
     const chatService = new ChatService(openAIService, settingRepository);
 
     const title = await chatService.createChatTitle(message);
-
     const conversation = createConversationUseCase.execute({ title });
-
     return FormatResponseService.formatToJson(conversation);
 });
 

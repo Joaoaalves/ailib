@@ -27,9 +27,10 @@ const DocumentSummaryProvider: React.FC<{ children: ReactNode }> = ({
             setProgress(data.progress);
         };
 
-        if (window.api.summary && window.api.summary.summary - progress) {
-            window.api.summary.summary -
-                progress(handleProgress, () => router.refresh());
+        if (window.api.summary && window.api.summary.summary_progress) {
+            window.api.summary.summary_progress(handleProgress, () =>
+                router.refresh(),
+            );
         }
     }, []);
 

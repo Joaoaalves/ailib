@@ -13,6 +13,7 @@ import { OpenAIService } from "../../infrastructure/services/OpenAIService";
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 import GetSettingUseCase from "@application/usecases/Setting/GetSettingUseCase";
+import ListTextChunksUseCase from "@application/usecases/TextChunk/ListTextChunksUseCase";
 
 const settingRepository = new SettingRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
@@ -20,6 +21,8 @@ const textChunkRepository = new TextChunkRepositorySequelize();
 const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
 const getSettingUseCase = new GetSettingUseCase(settingRepository);
+
+const listTextChunksUseCase = new ListTextChunksUseCase(textChunkRepository);
 
 const documentFilter = (documentId: string) => {
     return {
@@ -90,7 +93,7 @@ async function chat(
 
         const chunkIds = result.map((result) => result.chunkId);
 
-        const textChunks = await textChunkRepository.findAll({
+        const textChunks = await listTextChunksUseCase.execute({
             where: {
                 id: {
                     [Op.or]: chunkIds,

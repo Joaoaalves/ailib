@@ -12,6 +12,7 @@ import { QDrantService } from "@infra/services/QDrantService";
 import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import { FileProcesserService } from "@infra/services/FileProcesser";
+import CreateTextChunkUseCase from "@application/usecases/TextChunk/CreateTextChunkUseCase";
 
 const documentRepository = new DocumentRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
@@ -41,7 +42,7 @@ ipcMain.handle(
         const fileProcesserService = new FileProcesserService(
             openAiService,
             qdrantService,
-            textChunkRepository,
+            new CreateTextChunkUseCase(textChunkRepository),
             event.sender,
         );
 
