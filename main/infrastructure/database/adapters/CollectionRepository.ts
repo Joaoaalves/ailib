@@ -2,17 +2,17 @@ import ICollection from "@domain/entities/Collection";
 import ICollectionRepository from "@domain/repositories/CollectionRepository";
 import CollectionModel from "@infra/database/models/CollectionModel";
 import DocumentModel from "@infra/database/models/DocumentModel";
-import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
+import { EntityMapper } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class CollectionRepositorySequelize implements ICollectionRepository {
     async create(collection: Partial<ICollection>): Promise<ICollection> {
         const col = await CollectionModel.create(collection);
-        return mapToEntity<ICollection>(col);
+        return EntityMapper.mapToEntity<ICollection>(col);
     }
 
     async findById(id: number): Promise<ICollection | null> {
         const collection = await CollectionModel.findByPk(id);
-        return collection ? mapToEntity<ICollection>(collection) : null;
+        return collection ? EntityMapper.mapToEntity<ICollection>(collection) : null;
     }
 
     async findAll(): Promise<ICollection[]> {
@@ -21,7 +21,7 @@ export class CollectionRepositorySequelize implements ICollectionRepository {
         });
 
         return collections.map((collection) =>
-            mapToEntity<ICollection>(collection),
+            EntityMapper.mapToEntity<ICollection>(collection),
         );
     }
 

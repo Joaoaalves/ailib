@@ -2,17 +2,17 @@ import IDocument from "@domain/entities/Document";
 import IDocumentRepository from "@domain/repositories/DocumentRepository";
 import SummaryModel from "@infra/database/models/SummaryModel";
 import DocumentModel from "@infra/database/models/DocumentModel";
-import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
+import { EntityMapper } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class DocumentRepositorySequelize implements IDocumentRepository {
     async create(document: Partial<IDocument>): Promise<IDocument> {
         const doc = await DocumentModel.create(document);
-        return mapToEntity<IDocument>(doc);
+        return EntityMapper.mapToEntity<IDocument>(doc);
     }
 
     async findById(id: number): Promise<IDocument | null> {
         const doc = await DocumentModel.findByPk(id);
-        return mapToEntity<IDocument>(doc);
+        return EntityMapper.mapToEntity<IDocument>(doc);
     }
 
     async update(id: number, document: Partial<IDocument>): Promise<void> {

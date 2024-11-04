@@ -2,26 +2,26 @@ import IConversation from "@domain/entities/Conversation";
 import IConversationRepository from "@domain/repositories/ConversationRepository";
 import ConversationModel from "@infra/database/models/ConversationModel";
 import MessageModel from "@infra/database/models/MessageModel";
-import { mapToEntity } from "@infra/adapters/SequelizeReponseAdapter";
+import { EntityMapper } from "@infra/adapters/SequelizeReponseAdapter";
 
 export class ConversationRepositorySequelize
     implements IConversationRepository
 {
     async create(conversation: Partial<IConversation>): Promise<IConversation> {
         const cnvs = await ConversationModel.create(conversation);
-        return mapToEntity<IConversation>(cnvs);
+        return EntityMapper.mapToEntity<IConversation>(cnvs);
     }
 
     async findAll(): Promise<IConversation[]> {
         const conversations = await ConversationModel.findAll();
         return conversations.map((conversation) =>
-            mapToEntity<IConversation>(conversation),
+            EntityMapper.mapToEntity<IConversation>(conversation),
         );
     }
 
     async findById(conversationId: number): Promise<IConversation> {
         const conversation = await ConversationModel.findByPk(conversationId);
-        return mapToEntity<IConversation>(conversation);
+        return EntityMapper.mapToEntity<IConversation>(conversation);
     }
 
     async delete(conversationId: number): Promise<void> {
@@ -58,6 +58,6 @@ export class ConversationRepositorySequelize
             order: [["id", "ASC"]],
         });
 
-        return mapToEntity<IConversation>(conversation);
+        return EntityMapper.mapToEntity<IConversation>(conversation);
     }
 }
