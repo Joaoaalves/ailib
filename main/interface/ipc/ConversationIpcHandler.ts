@@ -66,7 +66,7 @@ ipcMain.handle("getConversationMessages", async (event, conversationId) => {
 // Get All Conversations
 ipcMain.handle("getConversations", async (event) => {
     const conversations = await listConversationsUseCase.execute();
-    return FormatResponseService.formatToJson(conversations);
+    return FormatResponseService.formatToJson(conversations.reverse());
 });
 
 // Delete Conversation
