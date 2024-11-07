@@ -8,10 +8,7 @@ interface SummaryInstance extends Model<ISummary, SummaryCreationAttributes> {
     id?: number;
     title: string;
     path: string;
-    summaryType: "page" | "chapter" | "file";
     page?: number;
-    chapter?: number;
-    createAt: Date;
 }
 
 const SummaryModel = db.define<SummaryInstance>(
@@ -30,21 +27,9 @@ const SummaryModel = db.define<SummaryInstance>(
             type: DataTypes.TEXT,
             allowNull: false,
         },
-        summaryType: {
-            type: DataTypes.ENUM("page", "chapter", "file", "interval"),
-            allowNull: false,
-        },
         page: {
             type: DataTypes.INTEGER,
             allowNull: true,
-        },
-        chapter: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        createdAt: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
         },
     },
     {

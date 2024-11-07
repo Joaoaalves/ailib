@@ -34,6 +34,7 @@ const CollectionModel = db.define<CollectionInstance>(
         timestamps: false,
     },
 );
+
 CollectionModel.hasMany(DocumentModel);
 
 export default CollectionModel;

@@ -1,7 +1,8 @@
-import IDocument from "@domain/entities/Document";
+import { IDocument } from "@domain/entities/Document";
 import { DataTypes, Model, Optional } from "sequelize";
 import db from "@infra/database/database";
 import SummaryModel from "./SummaryModel";
+import Summary from "@domain/entities/Summary";
 
 interface DocumentCreationAttributes extends Optional<IDocument, "id"> {}
 
@@ -13,6 +14,7 @@ interface DocumentInstance
     cover?: string;
     totalPages?: number;
     lastPageRead?: number;
+    addSummary(summary: Summary): Promise<void>;
 }
 
 const DocumentModel = db.define<DocumentInstance>(
@@ -52,7 +54,7 @@ const DocumentModel = db.define<DocumentInstance>(
 
 DocumentModel.hasMany(SummaryModel, {
     as: "summaries",
-    foreignKey: "DocumentModelId",
+    foreignKey: "DocumentId",
 });
 
 export default DocumentModel;

@@ -5,6 +5,9 @@ import { usePDFJS } from "@/hooks/use-pdfjs";
 import { Label } from "@/components/ui/Label";
 import InputGroup from "@/components/ui/InputGroup";
 import { useSummaryDocument } from "@/contexts/SummaryProvider";
+import { Button } from "../ui/Button";
+
+import { AiOutlineLoading } from "react-icons/ai";
 
 export default function SummaryForm({ documentId }) {
     const document = useRef<IDocument>();
@@ -101,12 +104,17 @@ export default function SummaryForm({ documentId }) {
                 </InputGroup>
             </div>
 
-            <Input
-                className="hover:bg-neutral-100 hover:text-black font-black text-md cursor-pointer transition-all duration-300"
+            <Button
+                className={`hover:bg-neutral-100 hover:text-black bg-black text-white shadow-[0px_0px_8px_2px_rgba(255,255,255,0.2)] font-black text-md cursor-pointer transition-all  w-full ${isSummaryzing ? "animate-pulse duration-2000" : "duration-300"}`}
                 type="submit"
-                value="Summarize"
                 disabled={isSummaryzing}
-            />
+            >
+                {isSummaryzing ? (
+                    <AiOutlineLoading className="animate-spin text-xl" />
+                ) : (
+                    "Summaryze"
+                )}
+            </Button>
         </form>
     );
 }

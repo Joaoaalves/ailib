@@ -23,7 +23,6 @@ const DocumentUploadProvider: React.FC<{ children: ReactNode }> = ({
 
     useEffect(() => {
         const handleProgress = (prog: number) => {
-            console.log(prog);
             setIsEmbedding(true);
             if (!progress || prog > progress) setProgress(prog);
         };

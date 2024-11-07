@@ -76,7 +76,7 @@ declare global {
                     summaryTitle: string,
                 ) => void;
                 summary_progress: (
-                    callback: (data) => void,
+                    callback: (progress: number) => void,
                     onEnd: () => void,
                 ) => void;
             };

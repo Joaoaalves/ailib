@@ -17,6 +17,8 @@ export class TextChunkRepositorySequelize implements ITextChunkRepository {
     async findAll(filter?: object): Promise<ITextChunk[]> {
         const chunks = await TextChunkModel.findAll(filter);
 
-        return chunks.map((chunk) => EntityMapper.mapToEntity<ITextChunk>(chunk));
+        return chunks.map((chunk) =>
+            EntityMapper.mapToEntity<ITextChunk>(chunk),
+        );
     }
 }

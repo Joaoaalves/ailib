@@ -11,7 +11,7 @@ import { QDrantService } from "@infra/services/QDrantService";
 
 import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
-import { FileProcesserService } from "@infra/services/FileProcesser";
+import { FileProcesserService } from "@infra/services/FileProcesserService";
 import CreateTextChunkUseCase from "@application/usecases/TextChunk/CreateTextChunkUseCase";
 
 const documentRepository = new DocumentRepositorySequelize();

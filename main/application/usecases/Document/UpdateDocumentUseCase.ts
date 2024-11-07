@@ -1,4 +1,20 @@
-import BaseUpdateUseCase from "../../interfaces/BaseUpdateUseCase";
-import IDocument from "@domain/entities/Document";
+import IDocumentRepository from "@domain/repositories/DocumentRepository";
+import { Document } from "@domain/entities/Document";
 
-export default class UpdateDocumentUseCase extends BaseUpdateUseCase<IDocument> {}
+export default class UpdateDocumentUseCase {
+    constructor(private documentRepository: IDocumentRepository) {}
+
+    async execute(id: number, data: Partial<Document>): Promise<void> {
+        const document = await this.documentRepository.findById(id);
+
+        if (!document) {
+            throw new Error("Document not found.");
+        }
+
+        if (data.lastPageRead !== undefined) {
+            document.setLastPageRead(data.lastPageRead);
+        }
+
+        await this.documentRepository.update(id, { ...document, ...data });
+    }
+}

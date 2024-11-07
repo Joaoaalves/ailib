@@ -1,5 +1,5 @@
 export class FormatResponseService {
-    static formatToJson(data: any): string {
-        return data;
+    static formatToJson(data: any): object {
+        return JSON.parse(JSON.stringify(data));
     }
 }

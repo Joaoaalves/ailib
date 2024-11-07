@@ -1,10 +1,19 @@
-export default interface ISummary {
+interface ISummary {
     id?: number;
     title: string;
     text?: string;
     path: string;
-    summaryType: "page" | "chapter" | "file" | "interval";
     page?: number;
-    chapter?: number;
-    createdAt: Date;
+}
+
+export default class Summary {
+    id?: number;
+    title: string;
+    text?: string;
+    path: string;
+    page?: number;
+
+    constructor(data: ISummary) {
+        Object.assign(this, data);
+    }
 }

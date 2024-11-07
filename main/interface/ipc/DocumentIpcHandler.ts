@@ -1,6 +1,6 @@
 import { StorageService } from "../../infrastructure/services/StorageService";
 import { ipcMain, IpcMainEvent } from "electron";
-import IDocument from "@domain/entities/Document";
+import { Document } from "@domain/entities/Document";
 
 import AddDocumentToCollectionUseCase from "@application/usecases/Collection/AddDocumentToCollectionUseCase";
 import CreateDocumentUseCase from "@application/usecases/Document/CreateDocumentUseCase";
@@ -9,21 +9,14 @@ import UpdateDocumentUseCase from "@application/usecases/Document/UpdateDocument
 import DeleteDocumentUseCase from "@application/usecases/Document/DeleteDocumentUseCase";
 
 import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRepository";
-import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 import { CollectionRepositorySequelize } from "@infra/database/adapters/CollectionRepository";
 
 import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
-import { QDrantService } from "@infra/services/QDrantService";
-
-import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
 
 const documentRepository = new DocumentRepositorySequelize();
 const collectionRepository = new CollectionRepositorySequelize();
-const settingRepository = new SettingRepositorySequelize();
 
 const storageService = new StorageService();
-
-const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
 
 const addDocumentToCollectionUseCase = new AddDocumentToCollectionUseCase(
     collectionRepository,
@@ -47,19 +40,17 @@ ipcMain.handle(
             path,
             name,
         );
+        const document = new Document({ name, path: storagePdfPath });
 
-        const document = await createDocumentUseCase.execute({
-            name,
-            path: storagePdfPath,
-        });
+        const createdDocument = await createDocumentUseCase.execute(document);
 
-        if (document) {
+        if (createdDocument) {
             await addDocumentToCollectionUseCase.execute(
                 collectionId,
-                document.id,
+                createdDocument.id,
             );
 
-            return FormatResponseService.formatToJson(document);
+            return FormatResponseService.formatToJson(createdDocument);
         }
 
         return FormatResponseService.formatToJson({
@@ -74,7 +65,7 @@ ipcMain.handle(
     async (
         event: IpcMainEvent,
         documentId: number,
-        updateFields: IDocument,
+        updateFields: Partial<Document>,
     ) => {
         await updateDocumentUseCase.execute(documentId, updateFields);
         return FormatResponseService.formatToJson(updateFields);
@@ -84,16 +75,25 @@ ipcMain.handle(
 // Get Document
 ipcMain.handle("getDocument", async (event, documentId) => {
     const doc = await getDocumentUseCase.execute(documentId);
-
     return FormatResponseService.formatToJson(doc);
 });
 
 // Delete Document
 ipcMain.handle("deleteDocument", async (event, documentId) => {
     await deleteDocumentUseCase.execute(documentId);
-    await qdrantService.deletePointsForDocumentId(documentId);
 });
 
+// Set Last Page Read
+ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
+    const document = await getDocumentUseCase.execute(documentId);
+
+    if (document) {
+        document.setLastPageRead(page);
+        await updateDocumentUseCase.execute(documentId, document);
+    }
+});
+
+// Save Cover
 ipcMain.handle(
     "saveCover",
     async (event: IpcMainEvent, documentId: number, cover: ArrayBuffer) => {
@@ -101,14 +101,12 @@ ipcMain.handle(
 
         if (doc) {
             const buffer = Buffer.from(cover);
-
             const coverPath = await storageService.saveCoverOnStorage(
                 buffer,
                 doc.name,
             );
 
-            doc.cover = coverPath;
-
+            doc.setCover(coverPath);
             await updateDocumentUseCase.execute(documentId, doc);
 
             return FormatResponseService.formatToJson(doc);
@@ -119,13 +117,3 @@ ipcMain.handle(
         };
     },
 );
-
-// Set Last Page Read
-ipcMain.handle("setLastPageReadSave", async (event, documentId, page) => {
-    const document = await getDocumentUseCase.execute(documentId);
-
-    if (document) {
-        document.lastPageRead = page;
-        await updateDocumentUseCase.execute(documentId, document);
-    }
-});

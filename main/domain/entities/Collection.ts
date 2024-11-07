@@ -1,7 +1,25 @@
-import IDocument from "@domain/entities/Document";
+import { Document } from "@domain/entities/Document";
 
-export default interface ICollection {
+interface ICollection {
     id: number;
     name: string;
-    documents?: IDocument[];
+    documents?: Document[];
+}
+
+export default class Collection {
+    id: number;
+    name: string;
+    documents?: Document[];
+
+    constructor(data: ICollection) {
+        Object.assign(this, data);
+    }
+
+    public addDocument(document: Document): void {
+        if (!this.documents) {
+            this.documents = [];
+        }
+
+        this.documents.push(document);
+    }
 }

@@ -1,4 +1,4 @@
-import IDocument from "@domain/entities/Document";
+import { Document } from "@domain/entities/Document";
 import BaseGetUseCase from "../../interfaces/BaseGetUseCase";
 
-export default class GetDocumentUseCase extends BaseGetUseCase<IDocument> {}
+export default class GetDocumentUseCase extends BaseGetUseCase<Document> {}

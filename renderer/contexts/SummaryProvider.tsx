@@ -22,9 +22,9 @@ const DocumentSummaryProvider: React.FC<{ children: ReactNode }> = ({
     const [progress, setProgress] = useState<number>(null);
 
     useEffect(() => {
-        const handleProgress = (data: { progress: number }) => {
+        const handleProgress = (progress: number) => {
             setIsSummaryzing(true);
-            setProgress(data.progress);
+            setProgress(progress);
         };
 
         if (window.api.summary && window.api.summary.summary_progress) {

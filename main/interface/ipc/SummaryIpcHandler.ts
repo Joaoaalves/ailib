@@ -1,6 +1,5 @@
 import { ipcMain, IpcMainEvent } from "electron";
-import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
-import path from "path";
+import { readFileSync } from "fs";
 
 import AddSummaryToDocumentUseCase from "@application/usecases/Document/AddSumaryToDocumentUseCase";
 import CreateSummaryUseCase from "@application/usecases/Summary/CreateSummaryUseCase";
@@ -16,6 +15,7 @@ import { FormatResponseService } from "../../infrastructure/services/FormatRespo
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import GetSummaryUseCase from "@application/usecases/Summary/GetSummaryUseCase";
+import { EventEmitterService } from "@infra/events/EventEmmiterService";
 
 const summaryRepository = new SummaryRepositorySequelize();
 const documentRepository = new DocumentRepositorySequelize();
@@ -27,6 +27,8 @@ const addSummaryToDocumentUseCase = new AddSummaryToDocumentUseCase(
 const createSummaryUseCase = new CreateSummaryUseCase(summaryRepository);
 const listSummarysUseCase = new ListSummarysUseCase(summaryRepository);
 const getSummaryUseCase = new GetSummaryUseCase(summaryRepository);
+
+const eventEmmiterService = EventEmitterService.getInstance();
 
 ipcMain.handle(
     "summarizePages",
@@ -43,51 +45,25 @@ ipcMain.handle(
             settingRepository,
         );
 
-        const summaryzerService = new SummaryzerService(openAIService);
+        const summaryzerService = new SummaryzerService(
+            openAIService,
+            event.sender,
+        );
 
         const summaryModel = await settingRepository.findById("summaryModel");
-        var lastSummary: string;
 
-        const outputDir = path.join(
-            __dirname,
-            `/storage/summaries/${documentId}`,
-        );
-        const outputPath = path.join(outputDir, `${summaryTitle}.txt`);
+        summaryzerService.setOutpuDir(documentId);
+        summaryzerService.setOutputPath(summaryTitle);
 
-        if (!existsSync(outputDir)) {
-            mkdirSync(outputDir, { recursive: true });
-        }
-
-        var writeStream = createWriteStream(outputPath, { flags: "a" });
-
-        for (let i = 0; i < pages.length; i += 4) {
-            const startingPage = i;
-            const endingPage = Math.min(pages.length, i + 4);
-
-            lastSummary = await summaryzerService.summarizePages(
-                pages.slice(startingPage, endingPage),
-                lastSummary,
-                summaryModel.value,
-            );
-
-            event.sender.send("summary-progress", {
-                progress: (endingPage * 100) / pages.length,
-            });
-
-            writeStream.write(lastSummary + "\n\n");
-        }
-
-        writeStream.end();
+        await summaryzerService.summaryze(pages, summaryModel.value);
 
         const summary = await createSummaryUseCase.execute({
             title: summaryTitle,
-            path: outputPath,
-            summaryType: "interval",
+            path: summaryzerService.getOutputPath(),
         });
 
         await addSummaryToDocumentUseCase.execute(documentId, summary.id);
 
-        event.sender.send("summary-complete");
         return FormatResponseService.formatToJson(summary);
     },
 );

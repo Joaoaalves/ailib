@@ -12,7 +12,9 @@ export class SummaryRepositorySequelize implements ISummaryRepository {
     async findAll(): Promise<ISummary[]> {
         const summarys = await SummaryModel.findAll();
 
-        return summarys.map((summary) => EntityMapper.mapToEntity<ISummary>(summary));
+        return summarys.map((summary) =>
+            EntityMapper.mapToEntity<ISummary>(summary),
+        );
     }
 
     async findById(id: number): Promise<ISummary | null> {

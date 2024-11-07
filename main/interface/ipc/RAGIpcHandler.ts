@@ -5,13 +5,13 @@ import { DocumentRepositorySequelize } from "@infra/database/adapters/DocumentRe
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
 
-import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
-import { OpenAIService } from "../../infrastructure/services/OpenAIService";
-import { RAGService } from "../../infrastructure/services/RAGService";
-import { FormatResponseService } from "../../infrastructure/services/FormatResponseService";
-import { QDrantService } from "../../infrastructure/services/QDrantService";
+import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
+import { OpenAIService } from "@infra/services/OpenAIService";
+import { RAGService } from "@infra/services/RAGService";
+import { FormatResponseService } from "@infra/services/FormatResponseService";
+import { QDrantService } from "@infra/services/QDrantService";
 
-import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
+import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import GetTextChunkUseCase from "@application/usecases/TextChunk/GetTextChunkUseCase";
 
 const documentRepository = new DocumentRepositorySequelize();

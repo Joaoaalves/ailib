@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import ICollection from "@domain/entities/Collection";
 import { IChatStatus, IMessage } from "shared/types/conversation";
-import IDocument from "@domain/entities/Document";
+import { Document } from "@domain/entities/Document";
 import { RankedSearchResult } from "shared/types/qdrant";
 
 const handler = {
@@ -27,7 +27,7 @@ contextBridge.exposeInMainWorld("api", {
             ipcRenderer.invoke("createDocument", name, path, collectionId),
         get: (documentId: string) =>
             ipcRenderer.invoke("getDocument", documentId),
-        update: async (documentId: number, updateFields: IDocument) =>
+        update: async (documentId: number, updateFields: Document) =>
             ipcRenderer.invoke("updateDocument", documentId, updateFields),
         delete: (documentId: number) =>
             ipcRenderer.invoke("deleteDocument", documentId),
