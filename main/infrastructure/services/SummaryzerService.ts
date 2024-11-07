@@ -16,7 +16,7 @@ export interface ISummaryzerService {
     setOutpuDir(documentId: number): void;
     setOutputPath(title: string): void;
     getOutputPath(): any;
-    summaryze(pages: string[], model: string): Promise<void>;
+    summaryze(pages: string[]): Promise<void>;
 }
 
 export class SummaryzerService implements ISummaryzerService {
@@ -32,7 +32,7 @@ export class SummaryzerService implements ISummaryzerService {
         this.eventEmitterService.setSender(mainEvent);
     }
 
-    async summaryze(pages: string[], model: string): Promise<void> {
+    async summaryze(pages: string[]): Promise<void> {
         this.eventEmitterService.emitProgress(
             EventsChannel.SUMMARY_PROGRESS,
             0,
@@ -49,7 +49,6 @@ export class SummaryzerService implements ISummaryzerService {
             lastSummary = await this.summarizePages(
                 pages.slice(startingPage, endingPage),
                 lastSummary,
-                model,
             );
 
             this.eventEmitterService.emitProgress(
@@ -81,7 +80,6 @@ export class SummaryzerService implements ISummaryzerService {
     private async summarizePages(
         pages: string[],
         lastSummary: string,
-        model: string,
     ): Promise<string | null> {
         try {
             const userMessage = this.createMessage(
@@ -90,10 +88,10 @@ export class SummaryzerService implements ISummaryzerService {
                     lastSummary,
             );
 
-            const content = await this.openAIService.chat(
-                [staticPrompts.summaryCreationInstruction, userMessage],
-                model,
-            );
+            const content = await this.openAIService.chat([
+                staticPrompts.summaryCreationInstruction,
+                userMessage,
+            ]);
             return content;
         } catch (error) {
             throw error;

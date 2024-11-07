@@ -51,6 +51,12 @@ contextBridge.exposeInMainWorld("api", {
         getAll: () => ipcRenderer.invoke("getConversations"),
         create: (message: IMessage) =>
             ipcRenderer.invoke("createConversation", message),
+        createTitle: (message: IMessage, conversationId: number) =>
+            ipcRenderer.invoke(
+                "createConversationTitle",
+                message,
+                conversationId,
+            ),
         delete: (conversationId: number) =>
             ipcRenderer.invoke("deleteConversation", conversationId),
         saveMessage: (conversationId: number, message: IMessage) =>

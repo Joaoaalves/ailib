@@ -1,7 +1,8 @@
+import { ChatService } from "@infra/services/ChatService";
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import IMessage from "@domain/entities/Message";
-import { staticPrompts } from "@prompts/staticPrompts";
-import { Op } from "sequelize";
+
+import ListTextChunksUseCase from "@application/usecases/TextChunk/ListTextChunksUseCase";
 
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
 import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunkRepository";
@@ -9,18 +10,16 @@ import { TextChunkRepositorySequelize } from "@infra/database/adapters/TextChunk
 import { QDrantService } from "../../infrastructure/services/QDrantService";
 import { RAGService } from "../../infrastructure/services/RAGService";
 import { OpenAIService } from "../../infrastructure/services/OpenAIService";
+import { SettingService } from "@infra/services/SettingService";
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "../../infrastructure/adapters/QDrantAdapter";
-import GetSettingUseCase from "@application/usecases/Setting/GetSettingUseCase";
-import ListTextChunksUseCase from "@application/usecases/TextChunk/ListTextChunksUseCase";
 
 const settingRepository = new SettingRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
 
-const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
-
-const getSettingUseCase = new GetSettingUseCase(settingRepository);
+const settingService = new SettingService(settingRepository);
+const qdrantService = new QDrantService(new QDrantAdapter(settingService));
 
 const listTextChunksUseCase = new ListTextChunksUseCase(textChunkRepository);
 
@@ -54,85 +53,41 @@ const collectionFilter = (collectionId: number) => {
     };
 };
 
-async function streamChatStatus(
-    event: IpcMainInvokeEvent,
-    message: string,
-    isLoading: boolean = true,
-) {
-    return event.sender.send("chat-stream", {
-        isLoading,
-        message,
-    });
-}
-
 async function chat(
     event: IpcMainInvokeEvent,
     messages: IMessage[],
     filter: object,
 ) {
-    const openaiApiKey = (await getSettingUseCase.execute("openaiAPIKey"))
-        .value;
+    const openaiApiKey = await settingService.getOpenAIApiKey();
+    const conversationModel = await settingService.getConversationModel();
+    const embeddingModel = await settingService.getEmbeddingModel();
 
-    const openAIService = new OpenAIService(
-        new OpenAIAdapter(openaiApiKey),
-        settingRepository,
-    );
+    const openAIAdapater = new OpenAIAdapter(openaiApiKey);
+    openAIAdapater.setConversationModel(conversationModel);
+    openAIAdapater.setEmbeddingModel(embeddingModel);
+
+    const openAIService = new OpenAIService(openAIAdapater, settingService);
 
     const ragService = new RAGService(
         openAIService,
         qdrantService,
-        settingRepository,
+        settingService,
     );
 
-    streamChatStatus(event, "Searching for information over your library.");
+    const chatService = new ChatService(openAIService, event.sender);
 
-    const userQuery = messages.at(-1).content;
-
-    ragService.execute(userQuery, filter).then(async (result) => {
-        streamChatStatus(event, "Sending best results to AI");
-
-        const chunkIds = result.map((result) => result.chunkId);
-
-        const textChunks = await listTextChunksUseCase.execute({
-            where: {
-                id: {
-                    [Op.or]: chunkIds,
-                },
-            },
-            attributes: ["text"],
-        });
-
-        const lastMessage = messages.pop();
-
-        lastMessage.content =
-            "Contexto:\n---\n" +
-            JSON.stringify(textChunks) +
-            "\n---\nMensagem original do usuário:\n---\n" +
-            lastMessage.content;
-
-        const systemMessage = staticPrompts.defaultChatInstruction;
-
-        messages = [systemMessage, ...messages, lastMessage];
-
-        const completionStream = await openAIService.chatStream(
-            messages,
-            (await settingRepository.findById("conversationModel")).value,
-        );
-
-        for await (const chunk of completionStream) {
-            event.sender.send("chat-stream", chunk);
-        }
-
-        event.sender.send("chat-stream-end");
-
-        await streamChatStatus(event, "", false);
-    });
+    await chatService.chatStream(
+        messages,
+        filter,
+        ragService,
+        listTextChunksUseCase,
+    );
 }
 
 ipcMain.handle("chatWithCollection", async (event, messages, collectionId) => {
-    await chat(event, messages, collectionFilter);
+    await chat(event, messages, collectionFilter(collectionId));
 });
 
 ipcMain.handle("chatWithDocument", async (event, messages, documentId) => {
-    await chat(event, messages, documentFilter);
+    await chat(event, messages, documentFilter(documentId));
 });

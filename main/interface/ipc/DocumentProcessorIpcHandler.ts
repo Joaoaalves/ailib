@@ -13,6 +13,7 @@ import { OpenAIAdapter } from "@infra/adapters/OpenAIAdapter";
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import { FileProcesserService } from "@infra/services/FileProcesserService";
 import CreateTextChunkUseCase from "@application/usecases/TextChunk/CreateTextChunkUseCase";
+import { SettingService } from "@infra/services/SettingService";
 
 const documentRepository = new DocumentRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
@@ -20,7 +21,8 @@ const textChunkRepository = new TextChunkRepositorySequelize();
 
 const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
 
-const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
+const settingService = new SettingService(settingRepository);
+const qdrantService = new QDrantService(new QDrantAdapter(settingService));
 
 ipcMain.handle(
     "processPdf",
@@ -31,13 +33,13 @@ ipcMain.handle(
         collectionId: number,
         processCount: number,
     ) => {
-        const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
-            .value;
+        const openAiApiKey = await settingService.getOpenAIApiKey();
+        const embeddingModel = await settingService.getEmbeddingModel();
 
-        const openAiService = new OpenAIService(
-            new OpenAIAdapter(openAiApiKey),
-            settingRepository,
-        );
+        const openAIAdapter = new OpenAIAdapter(openAiApiKey);
+        openAIAdapter.setEmbeddingModel(embeddingModel);
+
+        const openAiService = new OpenAIService(openAIAdapter, settingService);
 
         const fileProcesserService = new FileProcesserService(
             openAiService,
@@ -46,8 +48,6 @@ ipcMain.handle(
             event.sender,
         );
 
-        const embeddingModel =
-            await settingRepository.findById("embeddingModel");
         const document = await getDocumentUseCase.execute(documentId);
 
         if (!document) {
@@ -68,16 +68,11 @@ ipcMain.handle(
         await Promise.all(
             intervals.map((pages, index) => {
                 const offset = index * chunkSize;
-                return fileProcesserService.processChunks(
-                    pages,
-                    offset,
-                    {
-                        collectionId,
-                        bookName: document.name,
-                        documentId: document.id,
-                    },
-                    embeddingModel.value,
-                );
+                return fileProcesserService.processChunks(pages, offset, {
+                    collectionId,
+                    bookName: document.name,
+                    documentId: document.id,
+                });
             }),
         );
 

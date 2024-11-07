@@ -29,12 +29,7 @@ export class FileProcesserService implements IFileProcesserService {
         this.eventEmitter.setSender(mainEvent);
     }
 
-    async processChunks(
-        chunks: string[],
-        offset: number,
-        metadata: Metadata,
-        embeddingModel: string,
-    ) {
+    async processChunks(chunks: string[], offset: number, metadata: Metadata) {
         try {
             for (let index = 0; index < chunks.length; index++) {
                 const chunk = chunks[index];
@@ -45,10 +40,7 @@ export class FileProcesserService implements IFileProcesserService {
 
                 const chunkParts = this.splitChunkSemantically(chunk, 5);
 
-                const embeddings = await this.embeddChunks(
-                    chunkParts,
-                    embeddingModel,
-                );
+                const embeddings = await this.embeddChunks(chunkParts);
 
                 this.emitProgress(index, chunks.length);
 
@@ -71,10 +63,10 @@ export class FileProcesserService implements IFileProcesserService {
         );
     }
 
-    private async embeddChunks(chunks: string[], model: string) {
+    private async embeddChunks(chunks: string[]) {
         return Promise.all(
             chunks.map(async (chunk) => {
-                return await this.openAIService.getEmbeddings(chunk, model);
+                return await this.openAIService.getEmbeddings(chunk);
             }),
         );
     }

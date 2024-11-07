@@ -15,7 +15,7 @@ import { FormatResponseService } from "../../infrastructure/services/FormatRespo
 
 import { OpenAIAdapter } from "../../infrastructure/adapters/OpenAIAdapter";
 import GetSummaryUseCase from "@application/usecases/Summary/GetSummaryUseCase";
-import { EventEmitterService } from "@infra/events/EventEmmiterService";
+import { SettingService } from "@infra/services/SettingService";
 
 const summaryRepository = new SummaryRepositorySequelize();
 const documentRepository = new DocumentRepositorySequelize();
@@ -28,7 +28,7 @@ const createSummaryUseCase = new CreateSummaryUseCase(summaryRepository);
 const listSummarysUseCase = new ListSummarysUseCase(summaryRepository);
 const getSummaryUseCase = new GetSummaryUseCase(summaryRepository);
 
-const eventEmmiterService = EventEmitterService.getInstance();
+const settingService = new SettingService(settingRepository);
 
 ipcMain.handle(
     "summarizePages",
@@ -38,11 +38,15 @@ ipcMain.handle(
         pages: string[],
         summaryTitle: string,
     ) => {
-        const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
-            .value;
+        const openAiApiKey = await settingService.getOpenAIApiKey();
+        const summaryModel = await settingService.getConversationModel();
+
+        const openAIAdapter = new OpenAIAdapter(openAiApiKey);
+        openAIAdapter.setConversationModel(summaryModel);
+
         const openAIService = new OpenAIService(
             new OpenAIAdapter(openAiApiKey),
-            settingRepository,
+            settingService,
         );
 
         const summaryzerService = new SummaryzerService(
@@ -50,12 +54,10 @@ ipcMain.handle(
             event.sender,
         );
 
-        const summaryModel = await settingRepository.findById("summaryModel");
-
         summaryzerService.setOutpuDir(documentId);
         summaryzerService.setOutputPath(summaryTitle);
 
-        await summaryzerService.summaryze(pages, summaryModel.value);
+        await summaryzerService.summaryze(pages);
 
         const summary = await createSummaryUseCase.execute({
             title: summaryTitle,

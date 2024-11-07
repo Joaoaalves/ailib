@@ -1,33 +1,39 @@
 import IMessage from "@domain/entities/Message";
 
-import ISettingRepository from "@domain/repositories/SettingRepository";
-
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
+import { ISettingService } from "./SettingService";
 
-export class OpenAIService {
+export class OpenAIService implements IOpenAIService {
     constructor(
         private openAIAdapter: IOpenAIService,
-        private settingRepository: ISettingRepository,
+        private settingService: ISettingService,
     ) {}
 
     private async checkAPIKey() {
-        return await this.settingRepository.findById("openaiAPIKey");
+        return await this.settingService.getOpenAIApiKey;
     }
 
-    async getEmbeddings(text: string, model: string) {
-        if (await this.checkAPIKey())
-            return await this.openAIAdapter.getEmbeddings(text, model);
+    async getEmbeddings(text: string) {
+        if (await this.checkAPIKey()) {
+            return await this.openAIAdapter.getEmbeddings(text);
+        }
 
         throw new Error("OpenAI API Key is not set.");
     }
 
-    async chatStream(messages: IMessage[], model: string) {
-        if (await this.checkAPIKey())
-            return await this.openAIAdapter.chatStream(messages, model);
+    async chatStream(messages: IMessage[]) {
+        if (await this.checkAPIKey()) {
+            return await this.openAIAdapter.chatStream(messages);
+        }
+
+        throw new Error("OpenAI API Key is not set.");
     }
 
-    async chat(messages: IMessage[], model: string) {
-        if (await this.checkAPIKey())
-            return await this.openAIAdapter.chat(messages, model);
+    async chat(messages: IMessage[]) {
+        if (await this.checkAPIKey()) {
+            return await this.openAIAdapter.chat(messages);
+        }
+
+        throw new Error("OpenAI API Key is not set.");
     }
 }

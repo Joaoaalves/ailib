@@ -12,6 +12,18 @@ export class ConversationRepositorySequelize
         return EntityMapper.mapToEntity<IConversation>(cnvs);
     }
 
+    async update(
+        conversationId: number,
+        data: Partial<IConversation>,
+    ): Promise<void> {
+        const cnvs = await ConversationModel.findByPk(conversationId);
+        if (cnvs) {
+            cnvs.title = data.title;
+
+            await cnvs.save();
+        }
+    }
+
     async findAll(): Promise<IConversation[]> {
         const conversations = await ConversationModel.findAll();
         return conversations.map((conversation) =>
@@ -21,7 +33,9 @@ export class ConversationRepositorySequelize
 
     async findById(conversationId: number): Promise<IConversation> {
         const conversation = await ConversationModel.findByPk(conversationId);
-        return EntityMapper.mapToEntity<IConversation>(conversation);
+
+        if (conversation)
+            return EntityMapper.mapToEntity<IConversation>(conversation);
     }
 
     async delete(conversationId: number): Promise<void> {
@@ -58,6 +72,7 @@ export class ConversationRepositorySequelize
             order: [["id", "ASC"]],
         });
 
-        return EntityMapper.mapToEntity<IConversation>(conversation);
+        if (conversation)
+            return EntityMapper.mapToEntity<IConversation>(conversation);
     }
 }

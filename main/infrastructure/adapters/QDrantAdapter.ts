@@ -2,6 +2,7 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { v4 as uuid } from "uuid";
 
 import { SettingRepositorySequelize } from "@infra/database/adapters/SettingRepository";
+import { ISettingService } from "@infra/services/SettingService";
 
 export type Metadata = {
     collectionId: number;
@@ -39,13 +40,12 @@ export class QDrantAdapter implements IQDrantService {
     private largeCollectionName = "AILib-Large";
     private smallCollectionName = "AILib-Small";
 
-    constructor(private settingRepository: SettingRepositorySequelize) {}
+    constructor(private settingService: ISettingService) {}
 
     private async setQdrantCollection(): Promise<void> {
-        const embeddingModel =
-            await this.settingRepository.findById("embeddingModel");
+        const embeddingModel = await this.settingService.getEmbeddingModel();
 
-        if (embeddingModel.value == "text-embedding-3-large") {
+        if (embeddingModel == "text-embedding-3-large") {
             this.qdrantCollection = this.largeCollectionName;
             return;
         }

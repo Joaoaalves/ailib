@@ -9,11 +9,12 @@ import {
 
 import { IOpenAIService } from "@infra/adapters/OpenAIAdapter";
 import { IQDrantService } from "@infra/adapters/QDrantAdapter";
-import ISettingRepository from "@domain/repositories/SettingRepository";
+import { ISettingService } from "./SettingService";
 
 export interface IRAGService {
     createHypotheticalDocument(query: string, model: string): Promise<string>;
     generateQueries(query: string, model: string): Promise<string>;
+    execute(userQuery: string, filter: object);
 }
 
 export class RAGService implements IRAGService {
@@ -22,7 +23,7 @@ export class RAGService implements IRAGService {
     constructor(
         private openAIService: IOpenAIService,
         private qdrantService: IQDrantService,
-        private settingRepository: ISettingRepository,
+        private settingService: ISettingService,
     ) {}
 
     private createMessage(
@@ -36,32 +37,11 @@ export class RAGService implements IRAGService {
     }
 
     private async isSQREnabled(): Promise<boolean> {
-        const sqrSetting = await this.settingRepository.findById(
-            "selfQueryRetrievalEnabled",
-        );
-
-        return sqrSetting.value == "true";
+        return (await this.settingService.sqrEnabled()) == "true";
     }
 
     private async isHyDEEnabled(): Promise<boolean> {
-        const hydeSetting =
-            await this.settingRepository.findById("hydeEnabled");
-
-        return hydeSetting.value == "true";
-    }
-
-    private async getSQRModel(): Promise<string> {
-        return (
-            await this.settingRepository.findById("selfQueryRetrievalModel")
-        ).value;
-    }
-
-    private async getHyDEModel(): Promise<string> {
-        return (await this.settingRepository.findById("hydeModel")).value;
-    }
-
-    private async getEmbeddingModel(): Promise<string> {
-        return (await this.settingRepository.findById("embeddingModel")).value;
+        return (await this.settingService.hydeEnabled()) == "true";
     }
 
     async execute(userQuery: string, filter: object) {
@@ -85,35 +65,29 @@ export class RAGService implements IRAGService {
             queries.map(async (query) => this.embeddQuery(query)),
         );
 
-        return this.RAGFusion(embeddedQueries, filter);
+        return await this.RAGFusion(embeddedQueries, filter);
     }
 
     async createHypotheticalDocument(query: string): Promise<string> {
         if (!this.isHyDEEnabled()) return;
 
-        const hydeModel = await this.getHyDEModel();
-
-        return await this.openAIService.chat(
-            [staticPrompts.createHyDEInstruction, this.createMessage(query)],
-            hydeModel,
-        );
+        return await this.openAIService.chat([
+            staticPrompts.createHyDEInstruction,
+            this.createMessage(query),
+        ]);
     }
 
     async generateQueries(query: string): Promise<string> {
         if (!this.isSQREnabled()) return;
 
-        const sqrModel = await this.getSQRModel();
-
-        return await this.openAIService.chat(
-            [staticPrompts.queryCreationInstruction, this.createMessage(query)],
-            sqrModel,
-        );
+        return await this.openAIService.chat([
+            staticPrompts.queryCreationInstruction,
+            this.createMessage(query),
+        ]);
     }
 
     async embeddQuery(query: string): Promise<number[]> {
-        const embeddingModel = await this.getEmbeddingModel();
-
-        return this.openAIService.getEmbeddings(query, embeddingModel);
+        return this.openAIService.getEmbeddings(query);
     }
 
     async simpleRAG(

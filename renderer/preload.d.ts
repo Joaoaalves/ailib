@@ -48,6 +48,10 @@ declare global {
                 getAll: () => Promise<IConversation[]>;
                 get: (collectionId: string) => Promise<Conversation>;
                 create: (message: IMessage) => Promise<Conversation>;
+                createTitle: (
+                    message: IMessage,
+                    conversationId: number,
+                ) => Promise<Conversation>;
                 delete: (conversationId: number) => void;
                 saveMessage: (
                     conversationId: number,

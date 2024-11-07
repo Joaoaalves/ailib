@@ -21,7 +21,9 @@ export default function ChatRoot({
             (chunk) => {
                 streamMessage(chunk.choices[0]?.delta?.content || "");
             },
-            (result) => {},
+            (result) => {
+                console.log(result);
+            },
             () => setStreamEnd(true),
         );
     }, []);

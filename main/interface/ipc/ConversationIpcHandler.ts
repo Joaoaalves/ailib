@@ -15,9 +15,14 @@ import DeleteConversationUseCase from "@application/usecases/Conversation/Delete
 import ListConversationsUseCase from "@application/usecases/Message/ListConversationsUseCase";
 import GetConversationUseCase from "@application/usecases/Conversation/GetConversationUseCase";
 import AddMessageToConversationUseCase from "@application/usecases/Message/AddMessageToConversationUseCase";
+import UpdateConversationUseCase from "@application/usecases/Conversation/UpdateConversationUseCase";
+import CreateMessageUseCase from "@application/usecases/Message/CreateMessageUseCase";
+import { MessageRepositorySequelize } from "@infra/database/adapters/MessageRepository";
+import { SettingService } from "@infra/services/SettingService";
 
 const settingRepository = new SettingRepositorySequelize();
 const conversationRepository = new ConversationRepositorySequelize();
+const messageRepository = new MessageRepositorySequelize();
 
 const createConversationUseCase = new CreateConversationUseCase(
     conversationRepository,
@@ -34,26 +39,47 @@ const listConversationsUseCase = new ListConversationsUseCase(
 const getConversationUseCase = new GetConversationUseCase(
     conversationRepository,
 );
+
+const createMessageUseCase = new CreateMessageUseCase(messageRepository);
+
+const updateConversationUserCase = new UpdateConversationUseCase(
+    conversationRepository,
+);
+
 const addMessageToConversationUseCase = new AddMessageToConversationUseCase(
     conversationRepository,
 );
 
+const settingService = new SettingService(settingRepository);
+
 // Create Conversation
 ipcMain.handle("createConversation", async (event, message) => {
-    const openAiApiKey = (await settingRepository.findById("openaiAPIKey"))
-        .value;
+    const conversation = await createConversationUseCase.execute({
+        title: "New Chat",
+    });
 
-    const openAIService = new OpenAIService(
-        new OpenAIAdapter(openAiApiKey),
-        settingRepository,
-    );
-
-    const chatService = new ChatService(openAIService, settingRepository);
-
-    const title = await chatService.createChatTitle(message);
-    const conversation = createConversationUseCase.execute({ title });
     return FormatResponseService.formatToJson(conversation);
 });
+
+// Create Conversation Title
+ipcMain.handle(
+    "createConversationTitle",
+    async (event, message, conversationId) => {
+        const openAiApiKey = await settingService.getOpenAIApiKey();
+        const conversationModel = await settingService.getConversationModel();
+
+        const openAiAdapter = new OpenAIAdapter(openAiApiKey);
+        openAiAdapter.setConversationModel(conversationModel);
+
+        const openAIService = new OpenAIService(openAiAdapter, settingService);
+
+        const chatService = new ChatService(openAIService, event.sender);
+
+        const title = await chatService.createChatTitle(message);
+
+        await updateConversationUserCase.execute(conversationId, { title });
+    },
+);
 
 // Get Conversation with Messages
 ipcMain.handle("getConversationMessages", async (event, conversationId) => {
@@ -81,8 +107,7 @@ ipcMain.handle("saveMessage", async (event, conversationId, message) => {
             await getConversationUseCase.execute(conversationId);
 
         if (conversation) {
-            const createdMessage =
-                await createConversationUseCase.execute(message);
+            const createdMessage = await createMessageUseCase.execute(message);
 
             await addMessageToConversationUseCase.execute(
                 conversationId,

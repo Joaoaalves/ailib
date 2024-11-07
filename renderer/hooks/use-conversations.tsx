@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient, useMutation } from "react-query";
-import { IConversation, IMessage } from "shared/types/conversation";
+import { IMessage } from "shared/types/conversation";
 
 const getConversations = async () => {
     const conversations = await window.api.conversation.getAll();
@@ -11,7 +11,10 @@ const deleteConversation = async (conversationId: number) => {
 };
 
 const addConversation = async (message: IMessage) => {
-    return await window.api.conversation.create(message);
+    const conversation = await window.api.conversation.create(message);
+    await window.api.conversation.createTitle(message, conversation.id);
+    console.log("Conversation ", conversation);
+    return conversation;
 };
 
 export function useConversations() {

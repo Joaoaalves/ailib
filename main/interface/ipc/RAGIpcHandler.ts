@@ -13,42 +13,44 @@ import { QDrantService } from "@infra/services/QDrantService";
 
 import { QDrantAdapter } from "@infra/adapters/QDrantAdapter";
 import GetTextChunkUseCase from "@application/usecases/TextChunk/GetTextChunkUseCase";
+import { SettingService } from "@infra/services/SettingService";
 
 const documentRepository = new DocumentRepositorySequelize();
 const textChunkRepository = new TextChunkRepositorySequelize();
 const settingRepository = new SettingRepositorySequelize();
 
-const qdrantService = new QDrantService(new QDrantAdapter(settingRepository));
+const settingService = new SettingService(settingRepository);
+
+const qdrantService = new QDrantService(new QDrantAdapter(settingService));
 
 const getDocumentUseCase = new GetDocumentUseCase(documentRepository);
 
 const getTextChunkUseCase = new GetTextChunkUseCase(textChunkRepository);
 
 ipcMain.handle("search", async (event, query) => {
-    const openAiApiKey = (await settingRepository.findById("openaiApiKey"))
-        .value;
+    const openAiApiKey = await settingService.getOpenAIApiKey();
+    const embeddingModel = await settingService.getEmbeddingModel();
+
+    const openAiAdapter = new OpenAIAdapter(openAiApiKey);
+    openAiAdapter.setEmbeddingModel(embeddingModel);
 
     const openAIService = new OpenAIService(
         new OpenAIAdapter(openAiApiKey),
-        settingRepository,
+        settingService,
     );
 
     const ragService = new RAGService(
         openAIService,
         qdrantService,
-        settingRepository,
+        settingService,
     );
-
-    const embeddingModel = await settingRepository.findById("embeddingModel");
 
     const relevantQueries = await ragService.generateQueries(query);
 
     const queries = [query, ...relevantQueries];
 
     const embeddedQueries = await Promise.all(
-        queries.map((query) =>
-            openAIService.getEmbeddings(query, embeddingModel.value),
-        ),
+        queries.map((query) => openAIService.getEmbeddings(query)),
     );
 
     const RAGResult = await ragService.RAGFusion(embeddedQueries);
