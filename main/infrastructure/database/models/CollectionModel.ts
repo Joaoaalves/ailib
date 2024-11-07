@@ -14,7 +14,7 @@ interface CollectionInstance
     extends Model<CollectionAttributes, CollectionCreationAttributes> {
     id: number;
     name: string;
-    addDocument: (document: typeof Document) => Promise<void>;
+    addDocument: (document: Model) => Promise<void>;
 }
 
 const CollectionModel = db.define<CollectionInstance>(

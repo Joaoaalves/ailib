@@ -33,13 +33,10 @@ export class CollectionRepositorySequelize implements CollectionRepository {
         await CollectionModel.destroy({ where: { id } });
     }
 
-    async addDocument(collectionId: number, document: Document): Promise<void> {
-        const collectionData = await CollectionModel.findByPk(collectionId);
-        const collection = new Collection(collectionData);
-
-        collection.addDocument(document);
-        this.update(collection.id, collection);
-        // // @ts-expect-error
-        // await collection.addDocument(document);
+    async addDocument(collectionId: number, documentId: number): Promise<void> {
+        const collection = await CollectionModel.findByPk(collectionId);
+        const document = await DocumentModel.findByPk(documentId);
+        console.log("Adding document to collection");
+        await collection.addDocument(document);
     }
 }
